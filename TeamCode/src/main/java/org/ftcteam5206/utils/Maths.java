@@ -1,3 +1,4 @@
+package org.ftcteam5206.utils;
 /**
  * Created by Cat on 10/30/2016.
  */
@@ -58,26 +59,26 @@ public class Maths {
 
     /* 2D Vector Operations */
     vector2d addV2(vector2d v1, vector2d v2) {
-        double x = v1.getX() + v2.getX();
-        double y = v1.getY() + v2.getY();
+        double x = v1.x + v2.x;
+        double y = v1.y + v2.y;
         return new vector2d(x, y);
     }
 
     vector2d subtractV2(vector2d v1, vector2d v2) {
-        double x = v1.getX() - v2.getX();
-        double y = v1.getY() - v2.getY();
+        double x = v1.x - v2.x;
+        double y = v1.y - v2.y;
         return new vector2d(x, y);
     }
 
     vector2d multiplyV2byScalar(vector2d v, double a) {
-        double x = v.getX() * a;
-        double y = v.getY() * a;
+        double x = v.x * a;
+        double y = v.y * a;
         return new vector2d(x, y);
     }
 
     vector2d multiplyV2byScalar(double a, vector2d v) {
-        double x = v.getX() * a;
-        double y = v.getY() * a;
+        double x = v.x * a;
+        double y = v.y * a;
         return new vector2d(x, y);
     }
     /* End of 2D vector operations */
@@ -86,14 +87,11 @@ public class Maths {
 
 // 2D vectors
 class vector2d {
-    private double x;
-    private double y;
+    public double x;
+    public double y;
 
     public vector2d(double x, double y) {
         this.x = x;
         this.y = y;
     }
-
-    public double getX() { return x; }
-    public double getY() { return y; }
 }
