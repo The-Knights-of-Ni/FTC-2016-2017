@@ -7,8 +7,8 @@ import java.lang.Math;
 import org.ftcteam5206.utils.vectors.*;
 
 public class Maths {
-    final static double pi = 3.1415926535897932384626433832795;
-    final static double e_constant = 2.71828182845904523536;
+    public final static double pi = 3.1415926535897932384626433832795;
+    public final static double e_constant = 2.71828182845904523536;
 
     public static double square(double n) {
         return n*n;

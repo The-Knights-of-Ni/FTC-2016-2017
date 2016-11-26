@@ -86,7 +86,7 @@ public class PlannedPath {
     final static double Kv = 1/RobotConstants.maxDriveVelocity;
     final static double Ka = 0;//TODO: Tune this.
     final static double Kpt = 0;//Feedback disabled
-    vector2d getPWM(double driveTime, double distanceTraveled, double heading){
+    public vector2d getPWM(double driveTime, double distanceTraveled, double heading){
         vector2d pwm = new vector2d(0,0);
         if(driveTime < target_time || Math.abs(distanceTraveled - totalDistance) > RobotConstants.driveDistTolerance){
             vector3d feedForwardNumbers = getData(driveTime);
