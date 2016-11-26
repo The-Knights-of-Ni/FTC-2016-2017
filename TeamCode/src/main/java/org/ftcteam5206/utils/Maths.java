@@ -4,37 +4,38 @@ package org.ftcteam5206.utils;
  */
 
 import java.lang.Math;
+import org.ftcteam5206.utils.vectors.*;
 
 public class Maths {
-    final double pi = 3.1415926535897932384626433832795;
-    final double e_constant = 2.71828182845904523536;
+    final static double pi = 3.1415926535897932384626433832795;
+    final static double e_constant = 2.71828182845904523536;
 
-    public double square(double n) {
+    public static double square(double n) {
         return n*n;
     }
-    public double cube(double n) {
+    public static double cube(double n) {
         return n*n*n;
     }
 
     /* Angle operations */
-    public double degreeToRadians(double degrees) {
+    public static double degreeToRadians(double degrees) {
         return degrees*2.0*pi/360.0;
     }
 
-    public double radiansToDegrees(double radians) {
+    public static double radiansToDegrees(double radians) {
         return radians*360.0/(2.0*pi);
     }
 
-    public double getDifferenceRadians(double from, double to) {
+    public static double getDifferenceRadians(double from, double to) {
         return to-from;
     }
 
-    public double signedNormalizedDegrees(double degrees) {
+    public static double signedNormalizedDegrees(double degrees) {
         // NOTE: this can return both -180 and +180, the sign will be unchanged for these angles
         return degrees - 360 * Math.floor(degrees/360+0.5);
     }
 
-    double boundAngleNegPiToPiRadians(double angle) {
+    public static double boundAngleNegPiToPiRadians(double angle) {
         // Naive algorithm
         while (angle >= pi) {
             angle -= 2.0 * pi;
@@ -45,7 +46,7 @@ public class Maths {
         return angle;
     }
 
-    double boundAngle0to2PiRadians(double angle) {
+    public static double boundAngle0to2PiRadians(double angle) {
         // Naive algorithm
         while (angle >= 2.0 * pi) {
             angle -= 2.0 * pi;
@@ -58,40 +59,29 @@ public class Maths {
     /* End of angle operations */
 
     /* 2D Vector Operations */
-    vector2d addV2(vector2d v1, vector2d v2) {
+    public static vector2d addV2(vector2d v1, vector2d v2) {
         double x = v1.x + v2.x;
         double y = v1.y + v2.y;
         return new vector2d(x, y);
     }
 
-    vector2d subtractV2(vector2d v1, vector2d v2) {
+    public static vector2d subtractV2(vector2d v1, vector2d v2) {
         double x = v1.x - v2.x;
         double y = v1.y - v2.y;
         return new vector2d(x, y);
     }
 
-    vector2d multiplyV2byScalar(vector2d v, double a) {
+    public static vector2d multiplyV2byScalar(vector2d v, double a) {
         double x = v.x * a;
         double y = v.y * a;
         return new vector2d(x, y);
     }
 
-    vector2d multiplyV2byScalar(double a, vector2d v) {
+    public static vector2d multiplyV2byScalar(double a, vector2d v) {
         double x = v.x * a;
         double y = v.y * a;
         return new vector2d(x, y);
     }
     /* End of 2D vector operations */
 
-}
-
-// 2D vectors
-class vector2d {
-    public double x;
-    public double y;
-
-    public vector2d(double x, double y) {
-        this.x = x;
-        this.y = y;
-    }
 }
