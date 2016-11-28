@@ -54,8 +54,7 @@ public class RobotName {
         intake.setPower(0);
         redacted.setPower(0);
 
-        // Set all motors to run without encoders.
-        // May want to use RUN_USING_ENCODERS if encoders are installed.
+        // Set all motors to run with encoders.
         leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
