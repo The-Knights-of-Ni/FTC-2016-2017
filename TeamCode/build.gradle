@@ -13,3 +13,11 @@
 
 // Include common definitions from above.
 apply from: '../build.common.gradle'
+
+dependencies {
+    compile project(path: ':libraries:opencv')
+}
+android {
+    compileSdkVersion 23
+    buildToolsVersion '23.0.3'
+}

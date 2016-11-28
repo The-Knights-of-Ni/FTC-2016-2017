@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:opencv="http://schemas.android.com/apk/res-auto"
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
@@ -82,102 +83,149 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </RelativeLayout>
   <!-- end of black bar -->
 
-  <include layout="@layout/header"
-           android:id="@+id/included_header"/>
-
-  <RelativeLayout
-    android:id="@+id/RelativeLayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:keepScreenOn="true"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin" >
-
-    <TextView
-      android:id="@+id/textNetworkConnectionStatus"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:visibility="invisible"
-      android:text="" />
-
-    <TextView
-      android:id="@+id/textRobotStatus"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_below="@+id/textNetworkConnectionStatus"
-      android:visibility="invisible"
-      android:text="" />
-
-    <TextView
-      android:id="@+id/textOpMode"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_below="@+id/textRobotStatus"
-      android:visibility="invisible"
-      android:text="" />
-
-    <FrameLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_below="@+id/textOpMode"
-      android:layout_above="@+id/textGamepad1">
-
-      <LinearLayout
-          android:id="@+id/cameraMonitorViewId"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:orientation="vertical"
-          />
-
-      <!-- When visible, the error message will overlay and thus partially
-           obscure part of the camera monitor. We make this trade off so as to
-           allow for a bigger camera monitor view in the common case when the
-           error is not in fact present
-        -->
-        <TextView
-            android:id="@+id/textErrorMessage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:visibility="invisible"
-            android:textColor="#990000"
-            android:textStyle="bold"/>
-
-    </FrameLayout>
-
-    <TextView
-      android:id="@+id/textGamepad1"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_above="@+id/textGamepad2"
-      android:visibility="invisible"
-      android:text="" />
-
-    <TextView
-      android:id="@+id/textGamepad2"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_alignParentBottom="true"
-      android:visibility="invisible"
-      android:text="" />
-
-    <TextView
-      android:id="@+id/textRemoteProgrammingMode"
+    <RelativeLayout
+      android:id="@+id/RelativeLayout"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:background="#ff0066B3"
-      android:gravity="center"
-      android:textColor="#ffffffff"
-      android:textSize="40sp"
-      android:textStyle="bold"
-      android:visibility="invisible"
-      android:text="" />
+      android:keepScreenOn="true"
+      android:paddingBottom="@dimen/activity_vertical_margin"
+      android:paddingLeft="@dimen/activity_horizontal_margin"
+      android:paddingRight="@dimen/activity_horizontal_margin"
+      android:paddingTop="@dimen/activity_vertical_margin" >
 
-  </RelativeLayout>
+      <TextView
+        android:id="@+id/textNetworkConnectionStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:text="" />
 
-  <WebView
+      <TextView
+        android:id="@+id/textRobotStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textNetworkConnectionStatus"
+        android:visibility="invisible"
+        android:text="" />
+
+      <TextView
+        android:id="@+id/textOpMode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textRobotStatus"
+        android:visibility="invisible"
+        android:text="" />
+
+      <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textOpMode"
+        android:layout_above="@+id/textGamepad1">
+
+        <LinearLayout
+            android:id="@+id/cameraMonitorViewId"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            />
+
+        <!-- When visible, the error message will overlay and thus partially
+             obscure part of the camera monitor. We make this trade off so as to
+             allow for a bigger camera monitor view in the common case when the
+             error is not in fact present
+          -->
+          <TextView
+              android:id="@+id/textErrorMessage"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text=""
+              android:visibility="invisible"
+              android:textColor="#990000"
+              android:textStyle="bold"/>
+
+      </FrameLayout>
+
+      <TextView
+        android:id="@+id/textGamepad1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/textGamepad2"
+        android:visibility="invisible"
+        android:text="" />
+
+      <TextView
+        android:id="@+id/textGamepad2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible"
+        android:text="" />
+
+      <TextView
+        android:id="@+id/textRemoteProgrammingMode"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ff0066B3"
+        android:gravity="center"
+        android:textColor="#ffffffff"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        android:text="" />
+
+      <org.opencv.android.JavaCameraView
+          android:layout_width="fill_parent"
+          android:id="@+id/surfaceView"
+          android:layout_height="200dp"
+          android:layout_above="@+id/textGamepad1"
+          android:layout_alignParentStart="true"
+          opencv:show_fps="true"/>
+
+      <SeekBar
+          android:id="@+id/lowerThreshold"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_above="@+id/upperThreshold"/>
+
+      <SeekBar
+          android:id="@+id/upperThreshold"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_above="@+id/surfaceView" />
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/perimeterThreshold"
+            android:layout_above="@id/lowerThreshold"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/lowerThresholdText"
+            android:layout_above="@+id/upperThresholdText"
+            android:text="lower threshold text"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/upperThresholdText"
+            android:layout_above="@+id/lowerThreshold"
+            android:text="upper threshold text"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/perimeterThresholdText"
+            android:layout_above="@+id/lowerThresholdText" />
+
+
+    </RelativeLayout>
+
+    <include layout="@layout/header"
+           android:id="@+id/included_header"/>
+
+    <WebView
     android:id="@+id/webViewBlocksRuntime"
     android:layout_width="1dp"
     android:layout_height="1dp" />
