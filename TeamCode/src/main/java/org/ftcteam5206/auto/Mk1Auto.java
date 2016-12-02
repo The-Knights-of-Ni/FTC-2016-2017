@@ -10,7 +10,8 @@ import org.ftcteam5206.utils.*;
 import org.ftcteam5206.utils.vectors.*;
 
 /**
- * Created by Dev on 11/25/2016.
+ * Mk 1 Autonomous
+ * Get both beacons + score 2 balls in 10s.
  */
 @Autonomous(name="Mk1 Autonomous")
 public class Mk1Auto extends LinearOpMode{
@@ -27,6 +28,13 @@ public class Mk1Auto extends LinearOpMode{
         telemetry.addData("Status", "IMU Calibrating");
         telemetry.update();
         robot.imuCalibrate();
+
+        Drive drive = new Drive(robot.leftDrive, robot.rightDrive, runtime);
+        Launcher launcher = new Launcher(robot.launcher, robot.hood, runtime);
+        Intake intake = new Intake(robot.intake, runtime);
+        Transport transport = new Transport(robot.leftTransport, robot.rightTransport, robot.transportIn, robot.transportOut, runtime);
+        BeaconPusher beaconPusher = new BeaconPusher(robot.beaconPusher, runtime);
+        Cap cap = new Cap(robot.capRelease, robot.forkRelease, robot.clasp, runtime);
 
         waitForStart();
         runtime.reset();
