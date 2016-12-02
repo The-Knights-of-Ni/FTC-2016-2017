@@ -21,4 +21,8 @@ public final class RobotConstants {
     public final static double distPerRev = wheelRadius*2*pi;
     public final static double driveTicksToDist = drivePPR*distPerRev;
 
+    //LAUNCHER
+    public final static int launcherGearRatio = 2;
+    public final static int launcherPPR = neverRestPPR*launcherGearRatio;
+
 }

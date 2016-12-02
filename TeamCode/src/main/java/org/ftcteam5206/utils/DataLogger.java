@@ -13,7 +13,7 @@ public class DataLogger {
     //TODO: See if this needs its own thread.
 
     public static void dataLog(String s, Object o, Context c){
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
         //TODO: Add write logic.
         
         try {
