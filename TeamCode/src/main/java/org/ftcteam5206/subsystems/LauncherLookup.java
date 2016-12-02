@@ -1,4 +1,4 @@
-/**
+package org.ftcteam5206.subsystems; /**
  * Created by Cat on 10/30/2016.
  * Purpose: takes in distance from launcher to goal, outputs appropriate hood angle and RPM based on data set
  * Assumptions: data file has equal intervals between each successive distance, has only numerical values in the file
@@ -7,7 +7,7 @@
 import java.io.*;
 import java.util.*;
 
-public class LauncherFramework {
+public class LauncherLookup {
 
     // Reads data from file (of sorted distances) into a HashMap
     // @return a HashMap<Double, double[]> where the keys are distances and values are arrays of angles & RPM

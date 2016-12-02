@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Handles shots and lines up
  * Create one of these in each opmode you want to use the launcher in.
  */
-
+//TODO: Integrate Hood, Sensors, Lookup Table, etc. (basically everything)
 public class Launcher {
     public DcMotor launcher;
     public Servo hood;
@@ -18,6 +18,6 @@ public class Launcher {
     public Launcher(DcMotor launcher, Servo hood, ElapsedTime OpModeTime){
         this.launcher = launcher;
         this.hood = hood;
-        FlywheelController flywheel = new FlywheelController(launcher, OpModeTime);
+        Flywheel flywheel = new Flywheel(launcher, OpModeTime);
     }
 }

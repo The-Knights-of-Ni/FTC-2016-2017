@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.ftcteam5206.auto;
 
 /**
  * Created by tarunsingh on 10/30/16.
@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.R;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;

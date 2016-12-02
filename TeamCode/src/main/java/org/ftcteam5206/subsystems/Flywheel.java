@@ -7,17 +7,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Created by Dev on 12/1/2016.
  */
 
-public class FlywheelController {
+public class Flywheel {
     /*
     Set launcher motor. Does not have exclusive control, might need to make it respect state machine.
     TODO: Feedforward
     TODO: Location Based Spin up
     TODO: Make this a motion planned thing to save on battery (The way DC motors work might mean this is stupid)
     Ramp up at full power, ramp down to sustain rpm
-     */
+    */
     DcMotor launcher;
     ElapsedTime OpModeTime;
-    public FlywheelController(DcMotor launcher, ElapsedTime OpModeTime){
+    public Flywheel(DcMotor launcher, ElapsedTime OpModeTime){
         this.launcher = launcher;//Hook actual motor to this class for simplicity.
         this.OpModeTime = OpModeTime;
     }
@@ -32,7 +32,7 @@ public class FlywheelController {
         double timeSinceLastCall = OpModeTime.seconds() - lastCallTime;
         double currentRPM = revolutions/(timeSinceLastCall/60);
         double rpmError = targetRPM - currentRPM;
-        launcher.setPower(kpLauncher*rpmError + launcher.getPower());//P control,  pretty stupid.
+        launcher.setPower(kpLauncher*rpmError + launcher.getPower());//FIXME: P control,  pretty stupid.
         lastCallTicks = launcher.getCurrentPosition();//Need to wrap if this gets big
         lastCallTime = OpModeTime.seconds();
     }
