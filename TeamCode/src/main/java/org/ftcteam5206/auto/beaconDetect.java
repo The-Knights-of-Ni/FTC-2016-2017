@@ -138,7 +138,7 @@ public class beaconDetect extends LinearOpMode implements CameraBridgeViewBase.C
             //also find the center of the blob of redness
             //if there are no red contours, skip this step
             Moments redMoments = Imgproc.moments(red);
-            double redCenter = 0
+            double redCenter = 0;
             int redSelector = 0;
             if(redContourList.size() != 0) {
                 //find the largest red contour

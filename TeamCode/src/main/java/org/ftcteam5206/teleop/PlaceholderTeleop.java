@@ -1,6 +1,7 @@
 package org.ftcteam5206.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import org.ftcteam5206.hardwareDriveBot;
 
 /**
  * Created by Dev on 12/1/2016.
@@ -51,8 +52,11 @@ public class PlaceholderTeleop extends OpMode{
             // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
             left = -gamepad1.left_stick_y;
             right = -gamepad1.right_stick_y;
-            robot.lMotor.setPower(left);
-            robot.rMotor.setPower(right);
+
+            //THIS IS COMMENTED OUT BECAUSE I DON'T FEEL LIKE FIXING THE HARADWARE MAPS RIGHT NOW
+            //FIX THIS WHEN WE HAVE A NON PLACEHOLDER PROGRAM HERE
+            //robot.leftDrive.setPower(left);
+            //robot.rightDrive.setPower(right);
 
             // Send telemetry message to signify robot running;
             telemetry.addData("left",  "%.2f", left);

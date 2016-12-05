@@ -32,15 +32,33 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.ftcteam5206.teleop;
 
+import android.graphics.Color;
+
+import org.ftcteam5206.hardwareDriveBot;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.robot.Robot;
+import com.qualcomm.robotcore.util.Hardware;
+import com.qualcomm.robotcore.util.Range;
 
-import org.ftcteam5206.teleop.hardwareDriveBot;
 
 //copied template from PushbotTeleopTank_Interative.java
 
 @TeleOp(name="DriveBot_test", group="DriveBot")
 public class driveBot extends OpMode{
+    //variables for controlling the robot
+    double left;
+    double right;
+    double pusher;
+    final double servoLeft = 0.1;
+    final double servoRight = 0.84;
+    float hsvValues[] = {0F,0F,0F};
+    double rawValue;
+    double nRawValue;
+
 
     /* Declare OpMode members. */
     hardwareDriveBot robot = new hardwareDriveBot();
@@ -50,9 +68,7 @@ public class driveBot extends OpMode{
      */
     @Override
     public void init() {
-        /* Initialize the hardware variables.
-         * The init() method of the hardware class does all the work here
-         */
+
         robot.init(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
@@ -72,6 +88,7 @@ public class driveBot extends OpMode{
      */
     @Override
     public void start() {
+        robot.colorSensor.enableLed(true);
     }
 
     /*
@@ -79,18 +96,37 @@ public class driveBot extends OpMode{
      */
     @Override
     public void loop() {
-        double left;
-        double right;
-
         // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
-        left = -gamepad1.left_stick_y;
-        right = -gamepad1.right_stick_y;
-        robot.lMotor.setPower(left);
-        robot.rMotor.setPower(right);
+        left = -gamepad1.left_stick_y/2;
+        right = -gamepad1.right_stick_y/2;
+        robot.lfMotor.setPower(left);
+        robot.lbMotor.setPower(left);
+        robot.rfMotor.setPower(right);
+        robot.rbMotor.setPower(right);
+
+        //set the position of the button pusher servo
+        if(gamepad1.right_bumper)
+            pusher = servoRight;
+        else if(gamepad1.left_bumper)
+            pusher = servoLeft;
+        robot.buttonPusher.setPosition(pusher);
+
+        //get the HSV values from the color sensor
+        Color.RGBToHSV(robot.colorSensor.red() * 8, robot.colorSensor.green() * 8, robot.colorSensor.blue() * 8, hsvValues);
+        //get light values from ODS
+        nRawValue = robot.odsSensor.getLightDetected();
+        rawValue = robot.odsSensor.getRawLightDetected();
 
         // Send telemetry message to signify robot running;
         telemetry.addData("left",  "%.2f", left);
         telemetry.addData("right", "%.2f", right);
+        telemetry.addData("Servo", "%.2f", pusher);
+        telemetry.addData("Hue", "%.2f", hsvValues[0]);
+        telemetry.addData("Sat", "%.2f", hsvValues[1]);
+        telemetry.addData("Val", "%.2f", hsvValues[2]);
+        telemetry.addData("Raw", "%.2f", rawValue);
+        telemetry.addData("nonRaw", "%.2f", nRawValue);
+
         updateTelemetry(telemetry);
     }
 
