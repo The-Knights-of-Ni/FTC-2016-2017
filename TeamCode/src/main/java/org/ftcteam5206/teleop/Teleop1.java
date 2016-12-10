@@ -76,7 +76,7 @@ public class Teleop1 extends LinearOpMode{
 
         // Send telemetry message to signify robot running;
         telemetry.addData("left",  "%.2f", left);
-        telemetry.addData("right", "%.2f", right;
+        telemetry.addData("right", "%.2f", right);
         updateTelemetry(telemetry);
 
     }
@@ -116,7 +116,9 @@ public class Teleop1 extends LinearOpMode{
             robot.rightTransport.setDirection(Servo.Direction.REVERSE);
             robot.transportOut.setDirection(Servo.Direction.FORWARD);
         }
-        else if (gamePad2.toggle(Button.Buttons.LEFT_STICK_BUTTON))
+
+        //SOMEONE SHOULD ADD THE PROPER CODE HERE
+        //else if (gamePad2.toggle(Button.Buttons.LEFT_STICK_BUTTON))
     }
 
     public void updateForks(RobotName robot, Button gamePad1, Button gamePad2)
@@ -147,6 +149,18 @@ public class Teleop1 extends LinearOpMode{
         else if (!gamePad1.toggle(Button.Buttons.RIGHT_BUMPER))
         {
             robot.capRelease.setPosition(0.5);
+        }
+    }
+
+    public void updateBeaconPusher (RobotName robot, Button gamePad1, Button gamePad2){
+        if (gamePad2.toggle(Button.Buttons.Y)){
+            if (robot.beaconPusher.getPosition() < 0.5){
+                robot.beaconPusher.setPosition(0.9);
+            }
+            else {
+                robot.beaconPusher.setPosition(0.1);
+            }
+
         }
     }
 
@@ -188,6 +202,7 @@ public class Teleop1 extends LinearOpMode{
                     updateForks(robot, pad1, pad2);
                     updateCappRelease(robot, pad1, pad2);
                     updateClasp(robot, gamepad1, gamepad2);
+                    updateBeaconPusher(robot, pad1, pad2);
                     nextState = robotState.DRIVING;
                     break;
                 case INTAKE:

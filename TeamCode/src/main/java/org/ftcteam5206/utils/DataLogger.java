@@ -15,7 +15,7 @@ public class DataLogger {
     public static void dataLog(String s, Object o, Context c){
         throw new UnsupportedOperationException();
         //TODO: Add write logic.
-        
+        /*
         try {
             FileOutputStream fOut = c.openFileOutput("file name here", 1);
             OutputStreamWriter writer = new OutputStreamWriter(fOut);
@@ -23,6 +23,7 @@ public class DataLogger {
         } catch(Exception e){
             e.printStackTrace();
         }
+        */
     }
 
 }
