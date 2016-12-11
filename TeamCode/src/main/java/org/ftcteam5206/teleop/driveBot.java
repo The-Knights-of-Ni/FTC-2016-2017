@@ -52,13 +52,14 @@ public class driveBot extends OpMode{
     //variables for controlling the robot
     double left;
     double right;
+    /*
     double pusher;
     final double servoLeft = 0.1;
     final double servoRight = 0.84;
     float hsvValues[] = {0F,0F,0F};
     double rawValue;
     double nRawValue;
-
+    */
 
     /* Declare OpMode members. */
     hardwareDriveBot robot = new hardwareDriveBot();
@@ -88,7 +89,7 @@ public class driveBot extends OpMode{
      */
     @Override
     public void start() {
-        robot.colorSensor.enableLed(true);
+        //robot.colorSensor.enableLed(true);
     }
 
     /*
@@ -104,6 +105,7 @@ public class driveBot extends OpMode{
         robot.rfMotor.setPower(right);
         robot.rbMotor.setPower(right);
 
+        /*
         //set the position of the button pusher servo
         if(gamepad1.right_bumper)
             pusher = servoRight;
@@ -116,16 +118,16 @@ public class driveBot extends OpMode{
         //get light values from ODS
         nRawValue = robot.odsSensor.getLightDetected();
         rawValue = robot.odsSensor.getRawLightDetected();
-
+        */
         // Send telemetry message to signify robot running;
         telemetry.addData("left",  "%.2f", left);
         telemetry.addData("right", "%.2f", right);
-        telemetry.addData("Servo", "%.2f", pusher);
-        telemetry.addData("Hue", "%.2f", hsvValues[0]);
-        telemetry.addData("Sat", "%.2f", hsvValues[1]);
-        telemetry.addData("Val", "%.2f", hsvValues[2]);
-        telemetry.addData("Raw", "%.2f", rawValue);
-        telemetry.addData("nonRaw", "%.2f", nRawValue);
+        //telemetry.addData("Servo", "%.2f", pusher);
+        //telemetry.addData("Hue", "%.2f", hsvValues[0]);
+        //telemetry.addData("Sat", "%.2f", hsvValues[1]);
+        //telemetry.addData("Val", "%.2f", hsvValues[2]);
+        //telemetry.addData("Raw", "%.2f", rawValue);
+        //telemetry.addData("nonRaw", "%.2f", nRawValue);
 
         updateTelemetry(telemetry);
     }

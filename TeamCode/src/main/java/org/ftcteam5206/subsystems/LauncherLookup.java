@@ -1,4 +1,14 @@
-package org.ftcteam5206.subsystems; /**
+package org.ftcteam5206.subsystems;
+/**
+ * Created by Cat on 10/30/2016.
+ * Purpose: takes in distance from launcher to goal, outputs appropriate hood angle and RPM based on data set
+ * Assumptions: data file has equal intervals between each successive distance, has only numerical values in the file
+ */
+
+import java.io.*;
+import java.util.*;
+
+/**
  * Created by Cat on 10/30/2016.
  * Purpose: takes in distance from launcher to goal, outputs appropriate hood angle and RPM based on data set
  * Assumptions: data file has equal intervals between each successive distance, has only numerical values in the file
@@ -8,10 +18,11 @@ import java.io.*;
 import java.util.*;
 
 public class LauncherLookup {
+    private static HashMap data;
 
     // Reads data from file (of sorted distances) into a HashMap
-    // @return a HashMap<Double, double[]> where the keys are distances and values are arrays of angles & RPM
-    public HashMap readFile() {
+    // stores a HashMap<Double, double[]> in the global variable data where the keys are distances and values are arrays of angles & RPM
+    static {
         // Format: distance, hood angle, RPM
         String csvFile = "launchervalues.txt"; // Change file name/path
         BufferedReader reader;
@@ -20,7 +31,7 @@ public class LauncherLookup {
 
         // Create a HashMap: distance --> {hood angle, RPM}
         HashMap<Double, double[]> map = new HashMap<Double, double[]>();
-        
+
         try {
             reader = new BufferedReader(new FileReader(csvFile));
             while ((line = reader.readLine()) != null) {
@@ -33,8 +44,8 @@ public class LauncherLookup {
         } catch (Exception e) {
             // e.printStackTrace();
         }
-        
-        return map;
+
+        data = map;
     }
 
     /* @param distance, a double that indicates the amount of distance from the turet to goal
@@ -42,7 +53,7 @@ public class LauncherLookup {
     public double[] outputAngleRPM(double distance) {
         double[] output = new double[2]; // Outputs [angle, RPM]
 
-        HashMap<Double, double[]> map = readFile();
+        HashMap<Double, double[]> map = data;
 
         Set set = map.entrySet();
         Iterator i = set.iterator();
@@ -70,7 +81,7 @@ public class LauncherLookup {
                 Distance = 14, interval = 10
                 Dist1 = 10, Angle1 = 30, rpm1 = 100
                 Dist2 = 20, Angle2 = 40, rpm2 = 200
-                Outputted angle = (14-10)/10 * 30 + (20-14)/10 * 40 = 36 
+                Outputted angle = (14-10)/10 * 30 + (20-14)/10 * 40 = 36
                 Outputted rpm = (14-10)/10 * 100 + (20-14)/10 * 200 = 160 */
                 double interval = 10.0; // difference between distance values in the data set
                 double diff1 = (distance - dist1)/interval;
@@ -87,8 +98,10 @@ public class LauncherLookup {
 
 //    // For debugging purposes
 //    public static void main(String[] args) {
-//      System.out.println(Arrays.toString(outputAngleRPM(25)));
+//      System.out.println(Arrays.toString(outputAngleRPM(14)));
 //    }
 
 }
+
+
 

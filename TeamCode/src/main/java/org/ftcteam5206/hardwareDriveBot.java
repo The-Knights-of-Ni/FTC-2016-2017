@@ -37,18 +37,18 @@ public class hardwareDriveBot {
         // Save reference to Hardware map
         hwMap = ahwMap;
 
-        // Define and Initialize Motors
-        lfMotor = hwMap.dcMotor.get("motor3");
+        // Define and Initialize Motors clockwise starting with right front
         rfMotor = hwMap.dcMotor.get("motor1");
-        lbMotor = hwMap.dcMotor.get("motor2");
-        rbMotor = hwMap.dcMotor.get("motor4");
+        rbMotor = hwMap.dcMotor.get("motor2");
+        lbMotor = hwMap.dcMotor.get("motor3");
+        lfMotor = hwMap.dcMotor.get("motor4");
 
         //Define Servos
-        buttonPusher = hwMap.servo.get("servo");
+        //buttonPusher = hwMap.servo.get("servo");
 
         //Define Sensors
-        odsSensor = hwMap.opticalDistanceSensor.get("ods");
-        colorSensor = hwMap.colorSensor.get("color");
+        //odsSensor = hwMap.opticalDistanceSensor.get("ods");
+        //colorSensor = hwMap.colorSensor.get("color");
 
         //reverse selected motors
         lfMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -62,13 +62,13 @@ public class hardwareDriveBot {
         rbMotor.setPower(0);
         lbMotor.setPower(0);
 
-        buttonPusher.setPosition(0.1);
+        //buttonPusher.setPosition(0.1);
 
         // Set all motors to run with encoders.
-        lfMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rfMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        lbMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rbMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lfMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rfMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lbMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rbMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
 }
