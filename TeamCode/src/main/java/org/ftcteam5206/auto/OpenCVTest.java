@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-@Autonomous(name = "OpenCVTest", group = "Test Code")
+//@Autonomous(name = "OpenCVTest", group = "Test Code")
 public class OpenCVTest extends LinearOpMode implements CameraBridgeViewBase.CvCameraViewListener2 {
     private CameraBridgeViewBase OpenCvCameraView;
     private Mat rgba;
@@ -66,17 +66,17 @@ public class OpenCVTest extends LinearOpMode implements CameraBridgeViewBase.CvC
             }
         };
 
-        OpenCvCameraView = (CameraBridgeViewBase) ((Activity) hardwareMap.appContext).findViewById(R.id.surfaceView);
+        //OpenCvCameraView = (CameraBridgeViewBase) ((Activity) hardwareMap.appContext).findViewById(R.id.surfaceView);
         OpenCvCameraView.setVisibility(CameraBridgeViewBase.VISIBLE);
         OpenCvCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_BACK);
         OpenCvCameraView.setCvCameraViewListener(this);
 
-        lowerThreshold = (SeekBar) ((Activity) hardwareMap.appContext).findViewById(R.id.lowerThreshold);
+      /*  lowerThreshold = (SeekBar) ((Activity) hardwareMap.appContext).findViewById(R.id.lowerThreshold);
         upperThreshold = (SeekBar) ((Activity) hardwareMap.appContext).findViewById(R.id.upperThreshold);
         perimeterThreshold = (SeekBar) ((Activity) hardwareMap.appContext).findViewById(R.id.perimeterThreshold);
         lowerThresholdText = (TextView) ((Activity) hardwareMap.appContext).findViewById(R.id.lowerThresholdText);
         upperThresholdText = (TextView) ((Activity) hardwareMap.appContext).findViewById(R.id.upperThresholdText);
-        perimeterThresholdText = (TextView) ((Activity) hardwareMap.appContext).findViewById(R.id.perimeterThresholdText);
+        perimeterThresholdText = (TextView) ((Activity) hardwareMap.appContext).findViewById(R.id.perimeterThresholdText); */
 
 
         lowerThreshold.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {

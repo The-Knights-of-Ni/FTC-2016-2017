@@ -173,6 +173,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         android:visibility="invisible"
         android:text="" />
 
+        <FrameLayout
+            android:id="@+id/camera_preview"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Detect Beacon"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/beaconDetectButton"/>
+      <!--
       <org.opencv.android.JavaCameraView
           android:layout_width="fill_parent"
           android:id="@+id/surfaceView"
@@ -180,6 +193,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           android:layout_above="@+id/textGamepad1"
           android:layout_alignParentStart="true"
           opencv:show_fps="true"/>
+
+      <TextureView
+          android:layout_width="fill_parent"
+          android:layout_height="200dp"
+          android:id="@+id/textureView"
+          android:layout_above="@+id/textGamepad1"
+          android:layout_alignParentStart="true"/>
+
 
       <SeekBar
           android:id="@+id/lowerThreshold"
@@ -218,7 +239,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             android:layout_height="wrap_content"
             android:id="@+id/perimeterThresholdText"
             android:layout_above="@+id/lowerThresholdText" />
-
+        -->
 
     </RelativeLayout>
 

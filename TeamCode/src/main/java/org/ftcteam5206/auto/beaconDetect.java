@@ -69,7 +69,7 @@ public class beaconDetect extends LinearOpMode implements CameraBridgeViewBase.C
             }
         };
 
-        cameraPreview = (CameraBridgeViewBase) ((Activity) hardwareMap.appContext).findViewById(R.id.surfaceView);
+        //cameraPreview = (CameraBridgeViewBase) ((Activity) hardwareMap.appContext).findViewById(R.id.surfaceView);
         cameraPreview.setVisibility(CameraBridgeViewBase.VISIBLE);
         cameraPreview.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_BACK);
         cameraPreview.setCvCameraViewListener(this);
@@ -115,7 +115,7 @@ public class beaconDetect extends LinearOpMode implements CameraBridgeViewBase.C
 
             //my debugging methods are always incredibly professional
             //qLog.d("debug", "HIHIHIHIHIHIHIHIHIHIHIHI");
-
+            Log.d("Beacon", "Starting beacon detection");
             src.release();
             src = inputFrame.rgba();
 
@@ -180,12 +180,12 @@ public class beaconDetect extends LinearOpMode implements CameraBridgeViewBase.C
 
             //this may need to be changed based upon camera orientation
             //image is assumed to be upside down
+            Log.d("Beacon", "Red: " + redCenter + ", Blue: " + blueCenter);
             if(redCenter > blueCenter)
                 Log.d("Beacon", "Red is Left, Blue is Right");
             else
                 Log.d("Beacon", "Blue is Left, Red is Right");
-
-
+            cameraPreview.disableView();
             return src;
         }
 }
