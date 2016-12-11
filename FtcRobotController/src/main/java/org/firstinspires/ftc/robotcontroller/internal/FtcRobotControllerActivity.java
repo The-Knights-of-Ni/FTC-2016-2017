@@ -142,8 +142,12 @@ public class FtcRobotControllerActivity extends Activity {
   protected FtcEventLoop eventLoop;
   protected Queue<UsbDevice> receivedUsbAttachmentNotifications;
 
-  public Camera camera;
-  public CameraPreview cameraPreview;
+  public static Camera camera;
+  public static CameraPreview cameraPreview;
+    public static Camera.PictureCallback picture;
+
+    public static boolean pictureHasBeenTaken = false;
+    public static byte[] data;
 
   protected class RobotRestarter implements Restarter {
 
@@ -206,7 +210,6 @@ public class FtcRobotControllerActivity extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     RobotLog.vv(TAG, "onCreate()");
-
     receivedUsbAttachmentNotifications = new ConcurrentLinkedQueue<UsbDevice>();
     eventLoop = null;
 
@@ -241,10 +244,11 @@ public class FtcRobotControllerActivity extends Activity {
     camera = getCameraInstance();cameraPreview = new CameraPreview(context, camera);
     FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
     preview.addView(cameraPreview);
-    final Camera.PictureCallback picture = new Camera.PictureCallback() {
+    picture = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-            BeaconDetector.detectBeacon(data);
+            pictureHasBeenTaken = true;
+            FtcRobotControllerActivity.data = data;
         }
     };
     Button captureButton = (Button) findViewById(R.id.beaconDetectButton);
@@ -585,5 +589,9 @@ public class FtcRobotControllerActivity extends Activity {
         mediaFile = new File(mediaStorageDir.getPath() + File.separator
                 + "IMG_" + timeStamp + ".jpg");
         return mediaFile;
+    }
+
+    public static void takePicture(){
+        camera.takePicture(null, null, picture);
     }
 }

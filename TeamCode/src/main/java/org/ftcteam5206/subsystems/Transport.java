@@ -1,5 +1,6 @@
 package org.ftcteam5206.subsystems;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -10,17 +11,23 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 public class Transport {
-    public Servo leftTransport;
-    public Servo rightTransport;
-    public Servo transportIn;
-    public Servo transportOut;
+    public DcMotor transportMotor;
     public ElapsedTime OpModeTime;
+    public boolean isRunning = false;
 
-    public Transport(Servo leftTransport, Servo rightTransport, Servo transportIn, Servo transportOut, ElapsedTime opModeTime) {
-        this.leftTransport = leftTransport;
-        this.rightTransport = rightTransport;
-        this.transportIn = transportIn;
-        this.transportOut = transportOut;
+    public double transportSpeed = 0.5;
+
+    public Transport(DcMotor transportMotor, ElapsedTime opModeTime) {
+        this.transportMotor = transportMotor;
         OpModeTime = opModeTime;
+    }
+
+    public void toggleTransport(){
+        if(isRunning){
+            transportMotor.setPower(0);
+        } else {
+            transportMotor.setPower(transportSpeed);
+        }
+        isRunning = !isRunning;
     }
 }

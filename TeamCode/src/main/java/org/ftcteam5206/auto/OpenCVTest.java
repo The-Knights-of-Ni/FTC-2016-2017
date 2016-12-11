@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-//@Autonomous(name = "OpenCVTest", group = "Test Code")
+@Autonomous(name = "OpenCVTest", group = "Test Code")
 public class OpenCVTest extends LinearOpMode implements CameraBridgeViewBase.CvCameraViewListener2 {
     private CameraBridgeViewBase OpenCvCameraView;
     private Mat rgba;

@@ -38,7 +38,7 @@ public class RobotName {
         rightDrive  = hwMap.dcMotor.get("rdrive");
         launcher    = hwMap.dcMotor.get("launcher");
         intake = hwMap.dcMotor.get("intake");
-        redacted = hwMap.dcMotor.get("redacted");
+        redacted = hwMap.dcMotor.get("transport");
         //Set Directions
         leftDrive.setDirection(DcMotor.Direction.FORWARD);
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
