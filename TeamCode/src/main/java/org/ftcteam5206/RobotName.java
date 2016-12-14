@@ -16,6 +16,7 @@ public class RobotName {
     public DcMotor launcher = null;
     public DcMotor intake = null;
     public DcMotor redacted = null;
+    public DcMotor transportMotor = null;
 
     public Servo beaconPusher = null;
     public Servo leftTransport = null;

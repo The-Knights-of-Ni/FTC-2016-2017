@@ -32,7 +32,7 @@ public class Mk1Auto extends LinearOpMode{
         Drive drive = new Drive(robot.leftDrive, robot.rightDrive, runtime);
         Launcher launcher = new Launcher(robot.launcher, robot.hood, runtime);
         Intake intake = new Intake(robot.intake, runtime);
-        Transport transport = new Transport(robot.leftTransport, robot.rightTransport, robot.transportIn, robot.transportOut, runtime);
+        Transport transport = new Transport(robot.transportMotor, runtime);
         BeaconPusher beaconPusher = new BeaconPusher(robot.beaconPusher, runtime);
         Cap cap = new Cap(robot.capRelease, robot.forkRelease, robot.clasp, runtime);
 

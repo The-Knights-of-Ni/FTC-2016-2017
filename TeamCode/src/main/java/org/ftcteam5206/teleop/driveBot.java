@@ -50,8 +50,9 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name="DriveBot_test", group="DriveBot")
 public class driveBot extends OpMode{
     //variables for controlling the robot
-    double left;
-    double right;
+    double drive;
+    double turn;
+    int driverMode;
     /*
     double pusher;
     final double servoLeft = 0.1;
@@ -97,13 +98,58 @@ public class driveBot extends OpMode{
      */
     @Override
     public void loop() {
-        // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
-        left = -gamepad1.left_stick_y/2;
-        right = -gamepad1.right_stick_y/2;
-        robot.lfMotor.setPower(left);
-        robot.lbMotor.setPower(left);
-        robot.rfMotor.setPower(right);
-        robot.rbMotor.setPower(right);
+
+        // Run wheels in not tank mode
+        //set motor speeds
+        if (gamepad1.right_bumper = true){
+            driverMode = 1;
+        } else if (gamepad1.left_bumper = true){
+            driverMode = 2;
+        } else {
+            driverMode = 0;
+        }
+
+
+        switch (driverMode){
+            //speed mode
+            case 1:
+                drive = -gamepad1.left_stick_y;
+                turn = gamepad1.left_stick_x;
+                telemetry.addData("DriveMode", "%.2f", (double)driverMode);
+                break;
+            //slow mode
+            case 2:
+                drive = -gamepad1.left_stick_y/4;
+                turn = gamepad1.left_stick_x/4;
+                telemetry.addData("DriveMode", "%.2f", (double)driverMode);
+                break;
+            //normal mode
+            default:
+                drive = -gamepad1.left_stick_y/2;
+                turn = gamepad1.left_stick_x/2;
+                telemetry.addData("DriveMode", "%.2f", (double)driverMode);
+                break;
+        }
+
+        //set motor powers
+        //going forwards
+        if(drive > 0){
+            robot.lfMotor.setPower(drive + turn);
+            robot.lbMotor.setPower(drive + turn);
+            robot.rfMotor.setPower(drive - turn);
+            robot.rbMotor.setPower(drive - turn);
+        }
+        //going backwards or stopped, doesn't really matter if it's stopped
+        //but I didn't want to do extra if statements
+        else {
+            robot.lfMotor.setPower(drive - turn);
+            robot.lbMotor.setPower(drive - turn);
+            robot.rfMotor.setPower(drive + turn);
+            robot.rbMotor.setPower(drive + turn);
+        }
+
+
+
 
         /*
         //set the position of the button pusher servo
@@ -120,8 +166,10 @@ public class driveBot extends OpMode{
         rawValue = robot.odsSensor.getRawLightDetected();
         */
         // Send telemetry message to signify robot running;
-        telemetry.addData("left",  "%.2f", left);
-        telemetry.addData("right", "%.2f", right);
+        telemetry.addData("left",  "%.2f", -drive);
+        telemetry.addData("right", "%.2f", turn);
+        telemetry.addData("rb", gamepad1.right_bumper);
+        telemetry.addData("lb", gamepad1.left_bumper);
         //telemetry.addData("Servo", "%.2f", pusher);
         //telemetry.addData("Hue", "%.2f", hsvValues[0]);
         //telemetry.addData("Sat", "%.2f", hsvValues[1]);
