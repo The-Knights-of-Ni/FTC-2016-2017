@@ -52,6 +52,8 @@ public class driveBot extends OpMode{
     //variables for controlling the robot
     double drive;
     double turn;
+    double rPower;
+    double lPower;
     int driverMode;
     /*
     double pusher;
@@ -101,9 +103,9 @@ public class driveBot extends OpMode{
 
         // Run wheels in not tank mode
         //set motor speeds
-        if (gamepad1.right_bumper = true){
+        if (gamepad1.left_bumper = true){
             driverMode = 1;
-        } else if (gamepad1.left_bumper = true){
+        } else if (gamepad1.right_bumper = true){
             driverMode = 2;
         } else {
             driverMode = 0;
@@ -132,24 +134,13 @@ public class driveBot extends OpMode{
         }
 
         //set motor powers
-        //going forwards
-        if(drive > 0){
-            robot.lfMotor.setPower(drive + turn);
-            robot.lbMotor.setPower(drive + turn);
-            robot.rfMotor.setPower(drive - turn);
-            robot.rbMotor.setPower(drive - turn);
-        }
-        //going backwards or stopped, doesn't really matter if it's stopped
-        //but I didn't want to do extra if statements
-        else {
-            robot.lfMotor.setPower(drive - turn);
-            robot.lbMotor.setPower(drive - turn);
-            robot.rfMotor.setPower(drive + turn);
-            robot.rbMotor.setPower(drive + turn);
-        }
+        rPower = drive - turn/3;
+        lPower = drive + turn/3;
 
-
-
+        robot.lfMotor.setPower(lPower);
+        robot.lbMotor.setPower(lPower);
+        robot.rfMotor.setPower(rPower);
+        robot.rbMotor.setPower(rPower);
 
         /*
         //set the position of the button pusher servo
@@ -166,10 +157,10 @@ public class driveBot extends OpMode{
         rawValue = robot.odsSensor.getRawLightDetected();
         */
         // Send telemetry message to signify robot running;
-        telemetry.addData("left",  "%.2f", -drive);
-        telemetry.addData("right", "%.2f", turn);
-        telemetry.addData("rb", gamepad1.right_bumper);
-        telemetry.addData("lb", gamepad1.left_bumper);
+        telemetry.addData("drive",  "%.2f", -drive);
+        telemetry.addData("turn", "%.2f", turn);
+        //telemetry.addData("rb", gamepad1.right_bumper);
+        //telemetry.addData("lb", gamepad1.left_bumper);
         //telemetry.addData("Servo", "%.2f", pusher);
         //telemetry.addData("Hue", "%.2f", hsvValues[0]);
         //telemetry.addData("Sat", "%.2f", hsvValues[1]);
