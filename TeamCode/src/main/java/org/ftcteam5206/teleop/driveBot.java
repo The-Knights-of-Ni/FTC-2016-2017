@@ -121,21 +121,21 @@ public class driveBot extends OpMode{
                 break;
             //slow mode
             case 2:
-                drive = -gamepad1.left_stick_y/4;
-                turn = gamepad1.left_stick_x/4;
+                drive = -gamepad1.left_stick_y;
+                turn = gamepad1.left_stick_x;
                 telemetry.addData("DriveMode", "%.2f", (double)driverMode);
                 break;
             //normal mode
             default:
-                drive = -gamepad1.left_stick_y/2;
-                turn = gamepad1.left_stick_x/2;
+                drive = -gamepad1.left_stick_y;
+                turn = gamepad1.left_stick_x;
                 telemetry.addData("DriveMode", "%.2f", (double)driverMode);
                 break;
         }
 
         //set motor powers
-        rPower = drive - turn/3;
-        lPower = drive + turn/3;
+        rPower = drive - turn/2.5;
+        lPower = drive + turn/2.5;
 
         robot.lfMotor.setPower(lPower);
         robot.lbMotor.setPower(lPower);
