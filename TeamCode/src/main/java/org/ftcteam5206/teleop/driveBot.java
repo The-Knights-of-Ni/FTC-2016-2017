@@ -32,17 +32,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.ftcteam5206.teleop;
 
-import android.graphics.Color;
-
 import org.ftcteam5206.hardwareDriveBot;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.robot.Robot;
-import com.qualcomm.robotcore.util.Hardware;
-import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 //copied template from PushbotTeleopTank_Interative.java
@@ -50,20 +43,86 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name="DriveBot_test", group="DriveBot")
 public class driveBot extends OpMode{
     //variables for controlling the robot
+    ElapsedTime runTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    double lastTime;
+    double dTime;
     double drive;
     double turn;
     double rPower;
     double lPower;
     int driverMode;
-    /*
-    double pusher;
-    final double servoLeft = 0.1;
-    final double servoRight = 0.84;
-    float hsvValues[] = {0F,0F,0F};
-    double rawValue;
-    double nRawValue;
-    */
 
+    public void Drive(){
+        // Run wheels in not tank mode
+        //set motor speeds
+        if (gamepad1.right_bumper){
+            driverMode = 2;
+        } else if (gamepad1.left_bumper){
+            driverMode = 1;
+        } else {
+            driverMode = 0;
+        }
+
+        switch (driverMode){
+            //speed mode
+            case 1:
+                drive = -gamepad1.left_stick_y;
+                turn = gamepad1.left_stick_x/2.3;
+                telemetry.addData("DriveMode", "%.2f", (double)driverMode);
+                break;
+            //slow mode
+            case 2:
+                drive = -gamepad1.left_stick_y/4;
+                turn = gamepad1.left_stick_x/3;
+                telemetry.addData("DriveMode", "%.2f", (double)driverMode);
+                break;
+            //normal mode
+            default:
+                drive = -gamepad1.left_stick_y/2;
+                turn = gamepad1.left_stick_x/2.75;
+                telemetry.addData("DriveMode", "%.2f", (double)driverMode);
+                break;
+        }
+
+        //set motor powers
+        rPower = drive - turn;
+        lPower = drive + turn;
+
+        robot.lfMotor.setPower(lPower);
+        robot.lbMotor.setPower(lPower);
+        robot.rfMotor.setPower(rPower);
+        robot.rbMotor.setPower(rPower);
+
+        // Send telemetry message to signify robot running;
+        telemetry.addData("drive",  "%.2f", -drive);
+        telemetry.addData("turn", "%.2f", turn);
+
+    }
+
+    public void Score (){
+        //set intake and shooter mode
+        if(gamepad1.x){
+            //shoot
+            telemetry.addData("Say", "Shooting");
+        } else  if (gamepad1.a){
+            //spin up
+            telemetry.addData("Say", "Spinning up");
+        } else if (gamepad1.b){
+            //run transport
+            telemetry.addData("Say", "Transporting");
+        } else if (gamepad1.y){
+            //run intake and tranport
+            telemetry.addData("Say", "Intaking");
+        }
+    }
+
+    public void Navigate(){
+        //find change in time since last execution
+        time = runTime.time();
+        dTime = time - lastTime;
+        lastTime = time;
+        telemetry.addData("dtime","%.2f", dTime);
+    }
     /* Declare OpMode members. */
     hardwareDriveBot robot = new hardwareDriveBot();
 
@@ -100,74 +159,9 @@ public class driveBot extends OpMode{
      */
     @Override
     public void loop() {
-
-        // Run wheels in not tank mode
-        //set motor speeds
-        if (gamepad1.left_bumper = true){
-            driverMode = 1;
-        } else if (gamepad1.right_bumper = true){
-            driverMode = 2;
-        } else {
-            driverMode = 0;
-        }
-
-
-        switch (driverMode){
-            //speed mode
-            case 1:
-                drive = -gamepad1.left_stick_y;
-                turn = gamepad1.left_stick_x;
-                telemetry.addData("DriveMode", "%.2f", (double)driverMode);
-                break;
-            //slow mode
-            case 2:
-                drive = -gamepad1.left_stick_y;
-                turn = gamepad1.left_stick_x;
-                telemetry.addData("DriveMode", "%.2f", (double)driverMode);
-                break;
-            //normal mode
-            default:
-                drive = -gamepad1.left_stick_y;
-                turn = gamepad1.left_stick_x;
-                telemetry.addData("DriveMode", "%.2f", (double)driverMode);
-                break;
-        }
-
-        //set motor powers
-        rPower = drive - turn/2.5;
-        lPower = drive + turn/2.5;
-
-        robot.lfMotor.setPower(lPower);
-        robot.lbMotor.setPower(lPower);
-        robot.rfMotor.setPower(rPower);
-        robot.rbMotor.setPower(rPower);
-
-        /*
-        //set the position of the button pusher servo
-        if(gamepad1.right_bumper)
-            pusher = servoRight;
-        else if(gamepad1.left_bumper)
-            pusher = servoLeft;
-        robot.buttonPusher.setPosition(pusher);
-
-        //get the HSV values from the color sensor
-        Color.RGBToHSV(robot.colorSensor.red() * 8, robot.colorSensor.green() * 8, robot.colorSensor.blue() * 8, hsvValues);
-        //get light values from ODS
-        nRawValue = robot.odsSensor.getLightDetected();
-        rawValue = robot.odsSensor.getRawLightDetected();
-        */
-        // Send telemetry message to signify robot running;
-        telemetry.addData("drive",  "%.2f", -drive);
-        telemetry.addData("turn", "%.2f", turn);
-        //telemetry.addData("rb", gamepad1.right_bumper);
-        //telemetry.addData("lb", gamepad1.left_bumper);
-        //telemetry.addData("Servo", "%.2f", pusher);
-        //telemetry.addData("Hue", "%.2f", hsvValues[0]);
-        //telemetry.addData("Sat", "%.2f", hsvValues[1]);
-        //telemetry.addData("Val", "%.2f", hsvValues[2]);
-        //telemetry.addData("Raw", "%.2f", rawValue);
-        //telemetry.addData("nonRaw", "%.2f", nRawValue);
-
+        Drive();
+        Score();
+        Navigate();
         updateTelemetry(telemetry);
     }
 
