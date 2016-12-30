@@ -16,7 +16,7 @@ public class hardwareDriveBot {
     public DcMotor rbMotor = null;
 
     //Servos
-    public Servo buttonPusher = null;
+    public Servo intake = null;
 
     //sensors
     public OpticalDistanceSensor odsSensor;
@@ -44,7 +44,7 @@ public class hardwareDriveBot {
         lfMotor = hwMap.dcMotor.get("motor4");
 
         //Define Servos
-        //buttonPusher = hwMap.servo.get("servo");
+        intake = hwMap.servo.get("intake");
 
         //Define Sensors
         //odsSensor = hwMap.opticalDistanceSensor.get("ods");

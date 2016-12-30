@@ -30,7 +30,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.ftcteam5206.teleop;
+package org.ftcteam5206;
 
 import org.ftcteam5206.hardwareDriveBot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -51,6 +51,8 @@ public class driveBot extends OpMode{
     double rPower;
     double lPower;
     int driverMode;
+    boolean intake = false;
+    boolean intakelast = false;
 
     public void Drive(){
         // Run wheels in not tank mode
@@ -100,7 +102,7 @@ public class driveBot extends OpMode{
     }
 
     public void Score (){
-        //set intake and shooter mode
+        //transport and shooter mode
         if(gamepad1.x){
             //shoot
             telemetry.addData("Say", "Shooting");
@@ -110,9 +112,17 @@ public class driveBot extends OpMode{
         } else if (gamepad1.b){
             //run transport
             telemetry.addData("Say", "Transporting");
-        } else if (gamepad1.y){
-            //run intake and tranport
-            telemetry.addData("Say", "Intaking");
+        }
+        //code for running the intake
+        if (gamepad1.y == true) {
+            robot.intake.setPosition(1);
+            telemetry.addData("Say", "Intake On");
+        }else if(gamepad1.dpad_down == true){
+            robot.intake.setPosition(0);
+            telemetry.addData("Say", "Intake Reverse");
+        } else {
+            robot.intake.setPosition(0.5);
+            telemetry.addData("Say", "Intake Off");
         }
     }
 
@@ -131,9 +141,7 @@ public class driveBot extends OpMode{
      */
     @Override
     public void init() {
-
         robot.init(hardwareMap);
-
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");    //
         updateTelemetry(telemetry);
@@ -159,9 +167,9 @@ public class driveBot extends OpMode{
      */
     @Override
     public void loop() {
+        Navigate();
         Drive();
         Score();
-        Navigate();
         updateTelemetry(telemetry);
     }
 
