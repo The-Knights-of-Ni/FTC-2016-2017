@@ -25,8 +25,6 @@ public class hardwareDriveBot {
     //hardware map
     HardwareMap hwMap = null;
 
-    //private ElapsedTime period = new ElapsedTime();
-
     /* Constructor */
     public hardwareDriveBot() {
 
@@ -52,8 +50,8 @@ public class hardwareDriveBot {
 
         //reverse selected motors
         lfMotor.setDirection(DcMotor.Direction.REVERSE);
-        rfMotor.setDirection(DcMotor.Direction.FORWARD);
         lbMotor.setDirection(DcMotor.Direction.REVERSE);
+        rfMotor.setDirection(DcMotor.Direction.FORWARD);
         rbMotor.setDirection(DcMotor.Direction.FORWARD);
 
         // Set all motors to zero power
@@ -63,7 +61,7 @@ public class hardwareDriveBot {
         lbMotor.setPower(0);
 
         //buttonPusher.setPosition(0.1);
-
+        
         // Set all motors to run with encoders.
         lfMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rfMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
