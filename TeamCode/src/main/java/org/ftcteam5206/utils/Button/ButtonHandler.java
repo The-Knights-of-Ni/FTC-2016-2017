@@ -17,28 +17,28 @@ public class ButtonHandler //Might want to extend gamepad instead of passing to 
     //TODO: Trigger -> ButtonHandler option
     private int currentByte = 0; //Set these in update function
     private int previousByte = 0;//Can assume this is 0 at init.
+    public float rightTriggerCurrent;
+    public float rightTriggerPrevious;
+    public float leftTriggerCurrent;
+    public float leftTriggerPrevious;
     final int offset = 40;//Location of the ButtonHandler storage integer in Gamepad.java
     public Buttons buttons;
 
     public ButtonHandler() {
         this.buttons = new Buttons();
     }
-
-    /**
-     * Storage for locations and statuses of each button we need. You can use setStatus if
-     * you want the toggle/other function to start as true.
-     */
-
+    public double hairTrigger = 0.9;
+    public void setHairTriggerLevel(double level){
+        hairTrigger = level;
+    }
 
     //Check the state of a button inside of the button integer.
-    private static boolean getState(int btn, int bits)
+    private boolean getState(int btn, int bits)
     {
         if(((bits >>> (btn-1)) & 1) != 0)
             return true;
-        else
-            return false;
+        return false;
     }
-
     //============================ Start of actual button uses ================================
 
     /**
@@ -48,7 +48,8 @@ public class ButtonHandler //Might want to extend gamepad instead of passing to 
      */
     public boolean press(Button btn)
     {
-        if(getState(btn.value, currentByte))
+        if(getState(btn.value, currentByte) || ((btn.value == 16) && (leftTriggerCurrent >= hairTrigger))
+                || ((btn.value == 17) && (rightTriggerCurrent >= hairTrigger)))
             return true;
         return false;
     }
@@ -60,6 +61,8 @@ public class ButtonHandler //Might want to extend gamepad instead of passing to 
      */
     public boolean singlePress(Button btn)
     {
+        if(btn.value == 16) return (leftTriggerCurrent >= hairTrigger) && (leftTriggerPrevious < hairTrigger);
+        if(btn.value == 17) return (rightTriggerCurrent >= hairTrigger) && (rightTriggerPrevious < hairTrigger);
         return (getState(btn.value, currentByte) == true) && (getState(btn.value, previousByte) == false);
     }
 
@@ -70,7 +73,10 @@ public class ButtonHandler //Might want to extend gamepad instead of passing to 
      */
     public boolean toggle(Button btn)
     {
-        if((getState(btn.value, currentByte) == true) && (getState(btn.value, previousByte) == false))//If there's a change and it's from low to high, flip it, if not, keep toggle the same.
+        if(((getState(btn.value, currentByte) == true) && (getState(btn.value, previousByte) == false))
+                || ((btn.value == 16) && (leftTriggerCurrent >= hairTrigger) && (leftTriggerPrevious < hairTrigger))
+                || ((btn.value == 17) && (rightTriggerCurrent >= hairTrigger) && (rightTriggerPrevious < hairTrigger))
+                )//If there's a change and it's from low to high, flip it, if not, keep toggle the same.
             btn.status = !btn.status;
         return btn.status;
     }
@@ -107,9 +113,14 @@ public class ButtonHandler //Might want to extend gamepad instead of passing to 
      * To implement, call object.updateButtons(gamepad#.toByteArray()) in a try/catch inside the loop.
      * @param joystick The byte array from a gamepad.
      */
-    public int updateButtons(byte[] joystick) //TODO: Add lookup method that checks if currentByte == sum of a button combination and then makes it 0 if needed.
+    public int updateButtons(byte[] joystick, float leftTrigger, float rightTrigger) //TODO: Add lookup method that checks if currentByte == sum of a button combination and then makes it 0 if needed.
     {
         previousByte = currentByte;
+        leftTriggerPrevious = leftTriggerCurrent;
+        rightTriggerPrevious = rightTriggerCurrent;
+        leftTriggerCurrent = leftTrigger;
+        rightTriggerCurrent = rightTrigger;
+
         currentByte = ByteBuffer.wrap(joystick, 42, 4).getInt();
         return currentByte;
     }

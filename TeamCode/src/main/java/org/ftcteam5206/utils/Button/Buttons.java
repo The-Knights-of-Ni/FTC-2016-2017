@@ -22,6 +22,8 @@ public class Buttons {
     public Button BACK;
     public Button LEFT_BUMPER;
     public Button RIGHT_BUMPER;
+    public Button LEFT_TRIGGER;
+    public Button RIGHT_TRIGGER;
     public Buttons() {
         LEFT_STICK_BUTTON = new Button(15, false);
         RIGHT_STICK_BUTTON = new Button(14, false);
@@ -38,5 +40,7 @@ public class Buttons {
         BACK  = new Button(3, false);
         LEFT_BUMPER  = new Button(2, false);
         RIGHT_BUMPER  = new Button(1, false);
+        LEFT_TRIGGER = new Button(16, false);//Assigned 16 to LT
+        RIGHT_TRIGGER = new Button(17, false);//Assigned 17 to RT
     }
 }

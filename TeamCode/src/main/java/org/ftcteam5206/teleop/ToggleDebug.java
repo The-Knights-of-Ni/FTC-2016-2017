@@ -19,18 +19,24 @@ public class ToggleDebug extends LinearOpMode {
         while (opModeIsActive())
         {
             try {
-                telemetry.addData("Pad 1", pad1.updateButtons(gamepad1.toByteArray()));
+                telemetry.addData("Pad 1", pad1.updateButtons(gamepad1.toByteArray(), gamepad1.left_trigger, gamepad1.right_trigger));
             } catch (RobotCoreException e) {
                 e.printStackTrace();
             }
             try {
-                telemetry.addData("Pad 2", pad2.updateButtons(gamepad2.toByteArray()));
+                telemetry.addData("Pad 2", pad2.updateButtons(gamepad2.toByteArray(), gamepad2.left_trigger, gamepad2.right_trigger));
             } catch (RobotCoreException e) {
                 e.printStackTrace();
             }
+            if(pad1.singlePress(pad1.buttons.A)) pad1.setHairTriggerLevel(0.9);
+            if(pad1.singlePress(pad1.buttons.X)) pad1.setHairTriggerLevel(0.1);
 
-            telemetry.addData("Pad 1 A", pad1.toggle(pad1.buttons.A));
-            telemetry.addData("Pad 2 A", pad2.toggle(pad2.buttons.A));
+            telemetry.addData("Pad 1 RT", pad1.rightTriggerCurrent);
+            telemetry.addData("Pad 1 RT Tog", pad1.toggle(pad1.buttons.RIGHT_TRIGGER));
+            telemetry.addData("Pad 2 RT", pad2.rightTriggerCurrent);
+            telemetry.addData("Pad 2 RT Tog", pad2.toggle(pad2.buttons.RIGHT_TRIGGER));
+            telemetry.addData("Pad 1 Hair Trigger", pad1.hairTrigger);
+
 
             telemetry.update();
         }

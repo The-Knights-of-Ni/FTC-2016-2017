@@ -176,12 +176,12 @@ public class Teleop1 extends LinearOpMode{
         while (opModeIsActive())
         {
             try {
-                pad1.updateButtons(gamepad1.toByteArray());
+                pad1.updateButtons(gamepad1.toByteArray(), gamepad1.left_trigger, gamepad1.right_trigger);
             } catch (RobotCoreException e) {
                 e.printStackTrace();
             }
             try {
-                pad2.updateButtons(gamepad2.toByteArray());
+                pad2.updateButtons(gamepad2.toByteArray(), gamepad2.left_trigger, gamepad2.right_trigger);
             } catch (RobotCoreException e) {
                 e.printStackTrace();
             }
