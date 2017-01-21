@@ -17,6 +17,17 @@ public class Maths {
         return n*n*n;
     }
 
+    public static double clamp(double n, double lower, double upper){
+        if(n < lower) return lower;
+        if(n > upper) return upper;
+        return n;
+    }
+
+    public static double quadraticBezier(double t, double p0, double p1, double p2)//https://www.desmos.com/calculator/4ut4smjf8g
+    {
+        if(t < 0) t *= -1;//Produces unexpected results if you pass negatives
+        return (1-t)*(1-t)*p0 + 2*t*(1-t)*p1 + t*t*p2;
+    }
     /* Angle operations */
     public static double degreeToRadians(double degrees) {
         return degrees*2.0*pi/360.0;

@@ -11,18 +11,19 @@ public final class RobotConstants {
      */
     //MOTOR
     public final static int neverRestPPR = 7;
+    public final static int neverRestCPR = 4;
     //DRIVE
     public final static int wheelRadius = 2;
     public final static double maxDriveVelocity = 18;
     public final static double maxDriveAcceleration = 10;
     public final static double driveDistTolerance = 0.5;
     public final static int driveGearRatio = 20;
-    public final static int drivePPR = neverRestPPR*driveGearRatio;
+    public final static int drivePPR = neverRestCPR*neverRestPPR*driveGearRatio;
     public final static double distPerRev = wheelRadius*2*pi;
     public final static double driveTicksToDist = drivePPR*distPerRev;
 
     //LAUNCHER
     public final static int launcherGearRatio = 2;
-    public final static int launcherPPR = neverRestPPR*launcherGearRatio;
+    public final static int launcherPPR = neverRestCPR*neverRestPPR*launcherGearRatio;
 
 }

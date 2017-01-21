@@ -27,22 +27,23 @@ TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import org.ftcteam5206.RobotName;
+import org.ftcteam5206.KingArthur;
 import org.ftcteam5206.utils.Button.ButtonHandler;
 
 
 //copied template from PushbotTeleopTank_Interative.java
-
+@Disabled
 @TeleOp(name="Dri3veBot_test", group="DriveBot")
 public class Teleop1 extends LinearOpMode{
 
-    RobotName robot = new RobotName();
+    KingArthur robot = new KingArthur();
     ButtonHandler pad1; //TODO: Totally not right.
     public enum robotState
     {
@@ -52,7 +53,7 @@ public class Teleop1 extends LinearOpMode{
     private robotState currentState = robotState.STOPPED;
 
 
-    public void updatePosition(RobotName robot, Gamepad gamepad1, Gamepad gamepad2)
+    public void updatePosition(KingArthur robot, Gamepad gamepad1, Gamepad gamepad2)
     {
         double left  = -gamepad1.left_stick_y + gamepad1.left_stick_x;
         double right = -gamepad1.left_stick_y - gamepad1.left_stick_x;
@@ -75,47 +76,47 @@ public class Teleop1 extends LinearOpMode{
 
     }
 
-    public void updateIntakeForward(RobotName robot, ButtonHandler gamePad1, ButtonHandler gamePad2)
+    public void updateIntakeForward(KingArthur robot, ButtonHandler gamePad1, ButtonHandler gamePad2)
     {
         if (gamePad1.toggle(pad1.buttons.LEFT_STICK_BUTTON))
         {
-            robot.intake.setDirection(DcMotorSimple.Direction.FORWARD);
-            robot.intake.setPower(20);
+         //   robot.intake.setDirection(DcMotorSimple.Direction.FORWARD);
+       //     robot.intake.setPower(20);
         }
         else if (!gamePad1.toggle(pad1.buttons.LEFT_STICK_BUTTON))
         {
-            robot.intake.setPower(0);
+     //       robot.intake.setPower(0);
         }
     }
 
-    public void updateIntakeReverse(RobotName robot, ButtonHandler gamePad1, ButtonHandler gamePad2)
+    public void updateIntakeReverse(KingArthur robot, ButtonHandler gamePad1, ButtonHandler gamePad2)
     {
         if (gamePad1.toggle(pad1.buttons.LEFT_BUMPER))
         {
-            robot.intake.setDirection(DcMotorSimple.Direction.REVERSE);
-            robot.intake.setPower(20);
+           // robot.intake.setDirection(DcMotorSimple.Direction.REVERSE);
+           // robot.intake.setPower(20);
         }
         else if (!gamePad1.toggle(pad1.buttons.LEFT_BUMPER))
         {
-            robot.intake.setPower(0);
+           // robot.intake.setPower(0);
         }
     }
 
-    public void updateTransport(RobotName robot, ButtonHandler gamePad1, ButtonHandler gamePad2)
+    public void updateTransport(KingArthur robot, ButtonHandler gamePad1, ButtonHandler gamePad2)
     {
         if (gamePad2.toggle(pad1.buttons.LEFT_STICK_BUTTON))
         {
-            robot.transportIn.setDirection(Servo.Direction.FORWARD);
-            robot.leftTransport.setDirection(Servo.Direction.FORWARD);
-            robot.rightTransport.setDirection(Servo.Direction.REVERSE);
-            robot.transportOut.setDirection(Servo.Direction.FORWARD);
+           // robot.transportIn.setDirection(Servo.Direction.FORWARD);
+           // robot.leftTransport.setDirection(Servo.Direction.FORWARD);
+           // robot.rightTransport.setDirection(Servo.Direction.REVERSE);
+           // robot.transportOut.setDirection(Servo.Direction.FORWARD);
         }
 
         //SOMEONE SHOULD ADD THE PROPER CODE HERE
         //else if (gamePad2.toggle(pad1.buttons.LEFT_STICK_BUTTON))
     }
 
-    public void updateForks(RobotName robot, ButtonHandler gamePad1, ButtonHandler gamePad2)
+    public void updateForks(KingArthur robot, ButtonHandler gamePad1, ButtonHandler gamePad2)
     {
         if (gamePad1.toggle(pad1.buttons.RIGHT_STICK_BUTTON))
         {
@@ -127,14 +128,14 @@ public class Teleop1 extends LinearOpMode{
         }
     }
 
-    public void updateClasp(RobotName robot, Gamepad pad1, Gamepad pad2)
+    public void updateClasp(KingArthur robot, Gamepad pad1, Gamepad pad2)
     {
         double claspPos = pad1.left_stick_y;
 
         robot.clasp.setPosition(claspPos);
     }
 
-    public void updateCappRelease (RobotName robot, ButtonHandler gamePad1, ButtonHandler gamePad2)
+    public void updateCappRelease (KingArthur robot, ButtonHandler gamePad1, ButtonHandler gamePad2)
     {
         if (gamePad1.toggle(pad1.buttons.RIGHT_BUMPER))
         {
@@ -146,7 +147,7 @@ public class Teleop1 extends LinearOpMode{
         }
     }
 
-    public void updateBeaconPusher (RobotName robot, ButtonHandler gamePad1, ButtonHandler gamePad2){
+    public void updateBeaconPusher (KingArthur robot, ButtonHandler gamePad1, ButtonHandler gamePad2){
         if (gamePad2.toggle(pad1.buttons.Y)){
             if (robot.beaconPusher.getPosition() < 0.5){
                 robot.beaconPusher.setPosition(0.9);

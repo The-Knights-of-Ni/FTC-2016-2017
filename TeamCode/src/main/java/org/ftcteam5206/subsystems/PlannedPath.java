@@ -77,8 +77,8 @@ public class PlannedPath {
             result.y = velocityLimit;
             result.z = 0;
         }
-        return result;
-    }
+    return result;
+}
 
     //TODO: Add Angular Error for Gyro Stabilization
     //TODO: Add derivative term (requires a known dt)

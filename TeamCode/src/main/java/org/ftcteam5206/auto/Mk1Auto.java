@@ -4,9 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.ftcteam5206.RobotName;
+import org.ftcteam5206.KingArthur;
 import org.ftcteam5206.subsystems.*;
-import org.ftcteam5206.utils.*;
 import org.ftcteam5206.utils.vectors.*;
 
 /**
@@ -15,7 +14,7 @@ import org.ftcteam5206.utils.vectors.*;
  */
 @Autonomous(name="Mk1 Autonomous")
 public class Mk1Auto extends LinearOpMode{
-    RobotName robot = new RobotName();
+    KingArthur robot = new KingArthur();
     ElapsedTime runtime = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {

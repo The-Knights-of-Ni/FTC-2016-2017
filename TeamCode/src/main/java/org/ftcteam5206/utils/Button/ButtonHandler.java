@@ -14,7 +14,6 @@ public class ButtonHandler //Might want to extend gamepad instead of passing to 
     //TODO: Tap - similar to press, maybe not needed (Press that only triggers once)
     //TODO: Combination - true if all buttons pressed
     //TODO: Release - true when released
-    //TODO: Trigger -> ButtonHandler option
     private int currentByte = 0; //Set these in update function
     private int previousByte = 0;//Can assume this is 0 at init.
     public float rightTriggerCurrent;
