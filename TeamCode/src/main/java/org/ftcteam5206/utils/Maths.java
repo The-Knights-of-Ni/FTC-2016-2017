@@ -34,8 +34,10 @@ public class Maths {
     }
 
     public static double smallestSignedAngle(double a, double b){
-        double output = a - b;
-        return (output + 180) % 360 - 180;
+        double output = b - a;
+        if(output > 180) output -= 360;
+        if(output < -180) output += 360;
+        return output;
     }
     /* Angle operations */
     public static double degreeToRadians(double degrees) {
