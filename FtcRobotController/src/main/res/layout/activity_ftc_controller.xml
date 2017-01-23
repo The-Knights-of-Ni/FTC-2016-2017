@@ -185,14 +185,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             android:text="Detect Beacon"
             android:layout_centerHorizontal="true"
             android:id="@+id/beaconDetectButton"/>
-      <!--
+
       <org.opencv.android.JavaCameraView
-          android:layout_width="fill_parent"
-          android:id="@+id/surfaceView"
-          android:layout_height="200dp"
+          android:layout_width="600dp"
+          android:id="@+id/openCvView"
+          android:layout_height="600dp"
           android:layout_above="@+id/textGamepad1"
           android:layout_alignParentStart="true"
           opencv:show_fps="true"/>
+
+      <Button
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:id="@+id/detectBeaconButton"
+          android:layout_below="@+id/openCvView"
+          android:text="Detect Beacon"/>
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Result"
+          android:layout_toRightOf="@+id/detectBeaconButton"
+          android:id="@+id/resultTextView"/>
+
+      <SeekBar
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_below="@+id/resultTextView"
+          android:id="@+id/lowValueSeekBar"/>
+
+      <SeekBar
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_below="@+id/lowValueSeekBar"
+          android:id="@+id/highValueSeekBar"/>
 
       <TextureView
           android:layout_width="fill_parent"
@@ -201,7 +227,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           android:layout_above="@+id/textGamepad1"
           android:layout_alignParentStart="true"/>
 
-
+      <!--
       <SeekBar
           android:id="@+id/lowerThreshold"
           android:layout_width="match_parent"
