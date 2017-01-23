@@ -15,9 +15,13 @@ import org.ftcteam5206.subsystems.Drive;
 import org.ftcteam5206.subsystems.Intake;
 import org.ftcteam5206.subsystems.Launcher;
 import org.ftcteam5206.subsystems.Transport;
+import org.ftcteam5206.utils.Button.Button;
 import org.ftcteam5206.utils.Button.ButtonHandler;
+import org.ftcteam5206.utils.Button.Buttons;
 import org.ftcteam5206.utils.JoystickSmoother;
+import org.ftcteam5206.utils.Maths;
 import org.ftcteam5206.utils.vectors.vector2d;
+import org.ftcteam5206.utils.vectors.vector3d;
 
 @TeleOp(name="TeleOp", group="TeleOP")
 public class Mk2Teleop extends LinearOpMode{
@@ -32,7 +36,7 @@ public class Mk2Teleop extends LinearOpMode{
 
         robot.init(hardwareMap);
         //Init Subsystem Controllers
-        Drive drive = new Drive(robot.leftDrive, robot.rightDrive, runtime);
+        Drive drive = new Drive(robot.leftDrive, robot.rightDrive, robot.imu, runtime);
         Launcher launcher = new Launcher(robot.launcher, robot.hood, runtime);
         Intake intake = new Intake(robot.intakeTransport, runtime);
         Transport transport = new Transport(robot.intakeTransport, runtime);
@@ -40,10 +44,11 @@ public class Mk2Teleop extends LinearOpMode{
 
         waitForStart();
         runtime.reset();
+        //drive.zeroIMU();
 
-
-        while (opModeIsActive())
-        {
+        vector3d orient;
+        boolean driveAutoInitializing = true;
+        while (opModeIsActive()) {
             //Button Try Catch
             try {
                 pad1.updateButtons(gamepad1.toByteArray(), gamepad1.left_trigger, gamepad1.right_trigger);
@@ -52,7 +57,7 @@ public class Mk2Teleop extends LinearOpMode{
                 e.printStackTrace();
             }
             //Drive State Machine
-            switch (drive.getDriveState()){
+            switch (drive.getDriveState()) {
                 case STOPPED:
                     break;
                 case OPEN_LOOP:
@@ -61,8 +66,34 @@ public class Mk2Teleop extends LinearOpMode{
                     drive.leftDrive.setPower(-sticks.x - sticks.y);
                     break;
                 case AUTO:
+                    if (driveAutoInitializing){
+                        drive.absTurn(180);
+                        driveAutoInitializing = false;
+                    }
+                    if(drive.absTurnChecker(10)){
+                        drive.absTurnUpdate();
+                    }
+                    else{
+                        drive.setDriveState(Drive.DriveState.OPEN_LOOP);
+                    }
+
+
                     break;
             }
+            if (pad1.toggle(pad1.buttons.A)){
+                drive.setDriveState(Drive.DriveState.AUTO);
+                driveAutoInitializing = true;
+            }
+            else
+                drive.setDriveState(Drive.DriveState.OPEN_LOOP);
+
+
+            orient = new vector3d(robot.imu.getAngularOrientation().firstAngle, robot.imu.getAngularOrientation().secondAngle, robot.imu.getAngularOrientation().thirdAngle);
+            telemetry.addData("Angle 1", orient.x);
+            telemetry.addData("Robot Yaw", drive.getRobotYaw());
+            telemetry.addData("Angle 2", orient.y);
+            telemetry.addData("Angle 3", orient.z);
+            telemetry.update();
         }
     }
 }

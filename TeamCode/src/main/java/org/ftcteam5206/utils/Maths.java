@@ -28,6 +28,15 @@ public class Maths {
         if(t < 0) t *= -1;//Produces unexpected results if you pass negatives
         return (1-t)*(1-t)*p0 + 2*t*(1-t)*p1 + t*t*p2;
     }
+
+    public static boolean aboutEqual(double a, double b, double tolerance){
+        return (b <= a + tolerance/2 && b >= a - tolerance/2);
+    }
+
+    public static double smallestSignedAngle(double a, double b){
+        double output = a - b;
+        return (output + 180) % 360 - 180;
+    }
     /* Angle operations */
     public static double degreeToRadians(double degrees) {
         return degrees*2.0*pi/360.0;

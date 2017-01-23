@@ -1,5 +1,8 @@
 package org.ftcteam5206;
+import com.qualcomm.hardware.adafruit.BNO055IMU;
+import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -16,7 +19,7 @@ public class KingArthur {
     public DcMotor launcher = null;
     public DcMotor intakeTransport = null;
     public DcMotor redacted = null;
-
+    public BNO055IMU imu = null;
     public Servo beaconPusher = null;
     public Servo forkRelease = null;
     public Servo clasp = null;
@@ -36,8 +39,8 @@ public class KingArthur {
         intakeTransport = hwMap.dcMotor.get("intake");
         redacted = hwMap.dcMotor.get("transport");
         //Set Directions
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightDrive.setDirection(DcMotor.Direction.FORWARD);
         launcher.setDirection(DcMotor.Direction.FORWARD);
         launcher.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         intakeTransport.setDirection(DcMotor.Direction.FORWARD);
@@ -57,11 +60,23 @@ public class KingArthur {
         intakeTransport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         redacted.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Define and initialize ALL installed servos.
-        beaconPusher = hwMap.servo.get("beacon");
-        forkRelease= hwMap.servo.get("fork");
-        clasp = hwMap.servo.get("clasp");
-        hood = hwMap.servo.get("hood");
-        capRelease = hwMap.servo.get("cap");
+        //beaconPusher = hwMap.servo.get("beacon");
+        //forkRelease= hwMap.servo.get("fork");
+        //clasp = hwMap.servo.get("clasp");
+        //hood = hwMap.servo.get("hood");
+        //capRelease = hwMap.servo.get("cap");
+        //TODO: Change these parameters to things we actually like
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = false;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+
+        imu = hwMap.get(BNO055IMU.class, "imu");//Angle 1 is yaw, angle 2 is roll, angle 3 is pitch
+        imu.initialize(parameters);
     }
 
     public void resetEncoders(){
@@ -71,11 +86,11 @@ public class KingArthur {
         intakeTransport.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         redacted.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //Might need an idle/wait here.
-        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        intakeTransport.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        redacted.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        launcher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeTransport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        redacted.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     //TODO: See if we need to wait for tick
 
