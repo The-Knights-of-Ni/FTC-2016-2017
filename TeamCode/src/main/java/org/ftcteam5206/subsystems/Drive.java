@@ -67,7 +67,7 @@ public class Drive {
         }
     }
 
-    double processedTargetAngle;
+    public double processedTargetAngle;
     double targetAngle;
     public void absTurn(double targetAngle){
         this.targetAngle = targetAngle;
@@ -85,7 +85,7 @@ public class Drive {
     }
 
     public boolean absTurnChecker(double tolerance){
-        return Maths.aboutEqual(targetAngle, getRobotYaw(), tolerance);
+        return !Maths.aboutEqual(targetAngle, getRobotYaw(), tolerance);
     }
     //TODO: Path Planning, Turning, IMU, Pose Tracking, 2D Motion
 }
