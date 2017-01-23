@@ -15,7 +15,7 @@
 apply from: '../build.common.gradle'
 
 dependencies {
-    compile project(path: ':libraries:opencv')
+    compile project(path: ':libraries:opencv2')
     compile project(':FtcRobotController')
 }
 android {

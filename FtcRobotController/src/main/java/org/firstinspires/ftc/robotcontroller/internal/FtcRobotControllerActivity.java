@@ -239,7 +239,7 @@ public class FtcRobotControllerActivity extends Activity {
       configFile.markClean();
       cfgFileMgr.setActiveConfig(false, configFile);
     }
-
+    /*
     //User-added code
     camera = getCameraInstance();cameraPreview = new CameraPreview(context, camera);
     FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
@@ -258,7 +258,7 @@ public class FtcRobotControllerActivity extends Activity {
             camera.takePicture(null, null, picture);
         }
     });
-
+    */
     textDeviceName = (TextView) findViewById(R.id.textDeviceName);
     textNetworkConnectionStatus = (TextView) findViewById(R.id.textNetworkConnectionStatus);
     textRobotStatus = (TextView) findViewById(R.id.textRobotStatus);
