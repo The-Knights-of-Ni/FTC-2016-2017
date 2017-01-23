@@ -62,8 +62,8 @@ public class Mk2Teleop extends LinearOpMode{
                     break;
                 case OPEN_LOOP:
                     vector2d sticks = JoystickSmoother.smoothJoysticksBezierStyle(new vector2d(gamepad1.left_stick_x, gamepad1.left_stick_y));
-                    drive.rightDrive.setPower(sticks.x - sticks.y);
-                    drive.leftDrive.setPower(-sticks.x - sticks.y);
+                    drive.rightDrive.setPower(-sticks.x - sticks.y);
+                    drive.leftDrive.setPower(sticks.x - sticks.y);
                     break;
                 case AUTO:
                     if (driveAutoInitializing){
