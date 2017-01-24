@@ -142,13 +142,6 @@ public class FtcRobotControllerActivity extends Activity {
   protected FtcEventLoop eventLoop;
   protected Queue<UsbDevice> receivedUsbAttachmentNotifications;
 
-  public static Camera camera;
-  public static CameraPreview cameraPreview;
-    public static Camera.PictureCallback picture;
-
-    public static boolean pictureHasBeenTaken = false;
-    public static byte[] data;
-
   protected class RobotRestarter implements Restarter {
 
     public void requestRestart() {
@@ -239,26 +232,7 @@ public class FtcRobotControllerActivity extends Activity {
       configFile.markClean();
       cfgFileMgr.setActiveConfig(false, configFile);
     }
-    /*
-    //User-added code
-    camera = getCameraInstance();cameraPreview = new CameraPreview(context, camera);
-    FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-    preview.addView(cameraPreview);
-    picture = new Camera.PictureCallback() {
-        @Override
-        public void onPictureTaken(byte[] data, Camera camera) {
-            pictureHasBeenTaken = true;
-            FtcRobotControllerActivity.data = data;
-        }
-    };
-    Button captureButton = (Button) findViewById(R.id.beaconDetectButton);
-    captureButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            camera.takePicture(null, null, picture);
-        }
-    });
-    */
+
     textDeviceName = (TextView) findViewById(R.id.textDeviceName);
     textNetworkConnectionStatus = (TextView) findViewById(R.id.textNetworkConnectionStatus);
     textRobotStatus = (TextView) findViewById(R.id.textRobotStatus);
@@ -561,37 +535,4 @@ public class FtcRobotControllerActivity extends Activity {
       });
     }
   }
-
-    //wtf is with this indenting
-    private Camera getCameraInstance() {
-        Camera camera = null;
-        try {
-            camera = Camera.open();
-        } catch (Exception e) {
-            Log.d("camera", "Camera could not be accessed");
-        }
-        return camera;
-    }
-    private static File getOutputMediaFile() {
-        File mediaStorageDir = new File(
-                Environment
-                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                "MyCameraApp");
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d("MyCameraApp", "failed to create directory");
-                return null;
-            }
-        }
-        // Create a media file name
-        String timeStamp = "";
-        File mediaFile;
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator
-                + "IMG_" + timeStamp + ".jpg");
-        return mediaFile;
-    }
-
-    public static void takePicture(){
-        camera.takePicture(null, null, picture);
-    }
 }

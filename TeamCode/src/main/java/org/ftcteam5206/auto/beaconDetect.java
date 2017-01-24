@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -30,6 +31,7 @@ import java.util.List;
  * Read Tarun's OpenCV test, tried to repurpose it to do beacon color detection
  */
 
+@Disabled
 @Autonomous (name = "beaconDetect", group = "Test Code")
 public class beaconDetect extends LinearOpMode implements CameraBridgeViewBase.CvCameraViewListener2{
 
