@@ -1,9 +1,5 @@
 package org.ftcteam5206.teleop;
 
-/**
- * Created by Dev on 1/20/2017.
- */
-
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -15,11 +11,8 @@ import org.ftcteam5206.subsystems.Drive;
 import org.ftcteam5206.subsystems.Intake;
 import org.ftcteam5206.subsystems.Launcher;
 import org.ftcteam5206.subsystems.Transport;
-import org.ftcteam5206.utils.Button.Button;
 import org.ftcteam5206.utils.Button.ButtonHandler;
-import org.ftcteam5206.utils.Button.Buttons;
 import org.ftcteam5206.utils.JoystickSmoother;
-import org.ftcteam5206.utils.Maths;
 import org.ftcteam5206.utils.vectors.vector2d;
 import org.ftcteam5206.utils.vectors.vector3d;
 
@@ -76,8 +69,6 @@ public class Mk2Teleop extends LinearOpMode{
                     else{
                         drive.setDriveState(Drive.DriveState.OPEN_LOOP);
                     }
-
-
                     break;
             }
             if (pad1.toggle(pad1.buttons.A)){
