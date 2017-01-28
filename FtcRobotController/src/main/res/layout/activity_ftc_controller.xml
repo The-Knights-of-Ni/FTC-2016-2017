@@ -32,6 +32,287 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:opencv="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity"
+    android:focusable="true"
+    android:id="@+id/entire_screen"
+    android:orientation="vertical">
+
+    <!-- black bar on top -->
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="80dp"
+        android:background="@color/cardinal_red">
+
+        <ImageView
+            android:id="@+id/robotIcon"
+            android:src="@drawable/knights_of_ni_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:adjustViewBounds="true"
+            android:layout_margin="1dp"/>
+
+        <TextView
+            android:id="@+id/textDeviceName"
+            android:layout_toEndOf="@id/robotIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:padding="8dp"
+            android:textStyle="bold"
+            android:visibility="invisible"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="The Knights of Ni"
+            android:id="@+id/teamName"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:textColor="@color/white"
+            android:paddingTop="8dp"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/teamNumber"
+            android:text="52O6"
+            android:layout_below="@+id/teamName"
+            android:layout_centerHorizontal="true"
+            android:textSize="40sp"
+            android:textColor="@color/white"/>
+
+        <ImageButton
+            android:id="@+id/menu_buttons"
+            android:scaleType="fitXY"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_menu"
+            android:background="@color/cardinal_red"
+            android:padding="15dp"
+            android:adjustViewBounds="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="10dp"/>
+
+    </RelativeLayout>
+    <!-- end of black bar -->
+
+    <include layout="@layout/header"
+        android:id="@+id/included_header"/>
+
+    <RelativeLayout
+        android:id="@+id/RelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:keepScreenOn="true"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin" >
+
+        <TextView
+            android:id="@+id/textNetworkConnectionStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:text="" />
+
+        <TextView
+            android:id="@+id/textRobotStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textNetworkConnectionStatus"
+            android:visibility="invisible"
+            android:text="" />
+
+        <TextView
+            android:id="@+id/textOpMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textRobotStatus"
+            android:visibility="invisible"
+            android:text="" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@+id/textOpMode"
+            android:id="@+id/radioGroup">
+            <RadioButton android:id="@+id/radio_pirates"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Red"/>
+            <RadioButton android:id="@+id/radio_ninjas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Blue"/>
+        </RadioGroup>
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekBar1"
+            android:layout_below="@+id/radioGroup"/>
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekBar2"
+            android:layout_below="@+id/seekBar1"/>
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekBar3"
+            android:layout_below="@+id/seekBar2"/>
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekBar4"
+            android:layout_below="@+id/seekBar3"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/seekBar4">
+            <!--
+            <LinearLayout
+                android:id="@+id/cameraMonitorViewId"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                />
+            -->
+
+            <org.opencv.android.JavaCameraView
+                android:layout_width="match_parent"
+                android:id="@+id/openCvView"
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                opencv:show_fps="true"/>
+
+            <!-- When visible, the error message will overlay and thus partially
+                 obscure part of the camera monitor. We make this trade off so as to
+                 allow for a bigger camera monitor view in the common case when the
+                 error is not in fact present
+              -->
+
+            <TextView
+                android:id="@+id/textErrorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/notEnoughApps"
+                android:textColor="#990000"
+                android:textStyle="bold"
+                android:layout_below="@+id/radioGroup"/>
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/textGamepad1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/textGamepad2"
+            android:visibility="visible"
+            android:text="GAMEPAD 1" />
+
+        <TextView
+            android:id="@+id/textGamepad2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:visibility="visible"
+            android:text="GAMEPAD 2" />
+
+        <TextView
+            android:id="@+id/textRemoteProgrammingMode"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ff0066B3"
+            android:gravity="center"
+            android:textColor="#ffffffff"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            android:visibility="invisible"
+            android:text="" />
+
+    </RelativeLayout>
+
+    <WebView
+        android:id="@+id/webViewBlocksRuntime"
+        android:layout_width="1dp"
+        android:layout_height="1dp" />
+
+</LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+Copyright (c) 2014, 2015 Qualcomm Technologies Inc
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted (subject to the limitations in the disclaimer below) provided that
+the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list
+of conditions and the following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice, this
+list of conditions and the following disclaimer in the documentation and/or
+other materials provided with the distribution.
+
+Neither the name of Qualcomm Technologies Inc nor the names of its contributors
+may be used to endorse or promote products derived from this software without
+specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
+LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<!--
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:opencv="http://schemas.android.com/apk/res-auto"
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
@@ -40,8 +321,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               android:focusable="true"
               android:id="@+id/entire_screen"
               android:orientation="vertical">
-
+-->
   <!-- black bar on top -->
+<!--
   <RelativeLayout
     android:id="@+id/top_bar"
     android:layout_width="fill_parent"
@@ -81,8 +363,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       android:layout_margin="10dp"/>
 
   </RelativeLayout>
+  -->
   <!-- end of black bar -->
-
+<!--
     <RelativeLayout
       android:id="@+id/RelativeLayout"
       android:layout_width="match_parent"
@@ -118,9 +401,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
       <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="400dp"
         android:layout_below="@+id/textOpMode"
         android:layout_above="@+id/textGamepad1">
+
+
+        <org.opencv.android.JavaCameraView
+          android:layout_width="match_parent"
+          android:id="@+id/openCvView"
+          android:layout_height="match_parent"
+          android:layout_above="@+id/textGamepad1"
+          android:layout_alignParentStart="true"
+          android:visibility="gone"
+          opencv:show_fps="true"/>
 
         <LinearLayout
             android:id="@+id/cameraMonitorViewId"
@@ -128,12 +421,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             android:layout_height="match_parent"
             android:orientation="vertical"
             />
-
+            -->
         <!-- When visible, the error message will overlay and thus partially
              obscure part of the camera monitor. We make this trade off so as to
              allow for a bigger camera monitor view in the common case when the
              error is not in fact present
           -->
+<!--
           <TextView
               android:id="@+id/textErrorMessage"
               android:layout_width="match_parent"
@@ -178,14 +472,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1" />
-
+-->
+        <!--
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Detect Beacon"
             android:layout_centerHorizontal="true"
             android:id="@+id/beaconDetectButton"/>
-
+        -->
+      <!--
       <org.opencv.android.JavaCameraView
           android:layout_width="600dp"
           android:id="@+id/openCvView"
@@ -193,7 +489,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           android:layout_above="@+id/textGamepad1"
           android:layout_alignParentStart="true"
           opencv:show_fps="true"/>
-
+      -->
+      <!--
       <Button
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -226,7 +523,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           android:id="@+id/textureView"
           android:layout_above="@+id/textGamepad1"
           android:layout_alignParentStart="true"/>
-
+      -->
       <!--
       <SeekBar
           android:id="@+id/lowerThreshold"
@@ -266,7 +563,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             android:id="@+id/perimeterThresholdText"
             android:layout_above="@+id/lowerThresholdText" />
         -->
-
+<!--
     </RelativeLayout>
 
     <include layout="@layout/header"
@@ -278,3 +575,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     android:layout_height="1dp" />
 
 </LinearLayout>
+-->

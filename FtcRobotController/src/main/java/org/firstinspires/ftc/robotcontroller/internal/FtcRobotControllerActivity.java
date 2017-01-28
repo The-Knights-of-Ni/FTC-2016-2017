@@ -38,6 +38,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.hardware.Camera;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
@@ -130,6 +131,8 @@ public class FtcRobotControllerActivity extends Activity {
   protected TextView[] textGamepad = new TextView[NUM_GAMEPADS];
   protected TextView textOpMode;
   protected TextView textErrorMessage;
+  protected TextView textTeamName;
+  protected TextView textTeamNumber;
   protected ImmersiveMode immersion;
 
   protected UpdateUI updateUI;
@@ -237,7 +240,13 @@ public class FtcRobotControllerActivity extends Activity {
     textNetworkConnectionStatus = (TextView) findViewById(R.id.textNetworkConnectionStatus);
     textRobotStatus = (TextView) findViewById(R.id.textRobotStatus);
     textOpMode = (TextView) findViewById(R.id.textOpMode);
-    textErrorMessage = (TextView) findViewById(R.id.textErrorMessage);
+    //textErrorMessage = (TextView) findViewById(R.id.textErrorMessage);
+    textTeamName = (TextView) findViewById(R.id.teamName);
+    Typeface cinzelBold = Typeface.createFromAsset(getAssets(), "fonts/Cinzel-Bold.ttf");
+    textTeamName.setTypeface(cinzelBold);
+    textTeamNumber = (TextView) findViewById(R.id.teamNumber);
+    Typeface orbitronBold = Typeface.createFromAsset(getAssets(), "fonts/Orbitron-Bold.ttf");
+    textTeamNumber.setTypeface(orbitronBold);
     textGamepad[0] = (TextView) findViewById(R.id.textGamepad1);
     textGamepad[1] = (TextView) findViewById(R.id.textGamepad2);
     immersion = new ImmersiveMode(getWindow().getDecorView());
