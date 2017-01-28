@@ -30,4 +30,12 @@ public class Transport {
         }
         isRunning = !isRunning;
     }
+
+    public void On(){
+        transportMotor.setPower(0.75);
+    }
+
+    public void Off(){
+        transportMotor.setPower(0);
+    }
 }

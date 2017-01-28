@@ -13,11 +13,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class Launcher {
     public DcMotor launcher;
     public Servo hood;
+    public Flywheel flywheel;
     public ElapsedTime OpModeTime;
 
     public Launcher(DcMotor launcher, Servo hood, ElapsedTime OpModeTime){
         this.launcher = launcher;
         this.hood = hood;
-        Flywheel flywheel = new Flywheel(launcher, OpModeTime);
+        flywheel = new Flywheel(launcher, OpModeTime);
     }
 }

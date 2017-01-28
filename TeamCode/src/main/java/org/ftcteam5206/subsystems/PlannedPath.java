@@ -3,18 +3,11 @@ import org.ftcteam5206.subsystems.RobotConstants;
 import org.ftcteam5206.utils.*;
 import org.ftcteam5206.utils.vectors.*;
 
-
-/**
- * Created by Dev on 11/25/2016.
- */
-
 public class PlannedPath {
     /*
         Take path length in, as well as max velocity and max acceleration;
-        Update function is called with encoder feedback, returns motor pwm
         Creates a trapezoidal motion plan for the robot to follow.
-        TODO: Add stabilization based on gyro heading (return 2d vector of left/right)
-         */
+    */
     final double velocityLimit;
     final double accelerationLimit;
     final double totalDistance;
@@ -79,23 +72,5 @@ public class PlannedPath {
         }
     return result;
 }
-
-    //TODO: Add Angular Error for Gyro Stabilization
-    //TODO: Add derivative term (requires a known dt)
-    //TODO: Tune Kv, Ka, and Kpt
-    final static double Kv = 1/RobotConstants.maxDriveVelocity;
-    final static double Ka = 0;//TODO: Tune this.
-    final static double Kpt = 0;//Feedback disabled
-    public vector2d getPWM(double driveTime, double distanceTraveled, double heading){
-        vector2d pwm = new vector2d(0,0);
-        if(driveTime < target_time || Math.abs(distanceTraveled - totalDistance) > RobotConstants.driveDistTolerance){
-            vector3d feedForwardNumbers = getData(driveTime);
-            double tangentError = feedForwardNumbers.x - distanceTraveled;
-
-            pwm.x = Kv*feedForwardNumbers.y + Ka*feedForwardNumbers.z + Kpt*tangentError;
-            pwm.y = Kv*feedForwardNumbers.y + Ka*feedForwardNumbers.z + Kpt*tangentError;
-        }
-        return pwm;
-    }
 
 }

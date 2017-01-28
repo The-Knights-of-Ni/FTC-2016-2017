@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.ftcteam5206.utils.Maths;
+import org.ftcteam5206.utils.vectors.vector3d;
 
 /**
  * Drive Object
@@ -17,7 +18,6 @@ public class Drive {
     public ElapsedTime OpModeTime;
     public BNO055IMU imu;
     private DriveState driveState;
-
 
     public enum DriveState {
         STOPPED, OPEN_LOOP, AUTO
@@ -45,28 +45,45 @@ public class Drive {
         this.driveState = DriveState.OPEN_LOOP;
     }
 
-    private double offset1, offset2, offset3;
-    public void zeroIMU(){
-        offset1 = imu.getAngularOrientation().firstAngle;
-        offset2 = imu.getAngularOrientation().secondAngle;
-        offset3 = imu.getAngularOrientation().thirdAngle;
-    }
-
     public double getRobotYaw(){
-        //return imu.getAngularOrientation().firstAngle - offset1;
         return -imu.getAngularOrientation().firstAngle;
     }
-
-    public void turnTest(){
-        zeroIMU();
-        double angle0 = getRobotYaw();
-        double angleDelta = 90;
-        while(!Maths.aboutEqual(angle0 + angleDelta, getRobotYaw(), 10)){
-            leftDrive.setPower(0.5);
-            rightDrive.setPower(-0.5);
-        }
+    private int offset;
+    public void zeroDriveEncoders(){
+        offset = leftDrive.getCurrentPosition();
     }
 
+    public int getDriveEncoderTicks(){
+        return leftDrive.getCurrentPosition()-offset;
+    }
+    //Motion Profiled Drive
+    public PlannedPath drivePath;
+    private double driveTime;
+    public double driveBearing;
+    public double driveDist;
+    public void driveDist(double inches){
+        zeroDriveEncoders();
+        driveDist = inches;
+        drivePath = new PlannedPath(Math.abs(inches));
+        driveBearing = getRobotYaw();
+        driveTime = OpModeTime.seconds();
+    }
+    //TODO: Tune these, close loop with encoders, add in gyro stabilization (tangential and normal error)
+    public double kv = 1/RobotConstants.maxDriveVelocity;
+    public double ka = 1/(4*RobotConstants.maxDriveAcceleration);
+    public double kpDrive, kdDrive;
+    public void driveDistUpdate(){
+        double deltaTime = OpModeTime.seconds()-driveTime;
+        vector3d kinematics = drivePath.getData(deltaTime);
+        leftDrive.setPower(kv*kinematics.getY());
+        rightDrive.setPower(kv*kinematics.getY());
+    }
+
+    public boolean driveDistChecker(){
+        return (OpModeTime.seconds()-driveTime >= drivePath.target_time) || (Math.abs(getDriveEncoderTicks())*RobotConstants.driveTicksToDist >= Math.abs(driveDist));
+    }
+
+    //Basic Bang Bang ABS Turn
     public double processedTargetAngle;
     double targetAngle;
     public void absTurn(double targetAngle){
@@ -87,5 +104,31 @@ public class Drive {
     public boolean absTurnChecker(double tolerance){
         return !Maths.aboutEqual(targetAngle, getRobotYaw(), tolerance);
     }
-    //TODO: Path Planning, Turning, IMU, Pose Tracking, 2D Motion
+    //Motion Profiled Turn
+    public PlannedPath turnPath;
+    private double turnTime;
+    public void plannedTurn(double degrees){
+        turnPath = new PlannedPath(Maths.degreeToRadians(Math.abs(degrees))*RobotConstants.driveBaseRadius);
+        absTurn(getRobotYaw() + degrees);
+        turnTime = OpModeTime.seconds();
+    }
+    //TODO: Tune these and then close loop with gyro
+    public double kpTurn, kdTurn;
+    public void plannedTurnUpdate(){
+        double deltaTime = OpModeTime.seconds() - turnTime;
+        vector3d kinematics = turnPath.getData(deltaTime);
+        if(Math.signum(processedTargetAngle) == 1.0){ //Turn Right
+            leftDrive.setPower(kv*kinematics.getY());
+            rightDrive.setPower(-kv*kinematics.getY());
+            return;
+        }
+        leftDrive.setPower(-kv*kinematics.getY());
+        rightDrive.setPower(kv*kinematics.getY());
+    }
+
+    public boolean plannedTurnChecker(){
+        return (OpModeTime.seconds()-turnTime >= turnPath.target_time) || !Maths.aboutEqual(targetAngle, getRobotYaw(), 1);
+    }
+
+    //TODO: Pose Tracking, 2D Motion
 }
