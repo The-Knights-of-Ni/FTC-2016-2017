@@ -144,17 +144,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_below="@+id/textOpMode"
             android:id="@+id/radioGroup">
-            <RadioButton android:id="@+id/radio_pirates"
+            <RadioButton android:id="@+id/allianceColorRed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Red"/>
-            <RadioButton android:id="@+id/radio_ninjas"
+                android:text="Red"
+                android:textColor="@color/red"/>
+            <RadioButton android:id="@+id/allianceColorBlue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Blue"/>
+                android:text="Blue"
+                android:textColor="@color/blue"/>
         </RadioGroup>
 
         <SeekBar
@@ -211,7 +213,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 android:id="@+id/textErrorMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/notEnoughApps"
+                android:text=""
                 android:textColor="#990000"
                 android:textStyle="bold"
                 android:layout_below="@+id/radioGroup"/>

@@ -60,7 +60,7 @@ public class KingArthur {
         intakeTransport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         redacted.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Define and initialize ALL installed servos.
-        //beaconPusher = hwMap.servo.get("beacon");
+        beaconPusher = hwMap.servo.get("beacon");
         //forkRelease= hwMap.servo.get("fork");
         //clasp = hwMap.servo.get("clasp");
         //hood = hwMap.servo.get("hood");
