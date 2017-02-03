@@ -14,11 +14,14 @@ public class Launcher {
     public DcMotor launcher;
     public Servo hood;
     public Flywheel flywheel;
+    public Turret turret;
     public ElapsedTime OpModeTime;
 
-    public Launcher(DcMotor launcher, Servo hood, ElapsedTime OpModeTime){
+    public Launcher(DcMotor launcher, DcMotor turret, Servo hood, ElapsedTime OpModeTime){
         this.launcher = launcher;
         this.hood = hood;
+        this.OpModeTime = OpModeTime;
         flywheel = new Flywheel(launcher, OpModeTime);
+        this.turret = new Turret(turret, OpModeTime);
     }
 }
