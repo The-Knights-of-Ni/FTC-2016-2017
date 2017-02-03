@@ -1,5 +1,6 @@
-package org.ftcteam5206.auto;
+package org.ftcteam5206.subsystems.vision;
 
+import android.os.Environment;
 import android.util.Log;
 
 import org.opencv.core.CvType;
@@ -8,31 +9,27 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.core.Core;
 import org.opencv.imgproc.Moments;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by tarunsingh on 12/19/16.
- *
- * Just copied over Parker's code, need to test it
- */
-
 public class VisionHelper {
-    private static final String TAG = "OpenCV Test";
+    private static final String TAG = "Vision Helper";
 
-    /** Returns true if red is right */
-    public static boolean detectBeacon(Mat src) {
-        //Log.d(TAG, "Starting actual beacon detection");
+    /** Returns coordinates of center of blue and red mass */
+    public static double[][] detectBeacon(Mat src) {
+        Log.d(TAG, "Starting actual beacon detection");
         //matrices for images
-        Mat HSV;
-        Mat red;
-        Mat blue;
-        Mat redHierarchy;
-        Mat blueHierarchy;
+        Mat HSV = new Mat();
+        Mat red = new Mat();
+        Mat blue = new Mat();
+        Mat redHierarchy = new Mat();
+        Mat blueHierarchy = new Mat();
 
         //constants for thresholding
         final int redL = 152;
@@ -42,20 +39,11 @@ public class VisionHelper {
         final int saturation = 0;
         final int value = 0;
 
-        HSV = new Mat();
-        red = new Mat();
-        blue = new Mat();
-        redHierarchy = new Mat();
-        blueHierarchy = new Mat();
-
         Imgproc.cvtColor(src, HSV, Imgproc.COLOR_RGB2HSV);
 
         //create matrices with the red and blue areas thresholded
         Core.inRange(HSV, new Scalar(redL,saturation,value),new Scalar(redH, 255,255),red);
-        Core.inRange(HSV, new Scalar(blueL,saturation,value
-        ),new Scalar(blueH,255,255),blue);
-
-        //return red;
+        Core.inRange(HSV, new Scalar(blueL,saturation,value),new Scalar(blueH,255,255),blue);
 
         //store contour hierarchies for thresholded stuff
         List<MatOfPoint> redContourList = new ArrayList<>();
@@ -69,7 +57,7 @@ public class VisionHelper {
         //also find the center of the blob of redness
         //if there are no red contours, skip this step
         Moments redMoments = Imgproc.moments(red);
-        double redCenter = 0;
+        double redCenterX = 0;
         //int redSelector = 0;
         if(redContourList.size() != 0) {
             /*
@@ -85,13 +73,13 @@ public class VisionHelper {
                 }
             }
             */
-            redCenter = redMoments.m10/redMoments.m00;
+            redCenterX = redMoments.m10/redMoments.m00;
         }
 
         //repeat previous process, but for blue
         //int blueSelector = 0;
 
-        double blueCenter = 0;
+        double blueCenterX = 0;
         Moments blueMoments = Imgproc.moments(blue);
         if(blueContourList.size() != 0) {
             /*
@@ -107,23 +95,24 @@ public class VisionHelper {
                 }
             }
             */
-            blueCenter = blueMoments.m10/blueMoments.m00;
+            blueCenterX = blueMoments.m10/blueMoments.m00;
         }
 
         //draw the contours on the image
         //Imgproc.drawContours(src,redContourList,redSelector,new Scalar(255,0,0),-1);
         //Imgproc.drawContours(src,blueContourList,blueSelector,new Scalar(0,0,255),-1);
 
-        Log.i(TAG, "Red: " + redCenter + ", Blue: " + blueCenter);
-        Log.i(TAG, "Finished beacon detection: " + (System.currentTimeMillis() - OpenCVTest2.lastFrameRequestedTime) + "ms");
+        Log.i(TAG, "Red: " + redCenterX + ", Blue: " + blueCenterX);
+        Log.i(TAG, "Finished beacon detection: " + (System.currentTimeMillis() - VisionSystem.lastFrameRequestedTime) + "ms");
 
-        Imgproc.circle(src, new Point(blueCenter, blueMoments.m01/blueMoments.m00), 50, new Scalar(0, 0, 255));
-        Imgproc.circle(src, new Point(redCenter, redMoments.m01/redMoments.m00), 50, new Scalar(255, 0, 0));
-        OpenCVTest2.saveFrame(src);
+        double redCenterY = redMoments.m01/redMoments.m00;
+        double blueCenterY = blueMoments.m01/blueMoments.m00;
 
-        if(redCenter < blueCenter)
-            return true;
-        return false;
+        Imgproc.circle(src, new Point(blueCenterX, blueCenterY), 50, new Scalar(0, 0, 255));
+        Imgproc.circle(src, new Point(redCenterX, redCenterY), 50, new Scalar(255, 0, 0));
+        saveFrame(src);
+
+        return new double[][]{{redCenterX, redCenterY},{blueCenterX, blueCenterY}};
     }
 
     /*
@@ -188,4 +177,18 @@ public class VisionHelper {
         return new double[]{center.x, center.y};
     }
     */
+
+    /** Saves camera frame to internal storage */
+    public static void saveFrame(Mat img) {
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        String filename = "FRAME_" + System.currentTimeMillis() + ".png";
+        File file = new File(path, filename);
+        filename = file.toString();
+        boolean success = Imgcodecs.imwrite(filename, img);
+        if(success)
+            Log.d(TAG, "Successfully saved image");
+        else
+            Log.d(TAG, "Failed to save image");
+        //img.release();
+    }
 }
