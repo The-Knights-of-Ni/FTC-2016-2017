@@ -1,15 +1,12 @@
 package org.ftcteam5206.teleop;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.View;
 import android.widget.RadioButton;
-import android.widget.SeekBar;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.ftcteam5206.KingArthur;
@@ -19,7 +16,7 @@ import org.ftcteam5206.subsystems.Intake;
 import org.ftcteam5206.subsystems.Launcher;
 import org.ftcteam5206.subsystems.RobotConstants;
 import org.ftcteam5206.subsystems.Transport;
-import org.ftcteam5206.subsystems.Vision;
+import org.ftcteam5206.subsystems.vision.VisionSystem;
 import org.ftcteam5206.utils.Button.ButtonHandler;
 import org.ftcteam5206.utils.JoystickSmoother;
 import org.ftcteam5206.utils.vectors.vector2d;
@@ -57,7 +54,7 @@ public class Mk2Teleop extends LinearOpMode{
         Transport transport = new Transport(robot.intakeTransport, runtime);
         Cap cap = new Cap(robot.capRelease,robot.forkRelease, robot.clasp, runtime);
 
-        Vision vision = new Vision(this);
+        VisionSystem visionSystem = new VisionSystem(this);
 
         allianceColorRed = (RadioButton) ((Activity) hardwareMap.appContext).findViewById(R.id.allianceColorRed);
         allianceColorBlue = (RadioButton) ((Activity) hardwareMap.appContext).findViewById(R.id.allianceColorBlue);
@@ -101,13 +98,13 @@ public class Mk2Teleop extends LinearOpMode{
                     break;
                 case AUTO:
                     if (driveAutoInitializing){
-                        vision.detectBeacon();
+                        visionSystem.detectBeacon();
                         driveAutoInitializing = false;
                     }
-                    if(!vision.visionCallback.hasFinished){
+                    if(!visionSystem.visionCallback.hasFinished){
                     }
                     else{
-                        if((vision.visionCallback.redIsRight && allianceColor == AllianceColor.RED) || (!vision.visionCallback.redIsRight && allianceColor == AllianceColor.BLUE))
+                        if((visionSystem.visionCallback.redIsRight && allianceColor == AllianceColor.RED) || (!visionSystem.visionCallback.redIsRight && allianceColor == AllianceColor.BLUE))
                             robot.beaconPusher.setPosition(0);
                         else
                             robot.beaconPusher.setPosition(1);

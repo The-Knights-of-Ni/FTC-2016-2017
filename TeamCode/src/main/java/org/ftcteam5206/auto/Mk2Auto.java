@@ -10,7 +10,7 @@ import org.ftcteam5206.subsystems.Drive;
 import org.ftcteam5206.subsystems.Intake;
 import org.ftcteam5206.subsystems.Launcher;
 import org.ftcteam5206.subsystems.Transport;
-import org.ftcteam5206.subsystems.Vision;
+import org.ftcteam5206.subsystems.vision.VisionSystem;
 
 @Autonomous(name = "Mk2Auto", group = "Autonomous")
 public class Mk2Auto extends LinearOpMode {
@@ -25,7 +25,7 @@ public class Mk2Auto extends LinearOpMode {
         Intake intake = new Intake(robot.intakeTransport, runtime);
         Transport transport = new Transport(robot.intakeTransport, runtime);
         BeaconPusher beaconPusher = new BeaconPusher(robot.beaconPusher, runtime);
-        Vision vision = new Vision(this);
+        VisionSystem visionSystem = new VisionSystem(this);
 
         waitForStart();
         runtime.reset();
@@ -59,10 +59,10 @@ public class Mk2Auto extends LinearOpMode {
         }
         /*
         //Get Beacon Color
-        vision.detectBeacon();
-        while(!vision.visionCallback.hasFinished){}
+        visionSystem.detectBeacon();
+        while(!visionSystem.visionCallback.hasFinished){}
         //Move servo according to beacon orientation and alliance color
-        robot.beaconPusher.setPosition(vision.visionCallback.redIsRight ? 1 : 0);
+        robot.beaconPusher.setPosition(visionSystem.visionCallback.redIsRight ? 1 : 0);
         //Press beacon
         drive.driveDist(4);
         while(drive.driveDistChecker()){

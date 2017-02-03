@@ -1,4 +1,4 @@
-package org.ftcteam5206.subsystems;
+package org.ftcteam5206.subsystems.vision;
 
 /**
  * Created by tarunsingh on 1/28/17.

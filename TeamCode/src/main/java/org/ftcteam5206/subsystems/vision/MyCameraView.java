@@ -1,4 +1,4 @@
-package org.ftcteam5206.auto;
+package org.ftcteam5206.subsystems.vision;
 
 import org.opencv.android.JavaCameraView;
 
