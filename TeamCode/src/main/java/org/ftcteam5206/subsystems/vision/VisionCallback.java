@@ -7,15 +7,15 @@ package org.ftcteam5206.subsystems.vision;
 public class VisionCallback {
     public boolean hasFinished = false;
     public boolean redIsRight;
-    public double blueCenterX;
     public double redCenterX;
+    public double blueCenterX;
 
     public VisionCallback(){};
 
-    public void update(double blueCenterX, double redCenterX) {
+    public void update(double redCenterX, double blueCenterX) {
         this.hasFinished = true;
-        this.blueCenterX = blueCenterX;
         this.redCenterX = redCenterX;
+        this.blueCenterX = blueCenterX;
         this.redIsRight = blueCenterX < redCenterX;
     }
 }

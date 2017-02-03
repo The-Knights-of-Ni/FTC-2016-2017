@@ -141,15 +141,13 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
     public VisionCallback detectBeacon() {
         currentProcessingMode = ProcessingMode.BEACON;
         lastFrameRequestedTime = System.currentTimeMillis();
-        VisionCallback visionCallback = new VisionCallback();
-        this.visionCallback = visionCallback;
+        visionCallback = new VisionCallback();
         return visionCallback;
     }
 
     /** Updates vision callback object with result of beacon detection */
     private void updateBeaconResult(double[][] result) {
-        visionCallback.redCenterX = result[0][0];
-        visionCallback.blueCenterX = result[1][0];
+        visionCallback.update(result[0][0], result[1][0]);
     }
 
     /** Changes camera being used from rear to front, or front to rear */
