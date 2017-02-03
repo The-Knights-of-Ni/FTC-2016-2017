@@ -75,7 +75,7 @@ public class Drive {
         driveBearing = getRobotYaw();
         driveTime = OpModeTime.seconds();
     }
-    //TODO: Tune these, close loop with encoders, add in gyro stabilization (tangential and normal error)
+    //TODO: Tune these, add in gyro stabilization (tangential and normal error)
     public double kv = 1/RobotConstants.maxDriveVelocity;
     public double ka = 1/(8*RobotConstants.maxDriveAcceleration);
     public double kpDrive = 1/200.0;
@@ -133,7 +133,7 @@ public class Drive {
         absTurn(plannedTurnAngle);
         turnTime = OpModeTime.seconds();
     }
-    //TODO: Tune these and then close loop with gyro
+    //TODO: Tune these, add Ka
     public double kpTurn = 1/1200.0;
     public void plannedTurnUpdate(){
         double deltaTime = OpModeTime.seconds() - turnTime;

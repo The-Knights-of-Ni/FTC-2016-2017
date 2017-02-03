@@ -52,7 +52,7 @@ public class Mk2Teleop extends LinearOpMode{
         robot.init(hardwareMap);
         //Init Subsystem Controllers
         Drive drive = new Drive(robot.leftDrive, robot.rightDrive, robot.imu, runtime);
-        Launcher launcher = new Launcher(robot.launcher, robot.hood, runtime);
+        Launcher launcher = new Launcher(robot.launcher, robot.turret, robot.hood, runtime);
         Intake intake = new Intake(robot.intakeTransport, runtime);
         Transport transport = new Transport(robot.intakeTransport, runtime);
         Cap cap = new Cap(robot.capRelease,robot.forkRelease, robot.clasp, runtime);
@@ -81,7 +81,6 @@ public class Mk2Teleop extends LinearOpMode{
 
         vector3d orient;
         boolean driveAutoInitializing = true;
-        boolean driveDistCalled = false;
         while (opModeIsActive()) {
             //Button Try Catch
             try {
@@ -115,7 +114,7 @@ public class Mk2Teleop extends LinearOpMode{
                     }
                     break;
             }
-            if(pad1.press(pad1.buttons.Y)){
+            if(pad1.singlePress(pad1.buttons.Y)){
                 driveAutoInitializing = true;
             }
             if (pad1.toggle(pad1.buttons.Y)){
@@ -148,7 +147,7 @@ public class Mk2Teleop extends LinearOpMode{
             telemetry.addData("Drive State Machine", drive.getDriveState());
             telemetry.addData("Angle 1", orient.x);
             telemetry.addData("Robot Yaw", drive.getRobotYaw());
-            telemetry.addData("Angle 2", orient.y);
+            telemetry.addData("Turret Pot", robot.turretPot.getVoltage());
             telemetry.addData("Angle 3", orient.z);
             telemetry.update();
         }
