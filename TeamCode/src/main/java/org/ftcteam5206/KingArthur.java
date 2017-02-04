@@ -49,14 +49,15 @@ public class KingArthur {
         turret = hwMap.dcMotor.get("turret");
         //Set Directions
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         launcher.setDirection(DcMotor.Direction.FORWARD);
         launcher.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         intakeTransport.setDirection(DcMotor.Direction.FORWARD);
         intakeTransport.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         turret.setDirection(DcMotor.Direction.REVERSE);
+        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // Set all motors to zero power
         leftDrive.setPower(0);
         rightDrive.setPower(0);
