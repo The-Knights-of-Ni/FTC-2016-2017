@@ -1,5 +1,6 @@
 package org.ftcteam5206.subsystems;
 
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -17,11 +18,11 @@ public class Launcher {
     public Turret turret;
     public ElapsedTime OpModeTime;
 
-    public Launcher(DcMotor launcher, DcMotor turret, Servo hood, ElapsedTime OpModeTime){
+    public Launcher(DcMotor launcher, DcMotor turret, AnalogInput turretpot, Servo hood, ElapsedTime OpModeTime){
         this.launcher = launcher;
         this.hood = hood;
         this.OpModeTime = OpModeTime;
         flywheel = new Flywheel(launcher, OpModeTime);
-        this.turret = new Turret(turret, OpModeTime);
+        this.turret = new Turret(turret, turretpot, OpModeTime);
     }
 }
