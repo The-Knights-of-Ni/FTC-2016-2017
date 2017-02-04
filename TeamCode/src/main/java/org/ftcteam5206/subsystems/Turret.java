@@ -15,4 +15,10 @@ public class Turret {
         this.turret = turret;
         this.OpModeTime = OpModeTime;
     }
+
+    //TODO: Track Angle
+    //TODO: FFWD Control to change angle (Overkill)
+    //TODO: Encoder Tracking as well
+    //TODO: Hold Position (Relative  to Robot)
+    //TODO: Lock Position (Relative to field)
 }

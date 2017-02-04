@@ -108,6 +108,7 @@ public class Drive {
     public void absTurn(double targetAngle){
         this.targetAngle = targetAngle;
         processedTargetAngle = Maths.smallestSignedAngle(getRobotYaw(), targetAngle);
+        if(targetAngle >= 360) targetAngle -= 360;
     }
 
     public void absTurnUpdate(){
@@ -128,28 +129,37 @@ public class Drive {
     private double turnTime;
     private double plannedTurnAngle;
     public void plannedTurn(double degrees){
-        turnPath = new PlannedPath(Maths.degreeToRadians(Math.abs(degrees))*RobotConstants.driveBaseRadius);
+        turnPath = new PlannedPath(Maths.degreeToRadians(Math.abs(degrees))*RobotConstants.driveBaseRadius, 20, 150);
         plannedTurnAngle = getRobotYaw() + degrees;
         absTurn(plannedTurnAngle);
         turnTime = OpModeTime.seconds();
     }
     //TODO: Tune these, add Ka
-    public double kpTurn = 1/1200.0;
+    public double kpTurn = 1/600.0;
+    public double kiTurn = 0;
+    double errorlast, timelast;
     public void plannedTurnUpdate(){
         double deltaTime = OpModeTime.seconds() - turnTime;
         double error = -Maths.smallestSignedAngle(plannedTurnAngle, getRobotYaw());
+        double integralerror = errorlast + error;
+        errorlast = integralerror;
         vector3d kinematics = turnPath.getData(deltaTime);
+        Log.d("FFWD", "FFWD Comps ," + deltaTime + "," + kinematics.getX() + "," + kinematics.getY() + "," + kinematics.getZ());
+        Log.d("autodrive", "PWM components " + kv*kinematics.getY() + ", " + ka*kinematics.getZ()  + ", " + kpTurn*error + ", " + kiTurn*integralerror + " = " + (kv*kinematics.getY() + ka*kinematics.getZ() + kpTurn*error + kiTurn*integralerror));
         if(Math.signum(processedTargetAngle) == 1.0){ //Turn Right
-            leftDrive.setPower(kv*kinematics.getY() + kpTurn*error);
-            rightDrive.setPower(-kv*kinematics.getY() - kpTurn* error);
+            leftDrive.setPower(kv*kinematics.getY() + ka*kinematics.getZ() + kpTurn*error + kiTurn*integralerror);
+            rightDrive.setPower(-kv*kinematics.getY() - ka*kinematics.getZ() - kpTurn*error - kiTurn*integralerror);
             return;
         }
-        leftDrive.setPower(-kv*kinematics.getY() - kpTurn*error);
-        rightDrive.setPower(kv*kinematics.getY() + kpTurn*error);
+        leftDrive.setPower(-kv*kinematics.getY() - ka*kinematics.getZ() - kpTurn*error - kiTurn*integralerror);
+        rightDrive.setPower(kv*kinematics.getY() + ka*kinematics.getZ() + kpTurn*error + kiTurn*integralerror);
     }
 
     public boolean plannedTurnChecker(){
-        return (OpModeTime.seconds()-turnTime < turnPath.target_time) && !Maths.aboutEqual(targetAngle, getRobotYaw(), 0.5);
+        if(targetAngle >= 360)  targetAngle -= 360;
+        Log.d("autodrive", OpModeTime.seconds()-turnTime + " of " + turnPath.target_time);
+        Log.d("autodrive", "Robot Yaw " + getRobotYaw() + " of " + targetAngle);
+        return /*(OpModeTime.seconds()-turnTime < turnPath.target_time*1.5) && */!Maths.aboutEqual(targetAngle, getRobotYaw(), 1);
     }
 
     //TODO: Pose Tracking, 2D Motion

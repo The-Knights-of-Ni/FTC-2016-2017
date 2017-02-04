@@ -1,5 +1,7 @@
 package org.ftcteam5206;
+import android.app.Activity;
 import android.hardware.Sensor;
+import android.widget.RadioButton;
 
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
@@ -11,6 +13,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.R;
 import org.ftcteam5206.subsystems.RobotConstants;
 
 /**
@@ -32,6 +35,7 @@ public class KingArthur {
     public Servo capRelease = null;
 
     HardwareMap hwMap = null;
+
     public KingArthur(){}
 
     public void init(HardwareMap hwMap){
@@ -45,7 +49,9 @@ public class KingArthur {
         turret = hwMap.dcMotor.get("turret");
         //Set Directions
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         launcher.setDirection(DcMotor.Direction.FORWARD);
         launcher.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         intakeTransport.setDirection(DcMotor.Direction.FORWARD);

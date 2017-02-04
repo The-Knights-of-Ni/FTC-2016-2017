@@ -33,13 +33,6 @@ public class Mk2Teleop extends LinearOpMode{
     double lastEncoderTicks = 0;
     double encoderRefreshRate = 10;
 
-    public enum AllianceColor {
-        RED, BLUE
-    }
-
-    private RadioButton allianceColorRed, allianceColorBlue;
-    public AllianceColor allianceColor;
-
     @Override
     public void runOpMode() throws InterruptedException
     {
@@ -55,22 +48,6 @@ public class Mk2Teleop extends LinearOpMode{
         Cap cap = new Cap(robot.capRelease,robot.forkRelease, robot.clasp, runtime);
 
         VisionSystem visionSystem = new VisionSystem(this);
-
-        allianceColorRed = (RadioButton) ((Activity) hardwareMap.appContext).findViewById(R.id.allianceColorRed);
-        allianceColorBlue = (RadioButton) ((Activity) hardwareMap.appContext).findViewById(R.id.allianceColorBlue);
-        allianceColorRed.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                allianceColor = AllianceColor.RED;
-            }
-        });
-
-        allianceColorBlue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                allianceColor = AllianceColor.BLUE;
-            }
-        });
 
         waitForStart();
         runtime.reset();
@@ -96,17 +73,13 @@ public class Mk2Teleop extends LinearOpMode{
                     drive.leftDrive.setPower(sticks.x - sticks.y);
                     break;
                 case AUTO:
-                    if (driveAutoInitializing){
-                        visionSystem.detectBeacon();
+                    if (driveAutoInitializing) {
+                        drive.plannedTurn(90);
                         driveAutoInitializing = false;
                     }
-                    if(!visionSystem.visionCallback.hasFinished){
-                    }
-                    else{
-                        if((visionSystem.visionCallback.redIsRight && allianceColor == AllianceColor.RED) || (!visionSystem.visionCallback.redIsRight && allianceColor == AllianceColor.BLUE))
-                            robot.beaconPusher.setPosition(0);
-                        else
-                            robot.beaconPusher.setPosition(1);
+                    if (drive.plannedTurnChecker()){
+                        drive.plannedTurnUpdate();
+                    }else{
                         pad1.buttons.Y.setStatus(false);
                     }
                     break;

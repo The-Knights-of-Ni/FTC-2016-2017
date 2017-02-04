@@ -58,6 +58,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.google.blocks.ftcrobotcontroller.BlocksActivity;
@@ -134,6 +135,12 @@ public class FtcRobotControllerActivity extends Activity {
   protected TextView textTeamName;
   protected TextView textTeamNumber;
   protected ImmersiveMode immersion;
+
+  protected RadioButton allianceColorRed, allianceColorBlue;
+  public enum AllianceColor {
+      RED, BLUE
+  }
+  public AllianceColor allianceColor;
 
   protected UpdateUI updateUI;
   protected Dimmer dimmer;
@@ -252,6 +259,23 @@ public class FtcRobotControllerActivity extends Activity {
     immersion = new ImmersiveMode(getWindow().getDecorView());
     dimmer = new Dimmer(this);
     dimmer.longBright();
+
+    allianceColorBlue = (RadioButton) findViewById(R.id.allianceColorBlue);
+    allianceColorRed = (RadioButton) findViewById(R.id.allianceColorRed);
+
+   allianceColorBlue.setOnClickListener(new View.OnClickListener() {
+       @Override
+       public void onClick(View view) {
+           allianceColor= AllianceColor.BLUE;
+       }
+   });
+
+    allianceColorRed.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            allianceColor= AllianceColor.RED;
+        }
+    });
 
     programmingModeController = new ProgrammingModeControllerImpl(
         this, (TextView) findViewById(R.id.textRemoteProgrammingMode));
