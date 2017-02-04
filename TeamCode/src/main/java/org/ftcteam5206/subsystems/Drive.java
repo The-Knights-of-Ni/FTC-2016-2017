@@ -233,45 +233,6 @@ public class Drive {
     private double getRobotAngle() {
         return wrap360(getRobotYaw() - offsetAngle);
     }
-
-    void turnAbsDeg(double angle, double vIs)
-    {
-        if(vIs < 0)
-        {
-            vIs = Math.abs(vIs);
-            angle = -angle;
-        }
-
-        double target_heading = angle;
-        double turning_compensation = 0;
-
-        while (Math.abs(Maths.signedNormalizedDegrees(getRobotYaw()-target_heading)) > acceptableAngleError
-                || Math.abs(imu.getAngularVelocity().firstAngleRate) > 2)
-        {
-            float heading_error = Maths.signedNormalizedDegrees(target_heading-);
-            float turning_factor = turn_kp*heading_error;
-
-            if(left_drive_omega < 0.5 && right_drive_omega < 0.5)
-            {
-                turning_compensation += turn_ki*heading_error*dt;
-            }
-            else
-            {
-                turning_compensation = lerp(0.0, turning_compensation, exp(-1.0*dt));
-            }
-            turning_compensation = clamp(turning_compensation, -2.0, 2.0);
-            turning_factor += turning_compensation;
-
-            left_drive = -turning_factor;
-            right_drive = +turning_factor;
-
-            left_drive = clamp(left_drive, -vIs, vIs);
-            right_drive = clamp(right_drive, -vIs, vIs);
-            autonomousUpdate();
-        }
-        right_drive = 0;
-        left_drive = 0;
-    }
-
+    
     //TODO: Pose Tracking, 2D Motion
 }
