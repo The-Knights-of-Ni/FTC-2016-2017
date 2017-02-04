@@ -1,6 +1,7 @@
 package org.ftcteam5206.teleop;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.widget.RadioButton;
 
@@ -68,18 +69,26 @@ public class Mk2Teleop extends LinearOpMode{
                 case STOPPED:
                     break;
                 case OPEN_LOOP:
+                    /*
                     vector2d sticks = JoystickSmoother.smoothJoysticksBezierStyle(new vector2d(gamepad1.left_stick_x, gamepad1.left_stick_y));
                     drive.rightDrive.setPower(-sticks.x - sticks.y);
                     drive.leftDrive.setPower(sticks.x - sticks.y);
+                    Log.d("autodrive", drive.leftDrive.getPower() + " " + drive.rightDrive.getPower());
+                    */
+                    drive.leftDrive.setPower(-0.2);
+                    drive.rightDrive.setPower(0.2);
+                    Log.d("autodrive", drive.getRobotYaw()+"");
                     break;
                 case AUTO:
                     if (driveAutoInitializing) {
-                        drive.plannedTurn(90);
+                        drive.plannedTurn(80);
                         driveAutoInitializing = false;
                     }
                     if (drive.plannedTurnChecker()){
                         drive.plannedTurnUpdate();
                     }else{
+                        drive.rightDrive.setPower(-0.5);
+                        drive.leftDrive.setPower(0.5);
                         pad1.buttons.Y.setStatus(false);
                     }
                     break;

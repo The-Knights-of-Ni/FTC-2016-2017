@@ -30,33 +30,41 @@ public class Mk2Auto extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        //Drive Forward (21 in)
-        drive.driveDist(27);
-        while(drive.driveDistChecker()){
+        //Drive Forward (24 in)
+        drive.driveDist(36);
+        while(opModeIsActive() && drive.driveDistChecker()){
             drive.driveDistUpdate();
         }
+        drive.stop();
         //Launch
         robot.launcher.setPower(1);
         transport.On();
         //wait for 2 seconds to launch balls
         double currentTime = runtime.seconds();
-        while(runtime.seconds() - currentTime < 2){}
+        while(opModeIsActive() && (runtime.seconds() - currentTime < 2)){}
         transport.Off();
         //Drive forward half a tile after launching
-        drive.driveDist(12);
-        while(drive.driveDistChecker()){
+        drive.driveDist(25);
+        while(opModeIsActive() && drive.driveDistChecker()){
             drive.driveDistUpdate();
         }
+        drive.stop();
+        currentTime = runtime.seconds();
+        while(opModeIsActive() && (runtime.seconds() - currentTime < 1)){}
         //Turn 90 degrees (depends on color)
-        drive.plannedTurn(-90);
-        while(drive.plannedTurnChecker()){
+        drive.plannedTurn(-40);
+        while(opModeIsActive() && drive.plannedTurnChecker()){
             drive.plannedTurnUpdate();
         }
-        //Drive to beacon (38 in)
-        drive.driveDist(38);
+        drive.stop();
+        currentTime = runtime.seconds();
+        while(opModeIsActive() && (runtime.seconds() - currentTime < 5)){}
+        //Press Beacon
+        drive.driveDist(7, 10);
         while(drive.driveDistChecker()){
             drive.driveDistUpdate();
         }
+        drive.stop();
         /*
         //Get Beacon Color
         visionSystem.detectBeacon();
