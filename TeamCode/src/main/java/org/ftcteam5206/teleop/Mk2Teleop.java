@@ -8,6 +8,7 @@ import android.widget.RadioButton;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.ftcteam5206.KingArthur;
@@ -30,10 +31,6 @@ public class Mk2Teleop extends LinearOpMode{
     KingArthur robot = new KingArthur();
     ElapsedTime runtime = new ElapsedTime();
 
-    double lastRuntime = 0;
-    double lastEncoderTicks = 0;
-    double encoderRefreshRate = 10;
-
     @Override
     public void runOpMode() throws InterruptedException
     {
@@ -43,19 +40,15 @@ public class Mk2Teleop extends LinearOpMode{
         robot.init(hardwareMap);
         //Init Subsystem Controllers
         Drive drive = new Drive(robot.leftDrive, robot.rightDrive, robot.imu, runtime);
-        Launcher launcher = new Launcher(robot.launcher, robot.turret, robot.hood, runtime);
+        Launcher launcher = new Launcher(robot.launcher, robot.turret, robot.turretPot, robot.hood, runtime);
         Intake intake = new Intake(robot.intakeTransport, runtime);
         Transport transport = new Transport(robot.intakeTransport, runtime);
-        Cap cap = new Cap(robot.capRelease,robot.forkRelease, robot.clasp, runtime);
 
-        VisionSystem visionSystem = new VisionSystem(this);
-
+        robot.resetEncoders();
         waitForStart();
         runtime.reset();
         //drive.zeroIMU();
 
-        vector3d orient;
-        boolean driveAutoInitializing = true;
         while (opModeIsActive()) {
             //Button Try Catch
             try {
@@ -69,65 +62,77 @@ public class Mk2Teleop extends LinearOpMode{
                 case STOPPED:
                     break;
                 case OPEN_LOOP:
-                    /*
                     vector2d sticks = JoystickSmoother.smoothJoysticksBezierStyle(new vector2d(gamepad1.left_stick_x, gamepad1.left_stick_y));
                     drive.rightDrive.setPower(-sticks.x - sticks.y);
                     drive.leftDrive.setPower(sticks.x - sticks.y);
-                    Log.d("autodrive", drive.leftDrive.getPower() + " " + drive.rightDrive.getPower());
-                    */
-                    drive.leftDrive.setPower(-0.2);
-                    drive.rightDrive.setPower(0.2);
-                    Log.d("autodrive", drive.getRobotYaw()+"");
                     break;
                 case AUTO:
-                    if (driveAutoInitializing) {
-                        drive.plannedTurn(80);
-                        driveAutoInitializing = false;
+                    break;
+            }
+
+            //Intake State Machine
+            switch (intake.getIntakeState()) {
+                case STOPPED:
+                    break;
+                case OPEN_LOOP:
+                    //Enter launch mode
+                    /*
+                    if(pad2.toggle(pad2.buttons.X)) { //Enter launch mode
+                        intake.setIntakeState(Intake.IntakeState.AUTO);
+                        pad2.buttons.X.setStatus(false);
+                    } else if (pad2.press(pad2.buttons.Y))
+                        intake.intakeReverse();
+                    else if (pad1.toggle(pad1.buttons.A)) {
+                        intake.intakeOn();
                     }
-                    if (drive.plannedTurnChecker()){
-                        drive.plannedTurnUpdate();
-                    }else{
-                        drive.rightDrive.setPower(-0.5);
-                        drive.leftDrive.setPower(0.5);
-                        pad1.buttons.Y.setStatus(false);
+                    else
+                        intake.intakeOff();
+                    break;
+                    */
+                    if(pad2.press(pad2.buttons.Y))
+                        intake.intakeReverse();
+                    else if(pad1.press(pad1.buttons.A)) {
+                        intake.intakeOn();
+                        telemetry.addData("Intake", "On");
+                    } else {
+                        intake.intakeOff();
+                        telemetry.addData("Intake", "Off");
+                    }
+                    break;
+                /*
+                case AUTO:
+                    intake.intakeOff();
+                    if(pad2.toggle(pad2.buttons.A)) //Confirm launch
+                        intake.intakeOn();
+                    if(pad2.toggle(pad2.buttons.X)) { //Exit launch mode
+                        intake.setIntakeState(Intake.IntakeState.OPEN_LOOP);
+                    }
+                    break;
+                    */
+            }
+
+            //Launcher state machine
+            switch (launcher.getLauncherState()) {
+                case STOPPED:
+                    break;
+                case OPEN_LOOP:
+                    if(pad2.toggle(pad2.buttons.X)) {
+                        robot.launcher.setPower(1);
+                        telemetry.addData("Launcher", "On");
+                    } else {
+                        robot.launcher.setPower(0);
+                        telemetry.addData("Launcher", "off");
                     }
                     break;
             }
-            if(pad1.singlePress(pad1.buttons.Y)){
-                driveAutoInitializing = true;
-            }
-            if (pad1.toggle(pad1.buttons.Y)){
-                drive.setDriveState(Drive.DriveState.AUTO);
-            }
-            else
-                drive.setDriveState(Drive.DriveState.OPEN_LOOP);
 
-            //Launcher control
-            if(pad1.toggle(pad1.buttons.X)) {
-                robot.launcher.setPower(1.0);
-                telemetry.addData("Launcher", "On");
-            }
-            else {
-                robot.launcher.setPower(0);
-                telemetry.addData("Launcher", "Off");
-            }
+            //Turret control
+            robot.turret.setPower(.3*gamepad2.left_stick_x);
 
-            if(runtime.seconds() - lastRuntime > (1/encoderRefreshRate)) {
-                double encoderTicksSinceLast = robot.launcher.getCurrentPosition() - lastEncoderTicks;
-                double timeSinceLast = runtime.seconds() - lastRuntime;
-                double revolutions = encoderTicksSinceLast / RobotConstants.launcherPPR;
-                double minutes = timeSinceLast / 60;
-                double RPM = revolutions/minutes;
-                lastRuntime = runtime.seconds();
-                lastEncoderTicks = robot.launcher.getCurrentPosition();
-            }
-
-            orient = new vector3d(robot.imu.getAngularOrientation().firstAngle, robot.imu.getAngularOrientation().secondAngle, robot.imu.getAngularOrientation().thirdAngle);
+            telemetry.addData("Intake State Machine", intake.getIntakeState());
             telemetry.addData("Drive State Machine", drive.getDriveState());
-            telemetry.addData("Angle 1", orient.x);
             telemetry.addData("Robot Yaw", drive.getRobotYaw());
-            telemetry.addData("Turret Pot", robot.turretPot.getVoltage());
-            telemetry.addData("Angle 3", orient.z);
+            telemetry.addData("Turret Angle", launcher.turret.getAngle());
             telemetry.update();
         }
     }

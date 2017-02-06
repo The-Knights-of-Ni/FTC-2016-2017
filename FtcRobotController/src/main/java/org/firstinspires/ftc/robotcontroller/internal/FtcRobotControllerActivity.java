@@ -140,7 +140,7 @@ public class FtcRobotControllerActivity extends Activity {
   public enum AllianceColor {
       RED, BLUE
   }
-  public AllianceColor allianceColor;
+  public static AllianceColor allianceColor;
 
   protected UpdateUI updateUI;
   protected Dimmer dimmer;

@@ -26,7 +26,7 @@ public final class RobotConstants {
     //LAUNCHER
     public final static int launcherGearRatio = 2;
     public final static int launcherPPR = neverRestCPR*neverRestPPR*launcherGearRatio;
-    public final static int turretRingGear = 360;
+    public final static int turretRingGear = 455;
     public final static int turretMotorGear = 100;
     public final static int turretPotGear = 40;
 

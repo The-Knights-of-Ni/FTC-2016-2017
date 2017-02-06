@@ -12,6 +12,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class Intake {
     public DcMotor intake;
     public ElapsedTime OpModeTime;
+    private IntakeState intakeState = IntakeState.OPEN_LOOP;
+
+    public enum IntakeState {
+        STOPPED, OPEN_LOOP, AUTO;
+    }
+
 
     public Intake(DcMotor intake, ElapsedTime OpModeTime){
         this.intake = intake;
@@ -30,4 +36,11 @@ public class Intake {
         intake.setPower(-1);
     }
 
+    public IntakeState getIntakeState() {
+        return intakeState;
+    }
+
+    public void setIntakeState(IntakeState intakeState) {
+        this.intakeState = intakeState;
+    }
 }

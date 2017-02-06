@@ -17,6 +17,11 @@ public class Launcher {
     public Flywheel flywheel;
     public Turret turret;
     public ElapsedTime OpModeTime;
+    private LauncherState launcherState = LauncherState.OPEN_LOOP;
+
+    public enum LauncherState {
+        STOPPED, OPEN_LOOP, AUTO
+    }
 
     public Launcher(DcMotor launcher, DcMotor turret, AnalogInput turretpot, Servo hood, ElapsedTime OpModeTime){
         this.launcher = launcher;
@@ -24,5 +29,13 @@ public class Launcher {
         this.OpModeTime = OpModeTime;
         flywheel = new Flywheel(launcher, OpModeTime);
         this.turret = new Turret(turret, turretpot, OpModeTime);
+    }
+
+    public LauncherState getLauncherState() {
+        return launcherState;
+    }
+
+    public void setLauncherState(LauncherState launcherState) {
+        this.launcherState = launcherState;
     }
 }
