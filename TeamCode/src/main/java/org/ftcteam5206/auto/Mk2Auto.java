@@ -1,5 +1,7 @@
 package org.ftcteam5206.auto;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,6 +15,7 @@ import org.ftcteam5206.subsystems.Intake;
 import org.ftcteam5206.subsystems.Launcher;
 import org.ftcteam5206.subsystems.Transport;
 import org.ftcteam5206.subsystems.vision.VisionSystem;
+import org.ftcteam5206.utils.Maths;
 
 @Autonomous(name = "Mk2Auto", group = "Autonomous")
 public class Mk2Auto extends LinearOpMode {
@@ -32,16 +35,71 @@ public class Mk2Auto extends LinearOpMode {
         int allianceColorInt = 1;
         if(FtcRobotControllerActivity.allianceColor == FtcRobotControllerActivity.AllianceColor.BLUE)
             allianceColorInt = - 1;
-
+        telemetry.addData("Robot Yaw", drive.getRobotYaw());
+        telemetry.update();
         waitForStart();
         runtime.reset();
+        //double robotYaw = -robot.imu.getAngularOrientation().firstAngle;
+        /*double targetAngle = -robot.imu.getAngularOrientation().firstAngle + 90;
+        double turnStartTime = runtime.seconds();
+        Log.d("autodrive", "Planned Turn Starting. Target is " + targetAngle + " we're currently at " + -robot.imu.getAngularOrientation().firstAngle);
+        robot.dim.setLED(1, false);
+        while(Math.abs(Maths.smallestSignedAngle(-robot.imu.getAngularOrientation().firstAngle, targetAngle)) > 1.0){
+            Log.d("autodrive", (runtime.seconds() - turnStartTime) + ", " +  -robot.imu.getAngularOrientation().firstAngle + ", "  + Maths.smallestSignedAngle(-robot.imu.getAngularOrientation().firstAngle, targetAngle));
+            robot.leftDrive.setPower(0.2);
+            robot.rightDrive.setPower(-0.2);
+        }
+        robot.dim.setLED(1, true);
+        robot.rightDrive.setPower(0.0);
+        robot.leftDrive.setPower(0.0);
+        Log.d("autodrive", "Turn finished");
+        double currentTime = runtime.seconds();
+        while(opModeIsActive() && (runtime.seconds() - currentTime < 1)){
+            Log.d("autodrive", (runtime.seconds() - turnStartTime) + ", " +  -robot.imu.getAngularOrientation().firstAngle + ", "  + Maths.smallestSignedAngle(-robot.imu.getAngularOrientation().firstAngle, targetAngle));
+        }
+        Log.d("autodrive", "angle 1s after turn " + -robot.imu.getAngularOrientation().firstAngle);
+        Log.d("autodrive", "power 1s after turn " + robot.rightDrive.getPower());
+        //Drive Forward (36 in)*/
 
-        //Drive Forward (36 in)
-        drive.driveDist(36);
+        drive.driveDist(20, 20);
         while(opModeIsActive() && drive.driveDistChecker()){
             drive.driveDistUpdate();
         }
         drive.stop();
+        double currentTime = runtime.seconds();
+        while(opModeIsActive() && (runtime.seconds() - currentTime < 1)){}
+        drive.plannedTurn(90);
+        while(opModeIsActive() && drive.plannedTurnChecker()){
+            drive.plannedTurnUpdate();
+            sleep(5);
+        }
+        drive.stop();
+        currentTime = runtime.seconds();
+        while(opModeIsActive() && (runtime.seconds() - currentTime < 1)){}
+        telemetry.addData("Robot Yaw", drive.getRobotYaw());
+        telemetry.update();
+        drive.stop();
+        drive.plannedTurn(90 - drive.getRobotYaw());
+        while(opModeIsActive() && Maths.smallestSignedAngle(drive.getRobotYaw(),drive.targetAngle) < 0){
+            drive.plannedTurnUpdate();
+        }
+        drive.stop();
+        currentTime = runtime.seconds();
+        while(opModeIsActive() && (runtime.seconds() - currentTime < 1)){}
+        telemetry.addData("Robot Yaw", drive.getRobotYaw());
+        telemetry.update();
+        while(opModeIsActive());
+//        drive.driveDist(40, 20);
+//        while(opModeIsActive() && drive.driveDistChecker()){
+//            drive.driveDistUpdate();
+//        }
+//        drive.stop();
+        /*drive.driveDist(36);
+        while(opModeIsActive() && drive.driveDistChecker()){
+            drive.driveDistUpdate();
+        }
+        drive.stop();
+
         //Spin up launcher
         robot.launcher.setPower(1);
         double currentTime = runtime.seconds();
@@ -50,7 +108,8 @@ public class Mk2Auto extends LinearOpMode {
         transport.On();
         currentTime = runtime.seconds();
         while(opModeIsActive() && (runtime.seconds() - currentTime < 3.5)){}
-        transport.Off();
+        transport.Off();*/
+
         /*
         //Drive forward a tile after launching
         drive.driveDist(25);

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.ftcteam5206.utils.Maths;
+import org.ftcteam5206.utils.vectors.quaternion;
 import org.ftcteam5206.utils.vectors.vector3d;
 
 /**
@@ -49,8 +50,11 @@ public class Drive {
     }
 
     public double getRobotYaw(){
-        return -imu.getAngularOrientation().firstAngle;
+        //quaternion q = new quaternion(imu.getQuaternionOrientation());
+        //return Maths.lightweightQuatToYaw(q);
+        return -Maths.radiansToDegrees(imu.getAngularOrientation().firstAngle);
     }
+
     private int ldoffset, rdoffset;
     public void zeroDriveEncoders(){
         ldoffset = leftDrive.getCurrentPosition();
@@ -109,7 +113,7 @@ public class Drive {
 
     //Basic Bang Bang ABS Turn
     public double processedTargetAngle;
-    double targetAngle;
+    public double targetAngle;
     public double offsetAngle;
     public void absTurn(double targetAngle){
         this.targetAngle = targetAngle;
@@ -164,20 +168,21 @@ public class Drive {
         rightDrive.setPower(kv*kinematics.getY() + ka*kinematics.getZ() + kpTurn*error + kiTurn*integralerror);
     }
     */
-
+    double turnStartTime;
     public void plannedTurn(double degrees){
+        turnStartTime = OpModeTime.seconds();
         targetAngle = getRobotYaw() + degrees;
         targetAngle = wrap360(targetAngle);
         absTurn(targetAngle);
-        Log.d("autodrive", "Target angle: " + targetAngle);
-        Log.d("autodrive", "Processed target angle: " + processedTargetAngle);
+        Log.d("autodrive", "Planned Turn Starting. Target is " + targetAngle + " we're currently at " + getRobotYaw());
     }
 
     double previousTime = 0;
     double prevError = 0;
     public void plannedTurnUpdate() {
-        /*double kP = 1/215.0;
-        double kD = 1/1000.0;
+        double kP = 1/400.0;
+        double error = Maths.smallestSignedAngle(targetAngle, getRobotYaw());
+        /*double kD = 1/1000.0;
         double tChange = OpModeTime.seconds() - previousTime;
         tChange /= 1e9;
         previousTime = OpModeTime.seconds();
@@ -211,9 +216,11 @@ public class Drive {
             return !Maths.aboutEqual(targetAngle, getRobotYaw(), 1) && !(getRobotYaw() < targetAngle);
         */
         //return /*(OpModeTime.seconds()-turnTime < turnPath.target_time*1.5) && */!Maths.aboutEqual(targetAngle, getRobotYaw(), 1);
-        Log.d("autodrive", "Robot angle: " + getRobotYaw());
-        Log.d("autodrive", "Abs Smallest Signed Angle: " + Maths.smallestSignedAngle(getRobotYaw(), targetAngle));
-        return (Math.abs(Maths.smallestSignedAngle(getRobotYaw(),targetAngle)) > 1.0);
+        //Log.d("autodrive", "Robot angle: " + getRobotYaw());
+        //Log.d("autodrive", "Abs Smallest Signed Angle: " + Maths.smallestSignedAngle(getRobotYaw(), targetAngle));
+        Log.d("autodrive", (OpModeTime.seconds() - turnStartTime) + ", " +  getRobotYaw() + ", "  + Maths.smallestSignedAngle(getRobotYaw(), targetAngle));
+        //return (Math.abs(Maths.smallestSignedAngle(getRobotYaw(),targetAngle)) > 5);
+        return Maths.smallestSignedAngle(getRobotYaw(),targetAngle) > 0;
     }
 
     private double wrap360(double degrees) {

@@ -9,8 +9,10 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.AnalogSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.configuration.DeviceConfiguration;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
@@ -34,7 +36,7 @@ public class KingArthur {
     public Servo clasp = null;
     public Servo hood = null;
     public Servo capRelease = null;
-
+    public DeviceInterfaceModule dim = null;
     HardwareMap hwMap = null;
 
     public KingArthur(){}
@@ -78,14 +80,14 @@ public class KingArthur {
         //clasp = hwMap.servo.get("clasp");
         //hood = hwMap.servo.get("hood");
         //capRelease = hwMap.servo.get("cap");
-        //TODO: Change these parameters to things we actually like
+        dim = this.hwMap.deviceInterfaceModule.get("dim");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = false;
-        parameters.loggingTag          = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        parameters.mode = BNO055IMU.SensorMode.IMU;
+        parameters.useExternalCrystal = true;
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        parameters.pitchMode = BNO055IMU.PitchMode.WINDOWS;
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
 
 
         imu = hwMap.get(BNO055IMU.class, "imu");//Angle 1 is yaw, angle 2 is roll, angle 3 is pitch

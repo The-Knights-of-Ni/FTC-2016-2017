@@ -16,6 +16,7 @@ import org.ftcteam5206.subsystems.Cap;
 import org.ftcteam5206.subsystems.Drive;
 import org.ftcteam5206.subsystems.Intake;
 import org.ftcteam5206.subsystems.Launcher;
+import org.ftcteam5206.subsystems.PlannedPath;
 import org.ftcteam5206.subsystems.RobotConstants;
 import org.ftcteam5206.subsystems.Transport;
 import org.ftcteam5206.subsystems.vision.VisionSystem;
@@ -48,7 +49,8 @@ public class Mk2Teleop extends LinearOpMode{
         waitForStart();
         runtime.reset();
         //drive.zeroIMU();
-
+        boolean driveAutoInitializing = false;
+        double afterTurnLogs = Double.MAX_VALUE;
         while (opModeIsActive()) {
             //Button Try Catch
             try {
@@ -67,9 +69,34 @@ public class Mk2Teleop extends LinearOpMode{
                     drive.leftDrive.setPower(sticks.x - sticks.y);
                     break;
                 case AUTO:
+                    if(driveAutoInitializing){
+                        //drive.plannedTurn(90);
+                        drive.driveDist(24, 20);
+                        driveAutoInitializing = false;
+                    }
+                    if(drive.driveDistChecker()){
+                        drive.driveDistUpdate();
+                    } else {
+                        Log.d("autodrive", "Turn finished");
+                        pad1.buttons.Y.setStatus(false);
+                        afterTurnLogs = runtime.seconds();
+                    }
                     break;
             }
+            if(runtime.seconds() - afterTurnLogs > 5 ){
+                afterTurnLogs = Double.MAX_VALUE;
+                Log.d("autodrive", "angle 5s after turn " + drive.getRobotYaw());
+                Log.d("autodrive", "power 5s after turn " + drive.rightDrive.getPower());
+            }
 
+
+            if(pad1.toggle(pad1.buttons.Y)){
+                drive.setDriveState(Drive.DriveState.AUTO);
+            } else
+                drive.setDriveState(Drive.DriveState.OPEN_LOOP);
+            if(pad1.singlePress(pad1.buttons.Y)){
+                driveAutoInitializing = true;
+            }
             //Intake State Machine
             switch (intake.getIntakeState()) {
                 case STOPPED:

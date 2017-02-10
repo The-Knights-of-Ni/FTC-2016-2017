@@ -106,4 +106,32 @@ public class Maths {
     }
     /* End of 2D vector operations */
 
+    public static vector3d quaternionToEuler(quaternion q){
+        double ysqr = q.y * q.y;
+        vector3d output = new vector3d(0,0,0);
+        // roll (x-axis rotation)
+        double t0 = +2.0 * (q.w * q.x + q.y * q.z);
+        double t1 = +1.0 - 2.0 * (q.x * q.x + ysqr);
+        output.x = Math.atan2(t0, t1);
+
+        // pitch (y-axis rotation)
+        double t2 = +2.0 * (q.w * q.y - q.z * q.x);
+        t2 = t2 > 1.0 ? 1.0 : t2;
+        t2 = t2 < -1.0 ? -1.0 : t2;
+        output.y = Math.asin(t2);
+
+        // yaw (z-axis rotation)
+        double t3 = +2.0 * (q.w * q.z + q.x * q.y);
+        double t4 = +1.0 - 2.0 * (ysqr + q.z * q.z);
+        output.z = Math.atan2(t3, t4);
+        return output;
+    }
+
+    public static double lightweightQuatToYaw(quaternion q){
+        /*double ysqr = q.y * q.y;
+        double t3 = +2.0 * (q.w * q.z + q.x * q.y);
+        double t4 = +1.0 - 2.0 * (ysqr + q.z * q.z);
+        return Math.atan2(t3, t4);*/
+        return Math.atan2(2*(q.w*q.z + q.x*q.y), 1 - 2*(q.y*q.y + q.z*q.z) ) * 180.0 / Math.PI;
+    }
 }
