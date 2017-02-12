@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.configuration.DeviceConfiguration;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
@@ -37,6 +38,9 @@ public class KingArthur {
     public Servo hood = null;
     public Servo capRelease = null;
     public DeviceInterfaceModule dim = null;
+    public Servo transportServo = null;
+    public TouchSensor transportSensor = null;
+
     HardwareMap hwMap = null;
 
     public KingArthur(){}
@@ -81,6 +85,8 @@ public class KingArthur {
         //hood = hwMap.servo.get("hood");
         //capRelease = hwMap.servo.get("cap");
         dim = this.hwMap.deviceInterfaceModule.get("dim");
+        transportServo = hwMap.servo.get("transport");
+        //TODO: Change these parameters to things we actually like
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.mode = BNO055IMU.SensorMode.IMU;
         parameters.useExternalCrystal = true;
@@ -92,7 +98,8 @@ public class KingArthur {
 
         imu = hwMap.get(BNO055IMU.class, "imu");//Angle 1 is yaw, angle 2 is roll, angle 3 is pitch
         imu.initialize(parameters);
-        turretPot = hwMap.get(AnalogInput.class, "pot");
+        //turretPot = hwMap.get(AnalogInput.class, "pot");
+        transportSensor = hwMap.touchSensor.get("ball");
     }
 
     public void resetEncoders(){
