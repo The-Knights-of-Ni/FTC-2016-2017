@@ -68,7 +68,8 @@ public class Mk2Auto extends LinearOpMode {
         drive.stop();
         double currentTime = runtime.seconds();
         while(opModeIsActive() && (runtime.seconds() - currentTime < 1)){}
-        drive.plannedTurn(90);
+
+        drive.plannedTurn(-45);
         while(opModeIsActive() && drive.plannedTurnChecker()){
             drive.plannedTurnUpdate();
             sleep(5);
@@ -76,24 +77,29 @@ public class Mk2Auto extends LinearOpMode {
         drive.stop();
         currentTime = runtime.seconds();
         while(opModeIsActive() && (runtime.seconds() - currentTime < 1)){}
+
         telemetry.addData("Robot Yaw", drive.getRobotYaw());
         telemetry.update();
-        drive.stop();
-        drive.plannedTurn(90 - drive.getRobotYaw());
+        //TODO: Package Turn and Turn Back into one thing
+        drive.plannedTurn(-45 - drive.getRobotYaw());
         while(opModeIsActive() && Maths.smallestSignedAngle(drive.getRobotYaw(),drive.targetAngle) < 0){
             drive.plannedTurnUpdate();
         }
         drive.stop();
         currentTime = runtime.seconds();
         while(opModeIsActive() && (runtime.seconds() - currentTime < 1)){}
+
         telemetry.addData("Robot Yaw", drive.getRobotYaw());
         telemetry.update();
+
+        drive.driveDist(40, 20);
+        while(opModeIsActive() && drive.driveDistChecker()){
+            drive.driveDistUpdate();
+        }
+        drive.stop();
+        telemetry.update();
+
         while(opModeIsActive());
-//        drive.driveDist(40, 20);
-//        while(opModeIsActive() && drive.driveDistChecker()){
-//            drive.driveDistUpdate();
-//        }
-//        drive.stop();
         /*drive.driveDist(36);
         while(opModeIsActive() && drive.driveDistChecker()){
             drive.driveDistUpdate();
@@ -104,7 +110,8 @@ public class Mk2Auto extends LinearOpMode {
         robot.launcher.setPower(1);
         double currentTime = runtime.seconds();
         while(opModeIsActive() && (runtime.seconds() - currentTime < 1.2)){}
-        //wait for 2 seconds to launch balls
+        //wait for 2 seconds to
+         l aunch balls
         transport.On();
         currentTime = runtime.seconds();
         while(opModeIsActive() && (runtime.seconds() - currentTime < 3.5)){}
