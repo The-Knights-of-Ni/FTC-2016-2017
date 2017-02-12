@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.ftcteam5206.KingArthur;
 import org.ftcteam5206.subsystems.Cap;
@@ -32,8 +33,7 @@ public class Mk2Teleop extends LinearOpMode{
     ElapsedTime runtime = new ElapsedTime();
 
     @Override
-    public void runOpMode() throws InterruptedException
-    {
+    public void runOpMode() throws InterruptedException {
         ButtonHandler pad1 = new ButtonHandler();
         ButtonHandler pad2 = new ButtonHandler();
 
@@ -42,8 +42,10 @@ public class Mk2Teleop extends LinearOpMode{
         Drive drive = new Drive(robot.leftDrive, robot.rightDrive, robot.imu, runtime);
         Launcher launcher = new Launcher(robot.launcher, robot.turret, robot.turretPot, robot.hood, runtime);
         Intake intake = new Intake(robot.intakeTransport, runtime);
-        Transport transport = new Transport(robot.intakeTransport, runtime);
-
+        Transport transport = new Transport(robot.intakeTransport, robot.transportServo, runtime);
+        double servoPosition = 0;
+        robot.beaconPusher.setPosition(0.5);
+        transport.setServoPosition(servoPosition);
         robot.resetEncoders();
         waitForStart();
         runtime.reset();
@@ -69,7 +71,7 @@ public class Mk2Teleop extends LinearOpMode{
                 case AUTO:
                     break;
             }
-
+            /*
             //Intake State Machine
             switch (intake.getIntakeState()) {
                 case STOPPED:
@@ -88,10 +90,10 @@ public class Mk2Teleop extends LinearOpMode{
                     else
                         intake.intakeOff();
                     break;
-                    */
-                    if(pad2.press(pad2.buttons.Y))
+
+                    if (pad2.press(pad2.buttons.Y))
                         intake.intakeReverse();
-                    else if(pad1.press(pad1.buttons.A)) {
+                    else if (pad1.press(pad1.buttons.A)) {
                         intake.intakeOn();
                         telemetry.addData("Intake", "On");
                     } else {
@@ -99,7 +101,6 @@ public class Mk2Teleop extends LinearOpMode{
                         telemetry.addData("Intake", "Off");
                     }
                     break;
-                /*
                 case AUTO:
                     intake.intakeOff();
                     if(pad2.toggle(pad2.buttons.A)) //Confirm launch
@@ -108,15 +109,15 @@ public class Mk2Teleop extends LinearOpMode{
                         intake.setIntakeState(Intake.IntakeState.OPEN_LOOP);
                     }
                     break;
-                    */
             }
+            */
 
             //Launcher state machine
             switch (launcher.getLauncherState()) {
                 case STOPPED:
                     break;
                 case OPEN_LOOP:
-                    if(pad2.toggle(pad2.buttons.X)) {
+                    if (pad2.toggle(pad2.buttons.X)) {
                         robot.launcher.setPower(1);
                         telemetry.addData("Launcher", "On");
                     } else {
@@ -127,17 +128,51 @@ public class Mk2Teleop extends LinearOpMode{
             }
 
             //Turret control
-            robot.turret.setPower(.3*gamepad2.left_stick_x);
+            robot.turret.setPower(.3 * gamepad2.left_stick_x);
 
+            //Transport servo control
+            /*
+            double newPosition = transport.getServoPosition() -.1*gamepad1.right_stick_y;
+            Range.clip(newPosition, 0, 1);
+            transport.setServoPosition(newPosition);
+            */
+
+            servoPosition += -.01*gamepad1.right_stick_y;
+            servoPosition = Range.clip(servoPosition, 0, 1);
+            robot.transportServo.setPosition(servoPosition);
+
+            // Intake/transport control
+            if (pad2.press(pad2.buttons.Y)) //Reverse intake
+                intake.intakeReverse();
+            else if (pad1.press(pad1.buttons.A)) //Intake on
+                intake.intakeOn();
+            else //Intake off
+                intake.intakeOff();
+
+            //Flipper control
+            if (servoPosition == 0) //Flipper is down
+                if (robot.transportSensor.getValue() == 1) { //Ball is on flipper
+                    servoPosition = 0.3;
+                    transport.setServoPosition(servoPosition);
+                }
+            else if (servoPosition == 0.7) //Flipper is ready to launch
+                if (robot.transportSensor.getValue() == 0) {
+                    servoPosition = 0;
+                    transport.setServoPosition(servoPosition);
+                }
+
+            if(pad2.press(pad2.buttons.LEFT_TRIGGER)) {
+                servoPosition = 0.7;
+                transport.setServoPosition(servoPosition);
+            }
+
+            telemetry.addData("Transport Servo", servoPosition);
+            telemetry.addData("Ball Sensor", robot.transportSensor.getValue());
             telemetry.addData("Intake State Machine", intake.getIntakeState());
             telemetry.addData("Drive State Machine", drive.getDriveState());
             telemetry.addData("Robot Yaw", drive.getRobotYaw());
             telemetry.addData("Turret Angle", launcher.turret.getAngle());
             telemetry.update();
         }
-    }
-
-    private void onRadioButtonClicked() {
-
     }
 }

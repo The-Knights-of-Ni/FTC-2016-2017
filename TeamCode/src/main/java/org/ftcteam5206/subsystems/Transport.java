@@ -12,13 +12,21 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Transport {
     public DcMotor transportMotor;
+    public Servo transportServo;
     public ElapsedTime OpModeTime;
     public boolean isRunning = false;
 
     public double transportSpeed = 0.5;
 
-    public Transport(DcMotor transportMotor, ElapsedTime opModeTime) {
+    public enum TransportState {
+        OPEN_LOOP, HOLD_BALL, LAUNCH_POSITION
+    }
+
+    public TransportState transportState = TransportState.OPEN_LOOP;
+
+    public Transport(DcMotor transportMotor, Servo transportServo, ElapsedTime opModeTime) {
         this.transportMotor = transportMotor;
+        this.transportServo = transportServo;
         OpModeTime = opModeTime;
     }
 
@@ -31,11 +39,23 @@ public class Transport {
         isRunning = !isRunning;
     }
 
-    public void On(){
+    public void on(){
         transportMotor.setPower(0.75);
     }
 
-    public void Off(){
+    public void off(){
         transportMotor.setPower(0);
+    }
+
+    public void setServoPosition (double position) {
+        transportServo.setPosition(position);
+    }
+
+    public double getServoPosition () {
+        return transportServo.getPosition();
+    }
+
+    public TransportState getTransportState() {
+        return transportState;
     }
 }

@@ -25,7 +25,7 @@ public class Mk2Auto extends LinearOpMode {
         Drive drive = new Drive(robot.leftDrive, robot.rightDrive, robot.imu, runtime);
         Launcher launcher = new Launcher(robot.launcher, robot.turret, robot.turretPot, robot.hood, runtime);
         Intake intake = new Intake(robot.intakeTransport, runtime);
-        Transport transport = new Transport(robot.intakeTransport, runtime);
+        Transport transport = new Transport(robot.intakeTransport, robot.transportServo,runtime);
         //BeaconPusher beaconPusher = new BeaconPusher(robot.beaconPusher, runtime);
         VisionSystem visionSystem = new VisionSystem(this);
 
@@ -47,10 +47,10 @@ public class Mk2Auto extends LinearOpMode {
         double currentTime = runtime.seconds();
         while(opModeIsActive() && (runtime.seconds() - currentTime < 1.2)){}
         //wait for 2 seconds to launch balls
-        transport.On();
+        transport.on();
         currentTime = runtime.seconds();
         while(opModeIsActive() && (runtime.seconds() - currentTime < 3.5)){}
-        transport.Off();
+        transport.off();
         /*
         //Drive forward a tile after launching
         drive.driveDist(25);
