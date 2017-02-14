@@ -3,6 +3,7 @@ package org.ftcteam5206;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * Created by Parker on 2/13/17.
@@ -11,13 +12,18 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Autonomous(name="DriveBot_Auto", group="DriveBot")
 public class auto extends LinearOpMode {
     //setup required variables
-    ElapsedTime runTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-    hardwareDriveBot robot = new hardwareDriveBot();
+    public ElapsedTime runTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    public hardwareDriveBot robot = new hardwareDriveBot();
 
+    @Override
     public void runOpMode() throws InterruptedException {
-        driveForward(75,1000);
+        robot.init(hardwareMap);
+
+        waitForStart();
+
+        driveForward(25,800);
         Shoot();
-        driveForward(75,1000);
+        driveForward(50,1000);
     }
 
     //drives motors for a certain time
@@ -35,14 +41,17 @@ public class auto extends LinearOpMode {
 
             telemetry.addData("DriveTime", "%.2f", timer/1000);
         }
-
+        robot.lfMotor.setPower(0);
+        robot.rfMotor.setPower(0);
+        robot.rbMotor.setPower(0);
+        robot.lbMotor.setPower(0);
     }
 
     //try to shoot a particle
     public void Shoot(){
         double initialTime = runTime.time();
         double timer  = 0;
-        int allotedTime = 5000;
+        int allotedTime = 10000;
         double sPower = 0.75;
 
         //variables for tranloader control
@@ -65,6 +74,12 @@ public class auto extends LinearOpMode {
 
             telemetry.addData("ShootTime", "%.2f", timer/1000);
         }
+
+        robot.rShooter.setPower(0);
+        robot.lShooter.setPower(0);
+        robot.loader.setPosition(0.5);
+        robot.transport.setPosition(0.5);
+
     }
 }
 
