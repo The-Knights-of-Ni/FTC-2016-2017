@@ -51,15 +51,28 @@ public class driveBot extends OpMode{
     double lPower;
     int driverMode;
 
+    //variables for transloader control
+    double loaderUp = 0.3;
+    double loaderDown = 0.05;
+
+    //shooter variables
+    double sPower = 0.85;
+
+    //variables for button handling
+    boolean lastX = false;
+    boolean lastY = false;
+    boolean lastA = false;
+    boolean lastB = false;
+
     public void Drive(){
         // Run wheels in not tank mode
         //set motor speeds
         if (gamepad1.right_bumper){
-            driverMode = 2;
-        } else if (gamepad1.left_bumper){
-            driverMode = 1;
-        } else {
             driverMode = 0;
+        } else if (gamepad1.left_bumper){
+            driverMode = 2;
+        } else {
+            driverMode = 1;
         }
 
         switch (driverMode){
@@ -98,38 +111,75 @@ public class driveBot extends OpMode{
 
     }
 
-    public void Score (){
-        //transport and shooter mode
-        if(gamepad1.x){
+    public void Score () {
+        boolean shoot = false, runTrans = false, out = false, intakeOn = false;
+        //get current joystick state to setup actions
+        if (gamepad1.x != lastX && gamepad1.x) {
             //shoot
-            telemetry.addData("Say", "Shooting");
-        } else  if (gamepad1.a){
-            //spin up
-            telemetry.addData("Say", "Spinning up");
-        } else if (gamepad1.b){
-            //run transport
-            telemetry.addData("Say", "Transporting");
+            shoot = !shoot;
         }
-        //code for running the intake
-        if (gamepad1.y == true) {
-            robot.intake.setPosition(1);
-            telemetry.addData("Say", "Intake On");
-        }else if(gamepad1.dpad_down == true){
-            robot.intake.setPosition(0);
-            telemetry.addData("Say", "Intake Reverse");
-        } else {
-            robot.intake.setPosition(0.5);
-            telemetry.addData("Say", "Intake Off");
+        if (gamepad1.a != lastA && gamepad1.a) {
+            //transport on
+            runTrans = !runTrans;
         }
-    }
+        if (gamepad1.b != lastB && gamepad1.b) {
+            //run in reverse
+            out = !out;
+        }
+        if (gamepad1.y != lastY && gamepad1.y) {
+            intakeOn = !intakeOn;
+        }
 
-    public void Navigate(){
+        //code for running the transport
+            if (runTrans) {
+                telemetry.addData("Say", "Transporting");
+                robot.transport.setPosition(0);
+                if (runTime.time() % 2000 > 800) {
+                    robot.transloader.setPosition(loaderDown);
+                } else {
+                    robot.transloader.setPosition(loaderUp);
+                }
+            } else if (out) {
+                telemetry.addData("Say", "Outaking");
+                robot.transport.setPosition(1);
+                robot.transloader.setPosition(loaderDown);
+            } else {
+                robot.transloader.setPosition(loaderDown);
+                robot.transport.setPosition(0.5);
+            }
+
+            //run the intake
+            if (intakeOn) {
+                robot.intake.setPosition(1);
+                telemetry.addData("Say", "Intake On");
+            } else if (out) {
+                robot.intake.setPosition(0);
+            } else {
+                robot.intake.setPosition(0.5);
+                telemetry.addData("Say", "Intake Off");
+            }
+
+            //code for running the shooter
+            if (shoot) {
+                telemetry.addData("Say", "Shooting");
+                robot.rShooter.setPower(sPower);
+                robot.lShooter.setPower(sPower);
+                robot.loader.setPosition(0);
+            } else {
+                robot.lShooter.setPower(0);
+                robot.rShooter.setPower(0);
+                robot.loader.setPosition(0.5);
+            }
+        }
+
+    public void Navigate() {
         //find change in time since last execution
         time = runTime.time();
         dTime = time - lastTime;
         lastTime = time;
-        telemetry.addData("dtime","%.2f", dTime);
+        telemetry.addData("dtime", "%.2f", dTime);
     }
+
     /* Declare OpMode members. */
     hardwareDriveBot robot = new hardwareDriveBot();
 
