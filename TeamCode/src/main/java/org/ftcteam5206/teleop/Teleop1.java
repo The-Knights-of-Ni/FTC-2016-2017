@@ -116,6 +116,7 @@ public class Teleop1 extends LinearOpMode{
         //else if (gamePad2.toggle(pad1.buttons.LEFT_STICK_BUTTON))
     }
 
+    /*
     public void updateForks(KingArthur robot, ButtonHandler gamePad1, ButtonHandler gamePad2)
     {
         if (gamePad1.toggle(pad1.buttons.RIGHT_STICK_BUTTON))
@@ -127,6 +128,7 @@ public class Teleop1 extends LinearOpMode{
             robot.forkRelease.setPosition(0.5);
         }
     }
+    */
 
     public void updateClasp(KingArthur robot, Gamepad pad1, Gamepad pad2)
     {
@@ -194,7 +196,7 @@ public class Teleop1 extends LinearOpMode{
                     updateIntakeForward(robot, pad1, pad2);
                     updateIntakeReverse(robot, pad1, pad2);
                     updateTransport(robot, pad1, pad2);
-                    updateForks(robot, pad1, pad2);
+                    //updateForks(robot, pad1, pad2);
                     updateCappRelease(robot, pad1, pad2);
                     updateClasp(robot, gamepad1, gamepad2);
                     updateBeaconPusher(robot, pad1, pad2);

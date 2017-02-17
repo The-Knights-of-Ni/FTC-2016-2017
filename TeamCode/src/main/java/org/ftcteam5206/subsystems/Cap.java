@@ -1,7 +1,10 @@
 package org.ftcteam5206.subsystems;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import static org.ftcteam5206.subsystems.Cap.CapState.STOPPED;
 
 /**
  * Cap Object
@@ -10,16 +13,37 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 //TODO: Add in timing and releases
 public class Cap {
-    public Servo forkRelease;
+    public Servo forkReleaseLeft;
+    public Servo forkReleaseRight;
     public Servo clasp;
-    public Servo capRelease;
+    public DcMotor capMotor;
     public ElapsedTime OpModeTime;
 
+    public enum CapState {
+        STOPPED, FORKS_DOWN, CLASP_ON, LIFTING, LIFTED
+    }
 
-    public Cap(Servo capRelease, Servo forkRelease, Servo clasp, ElapsedTime OpModeTime) {
-        this.capRelease = capRelease;
-        this.forkRelease = forkRelease;
+    public CapState capState = STOPPED;
+
+    public Cap(Servo forkReleaseLeft, Servo forkReleaseRight, Servo clasp, DcMotor capMotor, ElapsedTime OpModeTime) {
+        this.forkReleaseLeft = forkReleaseLeft;
+        this.forkReleaseRight = forkReleaseRight;
         this.clasp = clasp;
+        this.capMotor = capMotor;
         this.OpModeTime = OpModeTime;
+    }
+
+    //TODO: Program servos
+    public void releaseForks() {
+        forkReleaseRight.setPosition(1);
+        forkReleaseRight.setPosition(1);
+    }
+
+    public void deployClasp() {
+        clasp.setPosition(1);
+    }
+
+    public void liftCap() {
+
     }
 }

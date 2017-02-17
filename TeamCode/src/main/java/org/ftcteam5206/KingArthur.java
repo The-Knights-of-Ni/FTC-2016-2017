@@ -27,11 +27,12 @@ public class KingArthur {
     public DcMotor rightDrive = null;
     public DcMotor launcher = null;
     public DcMotor intakeTransport = null;
-    public DcMotor turret = null;
+    public DcMotor capMotor = null;
     public AnalogInput turretPot = null;
     public BNO055IMU imu = null;
     public Servo beaconPusher = null;
-    public Servo forkRelease = null;
+    public Servo forkReleaseLeft = null;
+    public Servo forkReleaseRight = null;
     public Servo clasp = null;
     public Servo hood = null;
     public Servo capRelease = null;
@@ -50,7 +51,7 @@ public class KingArthur {
         rightDrive  = hwMap.dcMotor.get("rdrive");
         launcher    = hwMap.dcMotor.get("launcher");
         intakeTransport = hwMap.dcMotor.get("intake");
-        turret = hwMap.dcMotor.get("turret");
+        capMotor = hwMap.dcMotor.get("cap");
         //Set Directions
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -60,25 +61,26 @@ public class KingArthur {
         launcher.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         intakeTransport.setDirection(DcMotor.Direction.FORWARD);
         intakeTransport.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        turret.setDirection(DcMotor.Direction.REVERSE);
-        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        capMotor.setDirection(DcMotor.Direction.REVERSE);
+        capMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // Set all motors to zero power
         leftDrive.setPower(0);
         rightDrive.setPower(0);
         launcher.setPower(0);
         intakeTransport.setPower(0);
-        turret.setPower(0);
+        capMotor.setPower(0);
 
         // Set all motors to run in open loop.
         leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         launcher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeTransport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        capMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Define and initialize ALL installed servos.
         beaconPusher = hwMap.servo.get("beacon");
-        //forkRelease= hwMap.servo.get("fork");
-        //clasp = hwMap.servo.get("clasp");
+        forkReleaseLeft = hwMap.servo.get("forkLeft");
+        forkReleaseRight = hwMap.servo.get("forkRight");
+        clasp = hwMap.servo.get("clasp");
         //hood = hwMap.servo.get("hood");
         //capRelease = hwMap.servo.get("cap");
         transportServo = hwMap.servo.get("transport");
@@ -103,13 +105,13 @@ public class KingArthur {
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         launcher.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeTransport.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        capMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //Might need an idle/wait here.
         leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         launcher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeTransport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        capMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     //TODO: See if we need to wait for tick
 

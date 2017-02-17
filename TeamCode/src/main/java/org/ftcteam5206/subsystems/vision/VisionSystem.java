@@ -78,7 +78,6 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
         openCvCameraView = (JavaCameraView) appContext.findViewById(R.id.openCvView);
         openCvCameraView.setVisibility(SurfaceView.VISIBLE);
         openCvCameraView.setCvCameraViewListener(this);
-
         //Have to use either 3.1.0 or 2.4.13 since Imgproc.moments() isn't in 3.0.0
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, appContext, baseLoaderCallback); //Not sure this is actually doing anything
     }
@@ -114,9 +113,11 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         Mat rgb = inputFrame.rgba();
         Mat rgbT = new Mat();
-        //Rotate image to be right side up
         Core.transpose(rgb, rgbT);
-        Core.flip(rgbT, rgbT, 1);
+        if(cameraId == 0)
+            Core.flip(rgbT, rgbT, 1);
+        else
+            Core.flip(rgbT, rgbT, 0);
         Imgproc.resize(rgbT, rgbT, rgb.size());
         switch(currentProcessingMode) {
             case BEACON:
@@ -151,7 +152,7 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
     }
 
     /** Changes camera being used from rear to front, or front to rear */
-    private void swapCamera(){
+    public void swapCamera(){
         //lol kyler would be so proud
         cameraId = cameraId^1;
         openCvCameraView.disableView();

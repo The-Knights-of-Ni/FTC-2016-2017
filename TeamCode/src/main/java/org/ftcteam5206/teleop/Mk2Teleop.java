@@ -40,9 +40,12 @@ public class Mk2Teleop extends LinearOpMode{
         robot.init(hardwareMap);
         //Init Subsystem Controllers
         Drive drive = new Drive(robot.leftDrive, robot.rightDrive, robot.imu, runtime);
-        Launcher launcher = new Launcher(robot.launcher, robot.turret, robot.turretPot, robot.hood, runtime);
+        Launcher launcher = new Launcher(robot.launcher, robot.hood, runtime);
         Intake intake = new Intake(robot.intakeTransport, runtime);
         Transport transport = new Transport(robot.intakeTransport, robot.transportServo, runtime);
+        Cap cap = new Cap(robot.forkReleaseLeft, robot.forkReleaseRight, robot.clasp, robot.capMotor, runtime);
+        VisionSystem visionSystem = new VisionSystem(this);
+
         double servoPosition = 0;
         robot.beaconPusher.setPosition(0.5);
         transport.setServoPosition(servoPosition);
@@ -127,19 +130,17 @@ public class Mk2Teleop extends LinearOpMode{
                     break;
             }
 
-            //Turret control
-            robot.turret.setPower(.3 * gamepad2.left_stick_x);
-
             //Transport servo control
             /*
             double newPosition = transport.getServoPosition() -.1*gamepad1.right_stick_y;
             Range.clip(newPosition, 0, 1);
             transport.setServoPosition(newPosition);
             */
-
+            /*
             servoPosition += -.01*gamepad1.right_stick_y;
             servoPosition = Range.clip(servoPosition, 0, 1);
             robot.transportServo.setPosition(servoPosition);
+            */
 
             // Intake/transport control
             if (pad2.press(pad2.buttons.Y)) //Reverse intake
@@ -150,20 +151,49 @@ public class Mk2Teleop extends LinearOpMode{
                 intake.intakeOff();
 
             //Flipper control
-            if (servoPosition == 0) //Flipper is down
-                if (robot.transportSensor.getValue() == 1) { //Ball is on flipper
+            if (servoPosition == 0) { //Servo is down
+                if (robot.transportSensor.getValue() == 1) { //Ball is on switch
                     servoPosition = 0.3;
-                    transport.setServoPosition(servoPosition);
                 }
-            else if (servoPosition == 0.7) //Flipper is ready to launch
-                if (robot.transportSensor.getValue() == 0) {
+            } else if (servoPosition == 0.3) {
+                if (pad2.press(pad2.buttons.LEFT_TRIGGER)) { //Driver shoots ball
+                    servoPosition = 0.7;
+                }
+            } else if (servoPosition == 0.7) {
+                if (robot.transportSensor.getValue() == 0) { //Ball has been launched
                     servoPosition = 0;
-                    transport.setServoPosition(servoPosition);
                 }
+            }
 
-            if(pad2.press(pad2.buttons.LEFT_TRIGGER)) {
-                servoPosition = 0.7;
-                transport.setServoPosition(servoPosition);
+            transport.setServoPosition(servoPosition);
+
+            //Cap control
+            switch(cap.capState) {
+                case STOPPED:
+                    if (pad1.toggle(pad1.buttons.Y)) { //Enter cap mode and release forks
+                        cap.capState = Cap.CapState.FORKS_DOWN;
+                        cap.releaseForks();
+                        pad1.buttons.Y.setStatus(false);
+                    }
+                    break;
+                case FORKS_DOWN:
+                    if (pad1.toggle(pad1.buttons.Y)) { //Deploy clasp
+                        cap.capState = Cap.CapState.CLASP_ON;
+                        cap.deployClasp();
+                        pad1.buttons.Y.setStatus(false);
+                    }
+                    break;
+                case CLASP_ON:
+                    if (pad1.toggle(pad1.buttons.Y)) { //Lift cap ball
+                        cap.capState = Cap.CapState.LIFTING;
+                        cap.liftCap();
+                        pad1.buttons.Y.setStatus(false);
+                    }
+                    break;
+                case LIFTING:
+                    break;
+                case LIFTED:
+                    break;
             }
 
             telemetry.addData("Transport Servo", servoPosition);
@@ -171,7 +201,6 @@ public class Mk2Teleop extends LinearOpMode{
             telemetry.addData("Intake State Machine", intake.getIntakeState());
             telemetry.addData("Drive State Machine", drive.getDriveState());
             telemetry.addData("Robot Yaw", drive.getRobotYaw());
-            telemetry.addData("Turret Angle", launcher.turret.getAngle());
             telemetry.update();
         }
     }
