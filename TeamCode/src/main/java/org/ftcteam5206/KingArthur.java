@@ -37,6 +37,7 @@ public class KingArthur {
     public Servo clasp = null;
     public Servo hood = null;
     public Servo capRelease = null;
+    public Servo phone = null;
     public DeviceInterfaceModule dim = null;
     public Servo transportServo = null;
     public TouchSensor transportSensor = null;
@@ -80,7 +81,8 @@ public class KingArthur {
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Define and initialize ALL installed servos.
         beaconPusher = hwMap.servo.get("beacon");
-        //forkRelease= hwMap.servo.get("fork");
+        phone = hwMap.servo.get("Phone");
+        //forkRelease = hwMap.servo.get("fork");
         //clasp = hwMap.servo.get("clasp");
         //hood = hwMap.servo.get("hood");
         //capRelease = hwMap.servo.get("cap");

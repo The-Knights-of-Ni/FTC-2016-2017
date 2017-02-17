@@ -20,7 +20,11 @@ public class Launcher {
     private LauncherState launcherState = LauncherState.OPEN_LOOP;
 
     public enum LauncherState {
-        STOPPED, OPEN_LOOP, AUTO
+        STOPPED, OPEN_LOOP, SEMI_AUTO, AUTO
+    }
+
+    public enum SemiAutoState {
+        TRANSPORTING, SPINNING_UP, FIRING, RELOADING
     }
 
     public Launcher(DcMotor launcher, DcMotor turret, AnalogInput turretpot, Servo hood, ElapsedTime OpModeTime){
@@ -38,4 +42,6 @@ public class Launcher {
     public void setLauncherState(LauncherState launcherState) {
         this.launcherState = launcherState;
     }
+
+
 }

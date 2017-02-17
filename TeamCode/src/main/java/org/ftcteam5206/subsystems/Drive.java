@@ -50,11 +50,12 @@ public class Drive {
     }
 
     public double getRobotYaw(){
-        //quaternion q = new quaternion(imu.getQuaternionOrientation());
-        //return Maths.lightweightQuatToYaw(q);
         return -Maths.radiansToDegrees(imu.getAngularOrientation().firstAngle);
     }
 
+    public double getPredictedRobotYaw(int milliseconds){
+        return -Maths.radiansToDegrees(imu.getAngularOrientation().firstAngle + imu.getAngularVelocity().firstAngleRate*milliseconds/1000.0);
+    }
     private int ldoffset, rdoffset;
     public void zeroDriveEncoders(){
         ldoffset = leftDrive.getCurrentPosition();
