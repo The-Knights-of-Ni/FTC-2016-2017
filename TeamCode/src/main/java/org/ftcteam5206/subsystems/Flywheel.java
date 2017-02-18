@@ -40,12 +40,15 @@ public class Flywheel {
     public void spinDown(){
         launcher.setPower(0);
     }
-
+    double prevRPM;
     public double getRPM(){
         double ticksSinceLastCall = launcher.getCurrentPosition() - lastCallTicks;//This probably doesn't work.
+        if(ticksSinceLastCall == 0)
+            return -prevRPM;
         double revolutions = ticksSinceLastCall/RobotConstants.launcherPPR;
         double timeSinceLastCall = OpModeTime.seconds() - lastCallTime;
         double currentRPM = revolutions/(timeSinceLastCall/60);
+        prevRPM = currentRPM;
         lastCallTicks = launcher.getCurrentPosition();//Need to wrap if this gets big
         lastCallTime = OpModeTime.seconds();
         return -currentRPM;

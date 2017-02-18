@@ -33,6 +33,18 @@ public class Launcher {
         flywheel = new Flywheel(launcher, OpModeTime);
     }
 
+    public void layup() {
+        launcher.setPower(0.5);
+    }
+
+    public void midrange(){
+        launcher.setPower(0.75);
+    }
+
+    public void spinDown(){
+        flywheel.spinDown();
+    }
+
     public LauncherState getLauncherState() {
         return launcherState;
     }

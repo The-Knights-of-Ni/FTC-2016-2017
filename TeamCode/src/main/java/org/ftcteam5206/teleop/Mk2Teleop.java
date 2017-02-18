@@ -67,10 +67,12 @@ public class Mk2Teleop extends LinearOpMode{
         //Semi Auto Launcher
         Launcher.SemiAutoState semiAutoStatus = TRANSPORTING;
         double ballLaunchStartTime = 0;
+        double ballGrabTime = runtime.seconds();
         boolean emptyChamber = false;
         double shotConfirmTime = 0;
         double rpm = 0, counter = 0;
-
+        double servoUpdateRate = 0;
+        boolean switchHasBeenTriggered = false;
 
         while (opModeIsActive()) {
             //Button Try Catch
@@ -86,8 +88,8 @@ public class Mk2Teleop extends LinearOpMode{
                     break;
                 case OPEN_LOOP:
                     vector2d sticks = JoystickSmoother.smoothJoysticksBezierStyle(new vector2d(gamepad1.left_stick_x, gamepad1.left_stick_y));
-                    drive.rightDrive.setPower(-sticks.x - sticks.y);
-                    drive.leftDrive.setPower(sticks.x - sticks.y);
+                    drive.rightDrive.setPower(Range.clip(-sticks.x - sticks.y, -0.75, 0.75));
+                    drive.leftDrive.setPower(Range.clip(sticks.x - sticks.y, -0.75, 0.75));
                     break;
                 case AUTO:
                     if(driveAutoInitializing){
@@ -175,47 +177,52 @@ public class Mk2Teleop extends LinearOpMode{
                         robot.launcher.setPower(0);
                         telemetry.addData("Launcher", "off");
                     }
-                    if(pad2.press(pad2.buttons.LEFT_TRIGGER)) {
+                    if (pad2.press(pad2.buttons.LEFT_TRIGGER)) {
                         ballLaunchStartTime = runtime.seconds();
                         servoPosition = 0.7;
                         transport.setServoPosition(servoPosition);
                     }
-                    if (servoPosition == 0.7){ //Flipper is ready to launch
-                        Log.d("autodrive", "Time since button press " + (runtime.seconds()-ballLaunchStartTime));
-                        if (runtime.seconds()-ballLaunchStartTime > 0.25) {
+                    if (servoPosition == 0.7) { //Flipper is ready to launch
+                        Log.d("autodrive", "Time since button press " + (runtime.seconds() - ballLaunchStartTime));
+                        if (runtime.seconds() - ballLaunchStartTime > 0.25) {
                             servoPosition = 0;
                             transport.setServoPosition(servoPosition);
                         }
                     }
                     break;
                 case SEMI_AUTO: //After Confirm we spin up, empty the chamber (loop control), and then stop after confirm is pressed again
-                    if (pad2.singlePress(pad2.buttons.X)){
+                    if (pad2.singlePress(pad2.buttons.X)) {
                         emptyChamber = !emptyChamber;
                         shotConfirmTime = runtime.seconds();
                         semiAutoStatus = TRANSPORTING;
+                        if(!emptyChamber)
+                            servoPosition = 0;
                     }
-                    if(emptyChamber){
+                    if (emptyChamber) {
                         switch (semiAutoStatus) {
                             case TRANSPORTING:
                                 //TODO: Take control from drivers so they don't mess this up.
                                 transport.on();
-                                if(transport.getServoPosition() == 0.3)
+                                //Log.d("autolaunch", "Turning transport on");
+                                if (transport.getServoPosition() == 0.3) {
                                     semiAutoStatus = SPINNING_UP;
+                                    shotConfirmTime = runtime.seconds();
+                                }
                                 break;
                             case SPINNING_UP:
                                 transport.off();
                                 //launcher.flywheel.spinUpToRPM(3000);//FIXME: This method is broken
                                 launcher.launcher.setPower(1);
-                                if(launcher.flywheel.getRPM() == 3000 || runtime.seconds() - shotConfirmTime > 2){
+                                if (runtime.seconds() - shotConfirmTime > 2) {
                                     shotConfirmTime = runtime.seconds();
                                     semiAutoStatus = FIRING;
                                 }
                                 break;
                             case FIRING:
                                 servoPosition = 0.7;
-                                if(runtime.seconds()-shotConfirmTime > 0.25)//This should cause a jam to not be a problem, otherwise drivers will manually deal with it.
-                                    //semiAutoStatus = RELOADING;
-                                break;
+                                if (runtime.seconds() - shotConfirmTime > 2)//This should cause a jam to not be a problem, otherwise drivers will manually deal with it.
+                                    semiAutoStatus = RELOADING;
+                                    break;
                             case RELOADING:
                                 servoPosition = 0.0;
                                 semiAutoStatus = TRANSPORTING;
@@ -223,12 +230,14 @@ public class Mk2Teleop extends LinearOpMode{
                         }
                     } else {
                         launcher.flywheel.spinDown();
-                        servoPosition = 0;
+
                     }
                     break;
+            }
 
             // Intake/transport control
             if(!emptyChamber && !(launcher.getLauncherState() == SEMI_AUTO)) {
+                Log.d("autolaunch", "Manual intake/transport control");
                 if (pad2.press(pad2.buttons.Y)) //Reverse intake
                     intake.intakeReverse();
                 else if (pad1.press(pad1.buttons.A)) //Intake on
@@ -243,19 +252,31 @@ public class Mk2Teleop extends LinearOpMode{
             }
 
 
-
             //Flipper control
-            if (servoPosition == 0){ //Flipper is down
-                if (robot.transportSensor.getValue() == 1) { //Ball is on flipper
+            if(pad2.singlePress(pad2.buttons.RIGHT_TRIGGER)){
+                servoPosition = 0;
+            }
+
+            if(servoPosition == 0.7)
+                servoUpdateRate = runtime.seconds();
+
+            if (servoPosition == 0 && runtime.seconds() - servoUpdateRate > 0.25){ //Flipper is down
+                if (!switchHasBeenTriggered && robot.transportSensor.getValue() == 1) { //Ball is on flipper
+                    switchHasBeenTriggered = true;
+                    ballGrabTime = runtime.seconds();
+                }
+                if (switchHasBeenTriggered && runtime.seconds() - ballGrabTime > 0.2){
+                    ballGrabTime = runtime.seconds();
                     servoPosition = 0.3;
+                    switchHasBeenTriggered = false;
                 }
             }
-            else if (servoPosition == 0.7){ //Flipper is ready to launch
-                Log.d("autodrive", "Time since button press " + (runtime.seconds()-ballLaunchStartTime));
-                if (runtime.seconds()-ballLaunchStartTime > 0.25) {
-                    servoPosition = 0;
-                }
-            }
+//            else if (servoPosition == 0.7){ //Flipper is ready to launch
+//                Log.d("autodrive", "Time since button press " + (runtime.seconds()-ballLaunchStartTime));
+//                if (runtime.seconds()-ballLaunchStartTime > 0.25) {
+//                    servoPosition = 0;
+//                }
+//            }
 
             transport.setServoPosition(servoPosition);
 
@@ -288,12 +309,9 @@ public class Mk2Teleop extends LinearOpMode{
                     break;
             }
 
-            if(counter++ > 1000){
-                counter = 0;
-                rpm = launcher.flywheel.getRPM();
-                //Log.d("autodrive", "wheel: " + rpm);
-            }
-          //  telemetry.addData("Wheel RPM", rpm);
+            int secondsRemaining = (int) (120-runtime.seconds());
+            telemetry.addData("Time", secondsRemaining/60 + ":" + secondsRemaining%60);
+            telemetry.addData("Wheel RPM", rpm);
             telemetry.addData("Transport Servo", servoPosition);
             telemetry.addData("Ball Sensor", robot.transportSensor.getValue());
             telemetry.addData("Launcher FSM", launcher.getLauncherState());

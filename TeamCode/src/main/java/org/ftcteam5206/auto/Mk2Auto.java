@@ -13,14 +13,28 @@ import org.ftcteam5206.subsystems.BeaconPusher;
 import org.ftcteam5206.subsystems.Drive;
 import org.ftcteam5206.subsystems.Intake;
 import org.ftcteam5206.subsystems.Launcher;
+import org.ftcteam5206.subsystems.RobotConstants;
 import org.ftcteam5206.subsystems.Transport;
 import org.ftcteam5206.subsystems.vision.VisionSystem;
 import org.ftcteam5206.utils.Maths;
+
+import static org.ftcteam5206.subsystems.Launcher.SemiAutoState.FIRING;
+import static org.ftcteam5206.subsystems.Launcher.SemiAutoState.RELOADING;
+import static org.ftcteam5206.subsystems.Launcher.SemiAutoState.SPINNING_UP;
+import static org.ftcteam5206.subsystems.Launcher.SemiAutoState.TRANSPORTING;
 
 @Autonomous(name = "Mk2Auto", group = "Autonomous")
 public class Mk2Auto extends LinearOpMode {
     KingArthur robot = new KingArthur();
     ElapsedTime runtime = new ElapsedTime();
+
+
+
+    public void waitRobot(double seconds){
+        double startTime = runtime.seconds();
+        while(opModeIsActive() && runtime.seconds()-startTime < seconds){}
+    }
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -34,11 +48,33 @@ public class Mk2Auto extends LinearOpMode {
 
         int allianceColorInt = 1;
         if(FtcRobotControllerActivity.allianceColor == FtcRobotControllerActivity.AllianceColor.BLUE)
-            allianceColorInt = - 1;
+            allianceColorInt = -1;
         telemetry.addData("Robot Yaw", drive.getRobotYaw());
         telemetry.update();
+        robot.beaconPusher.setPosition(0.5);
+        transport.setServoPosition(0);
         waitForStart();
+        robot.resetEncoders();
         runtime.reset();
+
+/*
+        double distanceTarget = Math.PI/2.0 * RobotConstants.driveBaseRadius;
+        Log.d("autodrive", "Target = " + distanceTarget);
+        while(distanceTarget > drive.getAvgDriveEncoderTicks()*RobotConstants.driveTickToDist)
+        {
+            Log.d("autodrive", "Turning " + drive.getLeftDriveEncoderTicks()*RobotConstants.driveTickToDist + ", " + drive.getRightDriveEncoderTicks()*RobotConstants.driveTickToDist);
+            drive.leftDrive.setPower(-0.3);
+            drive.rightDrive.setPower(0.3);
+        }
+        drive.stop();
+        //waitRobot(5);
+        //Log.d("autodrive", " turn " + drive.getLeftDriveEncoderTicks()*RobotConstants.driveTickToDist);
+        while(opModeIsActive()) {
+            Log.d("autodrive", "After Turn " + drive.getLeftDriveEncoderTicks()*RobotConstants.driveTickToDist + ", " + drive.getRightDriveEncoderTicks()*RobotConstants.driveTickToDist);
+            telemetry.addData("IMU", drive.getRobotYaw());
+            telemetry.update();
+        }
+        */
         //double robotYaw = -robot.imu.getAngularOrientation().firstAngle;
         /*double targetAngle = -robot.imu.getAngularOrientation().firstAngle + 90;
         double turnStartTime = runtime.seconds();
@@ -61,50 +97,80 @@ public class Mk2Auto extends LinearOpMode {
         Log.d("autodrive", "power 1s after turn " + robot.rightDrive.getPower());
         //Drive Forward (36 in)*/
 
+        Log.d("auto", "Starting first drive segment");
         drive.driveDist(20, 20);
         while(opModeIsActive() && drive.driveDistChecker()){
             drive.driveDistUpdate();
         }
         drive.stop();
-        double currentTime = runtime.seconds();
-        while(opModeIsActive() && (runtime.seconds() - currentTime < 1)){}
+        Log.d("auto", "Finished first drive segment");
+        waitRobot(1);
 
-        drive.plannedTurn(-45);
-        while(opModeIsActive() && drive.plannedTurnChecker()){
-            drive.plannedTurnUpdate();
-            sleep(5);
+        while (opModeIsActive()) {
+            transport.on();
+            if (robot.transportSensor.getValue() == 1) {
+                transport.off();
+                break;
+            }
+        }
+
+        Log.d("auto", "Spinning up launcher");
+        launcher.launcher.setPower(1);
+        waitRobot(2);
+        Log.d("auto", "Launching first ball");
+        transport.setServoPosition(0.7);
+        waitRobot(0.5);
+        Log.d("auto", "Reset to transport second ball");
+        transport.setServoPosition(0);
+        while (opModeIsActive()) {
+            transport.on();
+            if (robot.transportSensor.getValue() == 1) {
+                transport.off();
+                break;
+            }
+        }
+        Log.d("auto", "Secured second ball");
+        waitRobot(0.5);
+        transport.setServoPosition(0.7);
+        Log.d("auto", "Launched second ball");
+        waitRobot(0.5);
+        Log.d("auto", "Spun down launcher");
+        launcher.launcher.setPower(0);
+
+        drive.encoderTurn(-45*allianceColorInt);
+        while(drive.encoderTurnChecker())
+        {
+            drive.encoderTurnUpdate();
         }
         drive.stop();
-        currentTime = runtime.seconds();
-        while(opModeIsActive() && (runtime.seconds() - currentTime < 1)){}
+        waitRobot(1);
 
-        telemetry.addData("Robot Yaw", drive.getRobotYaw());
-        telemetry.update();
-        //TODO: Package Turn and Turn Back into one thing
-        drive.plannedTurn(-45 - drive.getRobotYaw());
-        while(opModeIsActive() && Maths.smallestSignedAngle(drive.getRobotYaw(),drive.targetAngle) < 0){
-            drive.plannedTurnUpdate();
-        }
-        drive.stop();
-        currentTime = runtime.seconds();
-        while(opModeIsActive() && (runtime.seconds() - currentTime < 1)){}
-
-        telemetry.addData("Robot Yaw", drive.getRobotYaw());
-        telemetry.update();
-
-        drive.driveDist(40, 20);
+        drive.driveDist(44, 20);
         while(opModeIsActive() && drive.driveDistChecker()){
             drive.driveDistUpdate();
         }
         drive.stop();
-        telemetry.update();
+        waitRobot(1);
 
-        while(opModeIsActive());
-        /*drive.driveDist(36);
-        while(opModeIsActive() && drive.driveDistChecker()){
-            drive.driveDistUpdate();
+        drive.encoderTurn((allianceColorInt == 1 ? 270 - drive.getRobotYaw() : 90 - drive.getRobotYaw()));
+        while(opModeIsActive() && drive.encoderTurnChecker()){
+            drive.encoderTurnUpdate();
         }
         drive.stop();
+        waitRobot(1);
+
+        visionSystem.detectBeacon();
+        while (opModeIsActive() && !visionSystem.visionCallback.hasFinished) {}
+        if ((visionSystem.visionCallback.redIsRight && allianceColorInt == 1) || (!visionSystem.visionCallback.redIsRight && allianceColorInt == -1)) //Right beacon position
+            robot.beaconPusher.setPosition(0);
+        else //Left beacon position
+            robot.beaconPusher.setPosition(1);
+
+        while(opModeIsActive()) {
+            telemetry.addData("Robot Yaw", drive.getRobotYaw());
+            telemetry.update();
+        }
+        /*
 
         //Spin up launcher
         robot.launcher.setPower(1);
