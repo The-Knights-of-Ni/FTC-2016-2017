@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VisionHelper {
-    private static final String TAG = "Vision Helper";
+    private static final String TAG = "Vision";
 
     /** Returns coordinates of center of blue and red mass */
     public static double[][] detectBeacon(Mat src) {
@@ -32,18 +32,23 @@ public class VisionHelper {
         Mat blueHierarchy = new Mat();
 
         //constants for thresholding
-        final int redL = 152;
-        final int redH = 180;
-        final int blueL = 88;
-        final int blueH = 118;
-        final int saturation = 0;
-        final int value = 0;
+        final int redL = 148;
+        final int redH = 178;
+        final int blueL = 63;
+        final int blueH = 110;
+        final int saturation = 100;
+        final int value = 100;
 
         Imgproc.cvtColor(src, HSV, Imgproc.COLOR_RGB2HSV);
 
         //create matrices with the red and blue areas thresholded
-        Core.inRange(HSV, new Scalar(redL,saturation,value),new Scalar(redH, 255,255),red);
+        Core.inRange(HSV, new Scalar(redL,60,value),new Scalar(redH, 200,255),red);
         Core.inRange(HSV, new Scalar(blueL,saturation,value),new Scalar(blueH,255,255),blue);
+
+        saveFrame(red);
+        Log.d(TAG, "saved red frame");
+        saveFrame(blue);
+        Log.d(TAG, "saved blue frame");
 
         //store contour hierarchies for thresholded stuff
         List<MatOfPoint> redContourList = new ArrayList<>();

@@ -58,4 +58,11 @@ public class Transport {
     public TransportState getTransportState() {
         return transportState;
     }
+
+    public void checkForStall () {
+        if (transportMotor.getPower() == 0)
+            return;
+
+    }
+
 }

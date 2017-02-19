@@ -32,7 +32,7 @@ import org.opencv.imgproc.Moments;
  */
 
 public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 {
-    private static String TAG = "VisionSystem";
+    private static String TAG = "Vision";
 
     //OpenCV camera preview object
     private JavaCameraView openCvCameraView;
@@ -121,12 +121,16 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
         Imgproc.resize(rgbT, rgbT, rgb.size());
         switch(currentProcessingMode) {
             case BEACON:
-                updateBeaconResult(VisionHelper.detectBeacon(rgbT));
+                VisionHelper.saveFrame(rgb);
+                updateBeaconResult(VisionHelper.detectBeacon(rgb));
+                //VisionHelper.saveFrame(rgbT);
+                //updateBeaconResult(VisionHelper.detectBeacon(rgbT));
                 break;
             case VORTEX:
                 //break;
             case NONE:
-                return rgbT;
+                //return rgbT;
+                return rgb;
         }
 
         //VisionSystem detection was called
@@ -158,5 +162,9 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
         openCvCameraView.disableView();
         openCvCameraView.setCameraIndex(cameraId);
         openCvCameraView.enableView();
+    }
+
+    public void disableCamera () {
+        openCvCameraView.disableView();
     }
 }

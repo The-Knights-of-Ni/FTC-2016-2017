@@ -104,7 +104,8 @@ public class Drive {
         double rightDistanceError = kinematics.getX() - Math.abs(getRightDriveEncoderTicks()*RobotConstants.driveTickToDist*(isBackwards ? -1 : 1));
         //Log.d("autodrive", "Drive Dist Time: " + deltaTime + " of " + drivePath.target_time*1.5);
         //Log.d("autodrive", "Motor PWM: "+ (kv*kinematics.getY() + ka*kinematics.getZ() + kpDrive*leftDistanceError));
-        double power = kv*kinematics.getY() + ka*kinematics.getZ() + kpDrive*leftDistanceError;
+        //double power = kv*kinematics.getY() + ka*kinematics.getZ() + kpDrive*leftDistanceError;
+        double power = kv*kinematics.getY() + ka*kinematics.getZ() + kpDrive*rightDistanceError;
         leftDrive.setPower(power*(isBackwards ? -1 : 1));
         rightDrive.setPower(power*(isBackwards ? -1 : 1));
         if(leftDrive.getPower() != rightDrive.getPower());
@@ -116,7 +117,8 @@ public class Drive {
         //Log.d("autodrive", "Target drive distance: " + Math.abs(driveDist));
         //Log.d("autodrive", "Time expired: " + (OpModeTime.seconds()-driveTime >= drivePath.target_time*1.5) + "");
         //Log.d("autodrive", "Encoder reached target: " + (Math.abs(getAvgDriveEncoderTicks())*RobotConstants.driveTickToDist >= Math.abs(driveDist)) + "");
-        return (OpModeTime.seconds()-driveTime < drivePath.target_time*1.5) && (Math.abs(getAvgDriveEncoderTicks())*RobotConstants.driveTickToDist < Math.abs(driveDist));
+        //return (OpModeTime.seconds()-driveTime < drivePath.target_time*1.5) && (Math.abs(getAvgDriveEncoderTicks())*RobotConstants.driveTickToDist < Math.abs(driveDist));
+        return (OpModeTime.seconds()-driveTime < drivePath.target_time*1.5) && (Math.abs(getRightDriveEncoderTicks())*RobotConstants.driveTickToDist < Math.abs(driveDist));
     }
 
     //Basic Bang Bang ABS Turn

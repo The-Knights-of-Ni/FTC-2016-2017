@@ -1,4 +1,5 @@
 package org.ftcteam5206.teleop;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.ftcteam5206.hardwareDriveBot;
@@ -6,6 +7,7 @@ import org.ftcteam5206.hardwareDriveBot;
 /**
  * Created by Dev on 12/1/2016.
  */
+@Disabled
 @TeleOp(name="TeleopTest", group="DriveBot")
 public class PlaceholderTeleop extends OpMode{
 

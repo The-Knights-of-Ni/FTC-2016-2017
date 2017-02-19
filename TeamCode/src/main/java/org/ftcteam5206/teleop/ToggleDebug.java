@@ -1,11 +1,13 @@
 package org.ftcteam5206.teleop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.exception.RobotCoreException;
 
 import org.ftcteam5206.utils.Button.*;
 
+@Disabled
 @TeleOp(name="ButtonDebugger", group="Tester")
 public class ToggleDebug extends LinearOpMode {
     @Override

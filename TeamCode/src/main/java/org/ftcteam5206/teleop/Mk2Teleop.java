@@ -55,10 +55,11 @@ public class Mk2Teleop extends LinearOpMode{
         robot.phone.setPosition(0);
         transport.setServoPosition(servoPosition);
         robot.resetEncoders();
+        visionSystem.disableCamera();
         waitForStart();
         runtime.reset();
 
-
+        boolean wheelHasSpunUp = false;
 
         //drive.zeroIMU();
         //Auto Drive
@@ -70,7 +71,7 @@ public class Mk2Teleop extends LinearOpMode{
         double ballGrabTime = runtime.seconds();
         boolean emptyChamber = false;
         double shotConfirmTime = 0;
-        double rpm = 0, counter = 0;
+        double lastRPM = 0, counter = 0;
         double servoUpdateRate = 0;
         boolean switchHasBeenTriggered = false;
 
@@ -161,10 +162,15 @@ public class Mk2Teleop extends LinearOpMode{
                     break;
             }
             */
-            if(pad2.singlePress(pad2.buttons.DPAD_UP))
+            if(pad2.singlePress(pad2.buttons.DPAD_UP)) {
                 launcher.setLauncherState(OPEN_LOOP);
+                emptyChamber = false;
+            }
             if(pad2.singlePress(pad2.buttons.DPAD_DOWN))
                 launcher.setLauncherState(SEMI_AUTO);
+            if(pad2.press(pad2.buttons.Y) && launcher.getLauncherState() == SEMI_AUTO){
+                semiAutoStatus = EXHAUSTING;
+            }
             //Launcher state machine
             switch (launcher.getLauncherState()) {
                 case STOPPED:
@@ -200,47 +206,60 @@ public class Mk2Teleop extends LinearOpMode{
                     }
                     if (emptyChamber) {
                         switch (semiAutoStatus) {
+                            case EXHAUSTING:
+                                transport.transportMotor.setPower(-0.5);
+                                break;
                             case TRANSPORTING:
                                 //TODO: Take control from drivers so they don't mess this up.
                                 transport.on();
                                 //Log.d("autolaunch", "Turning transport on");
                                 if (transport.getServoPosition() == 0.3) {
-                                    semiAutoStatus = SPINNING_UP;
                                     shotConfirmTime = runtime.seconds();
+                                    if (wheelHasSpunUp)
+                                        semiAutoStatus = FIRING;
+                                    else
+                                        semiAutoStatus = SPINNING_UP;
                                 }
                                 break;
                             case SPINNING_UP:
                                 transport.off();
                                 //launcher.flywheel.spinUpToRPM(3000);//FIXME: This method is broken
                                 launcher.launcher.setPower(1);
-                                if (runtime.seconds() - shotConfirmTime > 2) {
+                                if (runtime.seconds() - shotConfirmTime > 3) {
                                     shotConfirmTime = runtime.seconds();
                                     semiAutoStatus = FIRING;
+                                    wheelHasSpunUp = true;
                                 }
                                 break;
                             case FIRING:
                                 servoPosition = 0.7;
+                                double deltaTime = runtime.seconds() - shotConfirmTime;
+                                if (deltaTime > 1.75 && deltaTime < 2)
+                                    intake.intakeReverse();
+                                else
+                                    transport.off();
                                 if (runtime.seconds() - shotConfirmTime > 2)//This should cause a jam to not be a problem, otherwise drivers will manually deal with it.
                                     semiAutoStatus = RELOADING;
                                     break;
                             case RELOADING:
+                                transport.off();
                                 servoPosition = 0.0;
                                 semiAutoStatus = TRANSPORTING;
                                 break;
                         }
                     } else {
                         launcher.flywheel.spinDown();
-
+                        wheelHasSpunUp = false;
                     }
                     break;
             }
 
             // Intake/transport control
-            if(!emptyChamber && !(launcher.getLauncherState() == SEMI_AUTO)) {
+            if(!emptyChamber) {
                 Log.d("autolaunch", "Manual intake/transport control");
                 if (pad2.press(pad2.buttons.Y)) //Reverse intake
                     intake.intakeReverse();
-                else if (pad1.press(pad1.buttons.A)) //Intake on
+                else if (pad1.toggle(pad1.buttons.A)) //Intake on
                     intake.intakeOn();
                 else //Intake off
                     intake.intakeOff();
@@ -309,9 +328,14 @@ public class Mk2Teleop extends LinearOpMode{
                     break;
             }
 
+            //Hood control
+            if (pad2.press(pad2.buttons.LEFT_BUMPER))
+                robot.hood.setPosition(0);
+            else if (pad2.press(pad2.buttons.RIGHT_BUMPER))
+                robot.hood.setPosition(1);
+
             int secondsRemaining = (int) (120-runtime.seconds());
             telemetry.addData("Time", secondsRemaining/60 + ":" + secondsRemaining%60);
-            telemetry.addData("Wheel RPM", rpm);
             telemetry.addData("Transport Servo", servoPosition);
             telemetry.addData("Ball Sensor", robot.transportSensor.getValue());
             telemetry.addData("Launcher FSM", launcher.getLauncherState());
@@ -320,7 +344,15 @@ public class Mk2Teleop extends LinearOpMode{
             telemetry.addData("Intake FSM", intake.getIntakeState());
             telemetry.addData("Drive FSM", drive.getDriveState());
             telemetry.addData("Robot Yaw", drive.getRobotYaw());
+            telemetry.addData("Launcher Ticks", robot.launcher.getCurrentPosition());
             telemetry.update();
+            double rpm = launcher.flywheel.getRPM();
+            /*
+            if (rpm != lastRPM) {
+                Log.d("autotest", String.valueOf(rpm));
+                lastRPM = rpm;
+            }
+            */
         }
     }
 }

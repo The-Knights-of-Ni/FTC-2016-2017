@@ -5,6 +5,7 @@ import android.util.Log;
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -14,7 +15,7 @@ import org.ftcteam5206.utils.Maths;
 /**
  * Created by tarunsingh on 2/17/17.
  */
-
+@Disabled
 @TeleOp(name="IMU Test")
 public class TwoIMUTest extends LinearOpMode {
     @Override

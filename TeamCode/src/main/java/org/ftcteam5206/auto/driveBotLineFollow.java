@@ -40,7 +40,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.ftcteam5206.hardwareDriveBot;
-
+@Disabled
 @Autonomous(name="DriveBot:Line Follow", group="DriveBot")
 public class driveBotLineFollow extends LinearOpMode {
 

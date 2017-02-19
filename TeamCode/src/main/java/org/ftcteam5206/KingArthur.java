@@ -82,13 +82,13 @@ public class KingArthur {
         capMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Define and initialize ALL installed servos.
         beaconPusher = hwMap.servo.get("beacon");
-        forkReleaseLeft = hwMap.servo.get("forkleft");
+        //forkReleaseLeft = hwMap.servo.get("forkleft");
         forkReleaseRight = hwMap.servo.get("forkright");
         clasp = hwMap.servo.get("clasp");
         phone = hwMap.servo.get("phone");
         //forkRelease = hwMap.servo.get("fork");
         //clasp = hwMap.servo.get("clasp");
-        //hood = hwMap.servo.get("hood");
+        hood = hwMap.servo.get("hood");
         //capRelease = hwMap.servo.get("cap");
         dim = this.hwMap.deviceInterfaceModule.get("dim");
         transportServo = hwMap.servo.get("transport");
