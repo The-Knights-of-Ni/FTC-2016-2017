@@ -80,7 +80,7 @@ public class Drive {
     public void driveDist(double inches, double speed){
         Log.d("autodrive", "Creating Drive Dist");
         zeroDriveEncoders();
-        driveDist = inches-1;
+        driveDist = inches;
         drivePath = new PlannedPath(Math.abs(driveDist), speed, 150);
         driveBearing = getRobotYaw();
         driveTime = OpModeTime.seconds();
@@ -93,15 +93,14 @@ public class Drive {
     public void driveDistUpdate(){
         double deltaTime = OpModeTime.seconds()-driveTime;
         vector3d kinematics = drivePath.getData(deltaTime);
-        double leftDistanceError = kinematics.getX() - Math.abs(getLeftDriveEncoderTicks())*RobotConstants.driveTickToDist;
-        double rightDistanceError = kinematics.getX() - Math.abs(getRightDriveEncoderTicks()*RobotConstants.driveTickToDist);
-        //Log.d("autodrive", "Drive Dist Time: " + deltaTime + " of " + drivePath.target_time*1.5);
-        //Log.d("autodrive", "Motor PWM: "+ (kv*kinematics.getY() + ka*kinematics.getZ() + kpDrive*leftDistanceError));
-        double power = kv*kinematics.getY() + ka*kinematics.getZ() + kpDrive*leftDistanceError;
+        double leftDistanceTangentialError = kinematics.getX() - Math.abs(getLeftDriveEncoderTicks())*RobotConstants.driveTickToDist;
+        double rightDistanceTangentialError = kinematics.getX() - Math.abs(getRightDriveEncoderTicks()*RobotConstants.driveTickToDist);
+        double leftDistanceNormalError;
+        double rightDistanceNormalError;
+
+        double power = kv*kinematics.getY() + ka*kinematics.getZ() + kpDrive*leftDistanceTangentialError;
         leftDrive.setPower(power);
         rightDrive.setPower(power);
-        if(leftDrive.getPower() != rightDrive.getPower());
-            //Log.d("autodrive", "Left drive power: " + leftDrive.getPower() + ", right drive power: " + rightDrive.getPower());
     }
 
     public boolean driveDistChecker(){
@@ -139,89 +138,93 @@ public class Drive {
     public PlannedPath turnPath;
     private double turnTime;
     private double plannedTurnAngle;
-    /*
+
     public void plannedTurn(double degrees){
-        turnPath = new PlannedPath(Maths.degreeToRadians(Math.abs(degrees))*RobotConstants.driveBaseRadius, 10, 150);
+        Log.d("autodrive", "Starting Planned Turn");
+        turnPath = new PlannedPath(Maths.degreeToRadians(Math.abs(degrees))*RobotConstants.driveBaseRadius, 30, 60);
         plannedTurnAngle = getRobotYaw() + degrees;
         absTurn(plannedTurnAngle);
         turnTime = OpModeTime.seconds();
     }
-    */
-    //TODO: Tune these, add Ka
-    public double kpTurn = 1/600.0;
-    public double kiTurn = 0;
+
+    //TODO: Tune these
+    public final double kvTurn = 1/40.0;
+    public final double kaTurn = 1/(4*RobotConstants.maxDriveAcceleration);
+    public final double kpTurn = 1/400.0;
+    public final double kiTurn = 1/100000.0;
+    public final double kdTurn = -1/78000.0;
     double errorlast, timelast;
-    /*
+    double maxError;
     public void plannedTurnUpdate(){
         double deltaTime = OpModeTime.seconds() - turnTime;
-        double error = -Maths.smallestSignedAngle(plannedTurnAngle, getRobotYaw());
-        double integralerror = errorlast + error;
-        errorlast = integralerror;
+        //double error = -Maths.smallestSignedAngle(plannedTurnAngle, getRobotYaw());//This is the full error as opposed to the correct model
         vector3d kinematics = turnPath.getData(deltaTime);
-        Log.d("FFWD", "FFWD Comps ," + deltaTime + "," + kinematics.getX() + "," + kinematics.getY() + "," + kinematics.getZ());
-        Log.d("autodrive", "PWM components " + kv*kinematics.getY() + ", " + ka*kinematics.getZ()  + ", " + kpTurn*error + ", " + kiTurn*integralerror + " = " + (kv*kinematics.getY() + ka*kinematics.getZ() + kpTurn*error + kiTurn*integralerror));
+        double ffwdAngle = Maths.radiansToDegrees(kinematics.getX()/RobotConstants.driveBaseRadius);//This is the angle we expect to be at.
+        double error =  -Maths.smallestSignedAngle(ffwdAngle, getRobotYaw());//The difference between where we expect to be and where we are.
+        if(error > maxError) maxError = error;
+        Log.d("autodrive", "Tracking within " + error + " of FFWD:" + ffwdAngle);
+        double integralError = errorlast + error;
+        errorlast = integralError;
+        double derivativeError = (error - errorlast)/deltaTime;
+        Log.d("autodrive", "FFWD Comps ," + kinematics.getX() + "," + kinematics.getY() + "," + kinematics.getZ());
+
+        double pwm = kvTurn*kinematics.getY() + kaTurn*kinematics.getZ() + kpTurn*error + kiTurn*integralError + kdTurn*derivativeError;
+
+        Log.d("autodrive", "PWM components " + kvTurn*kinematics.getY() + ", " + kaTurn*kinematics.getZ()  + ", " + kpTurn*error + ", " + kiTurn*integralError + ", " + kdTurn*derivativeError + " = " + pwm);
         if(Math.signum(processedTargetAngle) == 1.0){ //Turn Right
-            leftDrive.setPower(kv*kinematics.getY() + ka*kinematics.getZ() + kpTurn*error + kiTurn*integralerror);
-            rightDrive.setPower(-kv*kinematics.getY() - ka*kinematics.getZ() - kpTurn*error - kiTurn*integralerror);
+            leftDrive.setPower(pwm);
+            rightDrive.setPower(-pwm);
             return;
         }
-        leftDrive.setPower(-kv*kinematics.getY() - ka*kinematics.getZ() - kpTurn*error - kiTurn*integralerror);
-        rightDrive.setPower(kv*kinematics.getY() + ka*kinematics.getZ() + kpTurn*error + kiTurn*integralerror);
+        leftDrive.setPower(-pwm);
+        rightDrive.setPower(pwm);
     }
-    */
+
     double turnStartTime;
-    public void plannedTurn(double degrees){
-        turnStartTime = OpModeTime.seconds();
-        targetAngle = getRobotYaw() + degrees;
-        targetAngle = wrap360(targetAngle);
-        absTurn(targetAngle);
-        Log.d("autodrive", "Planned Turn Starting. Target is " + targetAngle + " we're currently at " + getRobotYaw());
-    }
+//    public void plannedTurn(double degrees){
+//        turnStartTime = OpModeTime.seconds();
+//        targetAngle = getRobotYaw() + degrees;
+//        targetAngle = wrap360(targetAngle);
+//        absTurn(targetAngle);
+//        Log.d("autodrive", "Planned Turn Starting. Target is " + targetAngle + " we're currently at " + getRobotYaw());
+//    }
 
     double previousTime = 0;
     double prevError = 0;
-    public void plannedTurnUpdate() {
-        double kP = 1/400.0;
-        double error = Maths.smallestSignedAngle(targetAngle, getRobotYaw());
-        /*double kD = 1/1000.0;
-        double tChange = OpModeTime.seconds() - previousTime;
-        tChange /= 1e9;
-        previousTime = OpModeTime.seconds();
-        double error = Maths.smallestSignedAngle(targetAngle, getRobotYaw());
-        double derivative = (error - prevError) / tChange;
-        Log.d("autodrive", "Target angle: " + targetAngle);
-        Log.d("autodrive", "Robot angle: " + getRobotAngle());
-        Log.d("autodrive", "Error: " + error);
-        prevError = error;
-        leftDrive.setPower(-kP*error);
-        rightDrive.setPower(kP*error);*/
-        if(Math.signum(processedTargetAngle) == 1.0){ //Turn Right
-            leftDrive.setPower(0.2);
-            rightDrive.setPower(-0.2);
-            return;
-        }
-        leftDrive.setPower(-0.2);
-        rightDrive.setPower(0.2);
-        //Log.d("autodrive", leftDrive.getPower() + " " + rightDrive.getPower());
-        //Log.d("autodrive", "Target angle: " + targetAngle);
-    }
-
+//    public void plannedTurnUpdate() {
+//        double kP = 1/400.0;
+//        double error = Maths.smallestSignedAngle(targetAngle, getRobotYaw());
+//        /*double kD = 1/1000.0;
+//        double tChange = OpModeTime.seconds() - previousTime;
+//        tChange /= 1e9;
+//        previousTime = OpModeTime.seconds();
+//        double error = Maths.smallestSignedAngle(targetAngle, getRobotYaw());
+//        double derivative = (error - prevError) / tChange;
+//        Log.d("autodrive", "Target angle: " + targetAngle);
+//        Log.d("autodrive", "Robot angle: " + getRobotAngle());
+//        Log.d("autodrive", "Error: " + error);
+//        prevError = error;
+//        leftDrive.setPower(-kP*error);
+//        rightDrive.setPower(kP*error);*/
+//        if(Math.signum(processedTargetAngle) == 1.0){ //Turn Right
+//            leftDrive.setPower(0.3);
+//            rightDrive.setPower(-0.3);
+//            return;
+//        }
+//        leftDrive.setPower(-0.3);
+//        rightDrive.setPower(0.3);
+//        //Log.d("autodrive", leftDrive.getPower() + " " + rightDrive.getPower());
+//        //Log.d("autodrive", "Target angle: " + targetAngle);
+//    }
     public boolean plannedTurnChecker(){
-        //if(targetAngle >= 360)  targetAngle -= 360;
-        //Log.d("autodrive", OpModeTime.seconds()-turnTime + " of " + turnPath.target_time);
-        //Log.d("autodrive", "Robot Yaw " + getRobotYaw() + " of " + targetAngle);
-        /*
-        if(Math.signum(processedTargetAngle) == 1)
-            return !Maths.aboutEqual(targetAngle, getRobotYaw(), 1) && !(getRobotYaw() > targetAngle);
-        else if(Math.signum(processedTargetAngle) == -1)
-            return !Maths.aboutEqual(targetAngle, getRobotYaw(), 1) && !(getRobotYaw() < targetAngle);
-        */
-        //return /*(OpModeTime.seconds()-turnTime < turnPath.target_time*1.5) && */!Maths.aboutEqual(targetAngle, getRobotYaw(), 1);
-        //Log.d("autodrive", "Robot angle: " + getRobotYaw());
-        //Log.d("autodrive", "Abs Smallest Signed Angle: " + Maths.smallestSignedAngle(getRobotYaw(), targetAngle));
-        Log.d("autodrive", (OpModeTime.seconds() - turnStartTime) + ", " +  getRobotYaw() + ", "  + Maths.smallestSignedAngle(getRobotYaw(), targetAngle));
-        //return (Math.abs(Maths.smallestSignedAngle(getRobotYaw(),targetAngle)) > 5);
-        return Maths.smallestSignedAngle(getRobotYaw(),targetAngle) > 0;
+        Log.d("autodrive", getRobotYaw() + ", "  + Maths.smallestSignedAngle(getRobotYaw(), targetAngle));
+        boolean isAboutEqual = Math.abs(Maths.smallestSignedAngle(getRobotYaw(), targetAngle)) < 0.5 && Math.abs(leftDrive.getPower()) < 0.15 ;//FIXME: Bad stop requirement
+        //isAboutEqual = OpModeTime.seconds() - turnTime > turnPath.target_time;
+        if(isAboutEqual){
+            stop();
+            Log.d("autodrive", "Max Error from FFWD was " + maxError);
+        }
+        return !isAboutEqual;
     }
 
     private double wrap360(double degrees) {
