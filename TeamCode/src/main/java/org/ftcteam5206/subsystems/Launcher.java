@@ -15,24 +15,34 @@ public class Launcher {
     public DcMotor launcher;
     public Servo hood;
     public Flywheel flywheel;
-    public Turret turret;
     public ElapsedTime OpModeTime;
-    private LauncherState launcherState = LauncherState.OPEN_LOOP;
+    private LauncherState launcherState = LauncherState.SEMI_AUTO;
 
     public enum LauncherState {
         STOPPED, OPEN_LOOP, SEMI_AUTO, AUTO
     }
 
     public enum SemiAutoState {
-        TRANSPORTING, SPINNING_UP, FIRING, RELOADING
+        EXHAUSTING, TRANSPORTING, SPINNING_UP, FIRING, RELOADING
     }
 
-    public Launcher(DcMotor launcher, DcMotor turret, AnalogInput turretpot, Servo hood, ElapsedTime OpModeTime){
+    public Launcher(DcMotor launcher, Servo hood, ElapsedTime OpModeTime){
         this.launcher = launcher;
         this.hood = hood;
         this.OpModeTime = OpModeTime;
         flywheel = new Flywheel(launcher, OpModeTime);
-        this.turret = new Turret(turret, turretpot, OpModeTime);
+    }
+
+    public void layup() {
+        launcher.setPower(0.5);
+    }
+
+    public void midrange(){
+        launcher.setPower(0.75);
+    }
+
+    public void spinDown(){
+        flywheel.spinDown();
     }
 
     public LauncherState getLauncherState() {
@@ -42,6 +52,5 @@ public class Launcher {
     public void setLauncherState(LauncherState launcherState) {
         this.launcherState = launcherState;
     }
-
 
 }

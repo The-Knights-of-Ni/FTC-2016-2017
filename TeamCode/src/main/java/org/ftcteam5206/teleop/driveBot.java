@@ -46,7 +46,7 @@ import com.qualcomm.robotcore.util.Range;
 
 
 //copied template from PushbotTeleopTank_Interative.java
-
+@Disabled
 @TeleOp(name="DriveBot_test", group="DriveBot")
 public class driveBot extends OpMode{
     //variables for controlling the robot

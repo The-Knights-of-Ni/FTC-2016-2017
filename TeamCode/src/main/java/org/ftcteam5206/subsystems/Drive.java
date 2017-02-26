@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.ftcteam5206.utils.Maths;
@@ -54,7 +55,7 @@ public class Drive {
     }
 
     public double getPredictedRobotYaw(int milliseconds){
-        return -Maths.radiansToDegrees(imu.getAngularOrientation().firstAngle + imu.getAngularVelocity().firstAngleRate*milliseconds/1000.0);
+        return -Maths.radiansToDegrees(imu.getAngularOrientation().firstAngle - imu.getAngularVelocity().firstAngleRate*milliseconds/1000.0);
     }
     private int ldoffset, rdoffset;
     public void zeroDriveEncoders(){
@@ -68,16 +69,22 @@ public class Drive {
         return leftDrive.getCurrentPosition()-ldoffset;
     }
     public int getRightDriveEncoderTicks() { return rightDrive.getCurrentPosition() - rdoffset;}
-    public double getAvgDriveEncoderTicks(){ return (getLeftDriveEncoderTicks() + getRightDriveEncoderTicks())/2.0;}
+    public double getAvgDriveEncoderTicks(){ return (Math.abs(getLeftDriveEncoderTicks()) + Math.abs(getRightDriveEncoderTicks()))/2.0;}
     //Motion Profiled Drive
     public PlannedPath drivePath;
     private double driveTime;
     public double driveBearing;
     public double driveDist;
+    private boolean isBackwards = false;
     public void driveDist(double inches){
         driveDist(inches, 67);
     }
     public void driveDist(double inches, double speed){
+        isBackwards = false;
+        if(inches < 0){
+            isBackwards = true;
+            inches = Math.abs(inches);
+        }
         Log.d("autodrive", "Creating Drive Dist");
         zeroDriveEncoders();
         driveDist = inches;
@@ -93,6 +100,7 @@ public class Drive {
     public void driveDistUpdate(){
         double deltaTime = OpModeTime.seconds()-driveTime;
         vector3d kinematics = drivePath.getData(deltaTime);
+
         double leftDistanceTangentialError = kinematics.getX() - Math.abs(getLeftDriveEncoderTicks())*RobotConstants.driveTickToDist;
         double rightDistanceTangentialError = kinematics.getX() - Math.abs(getRightDriveEncoderTicks()*RobotConstants.driveTickToDist);
         double leftDistanceNormalError;
@@ -104,17 +112,19 @@ public class Drive {
     }
 
     public boolean driveDistChecker(){
-        Log.d("autodrive", "Current distance driven: " + Math.abs(getAvgDriveEncoderTicks())*RobotConstants.driveTickToDist);
+        //Log.d("autodrive", "Current distance driven: " + Math.abs(getAvgDriveEncoderTicks())*RobotConstants.driveTickToDist);
         //Log.d("autodrive", "Target drive distance: " + Math.abs(driveDist));
-        Log.d("autodrive", "Time expired: " + (OpModeTime.seconds()-driveTime >= drivePath.target_time*1.5) + "");
-        Log.d("autodrive", "Encoder reached target: " + (Math.abs(getAvgDriveEncoderTicks())*RobotConstants.driveTickToDist >= Math.abs(driveDist)) + "");
-        return (OpModeTime.seconds()-driveTime < drivePath.target_time*1.5) && (Math.abs(getAvgDriveEncoderTicks())*RobotConstants.driveTickToDist < Math.abs(driveDist));
+        //Log.d("autodrive", "Time expired: " + (OpModeTime.seconds()-driveTime >= drivePath.target_time*1.5) + "");
+        //Log.d("autodrive", "Encoder reached target: " + (Math.abs(getAvgDriveEncoderTicks())*RobotConstants.driveTickToDist >= Math.abs(driveDist)) + "");
+        //return (OpModeTime.seconds()-driveTime < drivePath.target_time*1.5) && (Math.abs(getAvgDriveEncoderTicks())*RobotConstants.driveTickToDist < Math.abs(driveDist));
+        return (OpModeTime.seconds()-driveTime < drivePath.target_time*1.5) && (Math.abs(getRightDriveEncoderTicks())*RobotConstants.driveTickToDist < Math.abs(driveDist));
     }
 
     //Basic Bang Bang ABS Turn
     public double processedTargetAngle;
     public double targetAngle;
     public double offsetAngle;
+    private boolean turnIsClockwise = false;
     public void absTurn(double targetAngle){
         this.targetAngle = targetAngle;
         processedTargetAngle = Maths.smallestSignedAngle(getRobotYaw(), targetAngle);
@@ -122,7 +132,7 @@ public class Drive {
     }
 
     public void absTurnUpdate(){
-        if(Math.signum(processedTargetAngle) == 1.0) {//Turn Right
+        if(turnIsClockwise) {//Turn Right
             leftDrive.setPower(0.5);
             rightDrive.setPower(-0.5);
             return;
@@ -227,6 +237,34 @@ public class Drive {
         return !isAboutEqual;
     }
 
+    boolean returnedOnce = false;
+    public boolean createSecondTurn = false;
+    double secondTurnStartTime;
+    public boolean complexTurnChecker(){
+        if(!plannedTurnChecker() && !returnedOnce){
+            Log.d("autodrive", "Finished first turn");
+            stop();
+            returnedOnce = true;
+            secondTurnStartTime = OpModeTime.seconds();
+            createSecondTurn = true;
+        }
+        if (createSecondTurn) { //In between first and second turns
+            if (OpModeTime.seconds() - secondTurnStartTime > 5) { //0.5 second wait is over
+                Log.d("autodrive", "Starting second turn: " + getRobotYaw() + ", " + targetAngle);
+                createSecondTurn = false;
+                plannedTurn(targetAngle - getRobotYaw());
+            } else { //0.5 second wait is not over
+                Log.d("autodrive", "Waiting for 0.5 second delay");
+                return true;
+            }
+        }
+        if(returnedOnce && !plannedTurnChecker()){
+            Log.d("autodrive", "Finished with second turn");
+            stop();
+            return false;
+        }
+        return true;
+    }
     private double wrap360(double degrees) {
         while(degrees > 360)
             degrees -= 360;
@@ -244,6 +282,27 @@ public class Drive {
     private double getRobotAngle() {
         return wrap360(getRobotYaw() - offsetAngle);
     }
-    
+
+    double targetDist;
+    boolean isRightTurn;
+    public void encoderTurn(double degrees){
+        zeroDriveEncoders();
+        isRightTurn = true;
+        if(degrees < 0){
+            degrees = Math.abs(degrees);
+            isRightTurn = false;
+        }
+        targetDist = Maths.degreeToRadians(degrees)*RobotConstants.driveBaseRadius;
+    }
+
+    public boolean encoderTurnChecker(){
+        return targetDist > getAvgDriveEncoderTicks()*RobotConstants.driveTickToDist;
+    }
+    final double motorPWM = 0.3;
+    public void encoderTurnUpdate(){
+        rightDrive.setPower((isRightTurn ? -1:1)*motorPWM);
+        leftDrive.setPower((isRightTurn ? 1:-1)*motorPWM);
+    }
+
     //TODO: Pose Tracking, 2D Motion
 }

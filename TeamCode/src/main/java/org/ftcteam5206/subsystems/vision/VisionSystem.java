@@ -32,7 +32,7 @@ import org.opencv.imgproc.Moments;
  */
 
 public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 {
-    private static String TAG = "VisionSystem";
+    private static String TAG = "Vision";
 
     //OpenCV camera preview object
     private JavaCameraView openCvCameraView;
@@ -78,7 +78,6 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
         openCvCameraView = (JavaCameraView) appContext.findViewById(R.id.openCvView);
         openCvCameraView.setVisibility(SurfaceView.VISIBLE);
         openCvCameraView.setCvCameraViewListener(this);
-
         //Have to use either 3.1.0 or 2.4.13 since Imgproc.moments() isn't in 3.0.0
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, appContext, baseLoaderCallback); //Not sure this is actually doing anything
     }
@@ -114,18 +113,24 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         Mat rgb = inputFrame.rgba();
         Mat rgbT = new Mat();
-        //Rotate image to be right side up
         Core.transpose(rgb, rgbT);
-        Core.flip(rgbT, rgbT, 1);
+        if(cameraId == 0)
+            Core.flip(rgbT, rgbT, 1);
+        else
+            Core.flip(rgbT, rgbT, 0);
         Imgproc.resize(rgbT, rgbT, rgb.size());
         switch(currentProcessingMode) {
             case BEACON:
-                updateBeaconResult(VisionHelper.detectBeacon(rgbT));
+                VisionHelper.saveFrame(rgb);
+                updateBeaconResult(VisionHelper.detectBeacon(rgb));
+                //VisionHelper.saveFrame(rgbT);
+                //updateBeaconResult(VisionHelper.detectBeacon(rgbT));
                 break;
             case VORTEX:
                 //break;
             case NONE:
-                return rgbT;
+                //return rgbT;
+                return rgb;
         }
 
         //VisionSystem detection was called
@@ -151,11 +156,15 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
     }
 
     /** Changes camera being used from rear to front, or front to rear */
-    private void swapCamera(){
+    public void swapCamera(){
         //lol kyler would be so proud
         cameraId = cameraId^1;
         openCvCameraView.disableView();
         openCvCameraView.setCameraIndex(cameraId);
         openCvCameraView.enableView();
+    }
+
+    public void disableCamera () {
+        openCvCameraView.disableView();
     }
 }

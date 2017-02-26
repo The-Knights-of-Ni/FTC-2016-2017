@@ -3,6 +3,8 @@ package org.ftcteam5206.subsystems;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.ArrayList;
+
 /**
  * Created by Dev on 12/1/2016.
  */
@@ -40,14 +42,24 @@ public class Flywheel {
     public void spinDown(){
         launcher.setPower(0);
     }
-
-    public double getRPM(){
+    double prevRPM, currentRPM;
+    int counter = 0;
+    private ArrayList<Double> last100 = new ArrayList<>();
+    public double getRPM() {
         double ticksSinceLastCall = launcher.getCurrentPosition() - lastCallTicks;//This probably doesn't work.
-        double revolutions = ticksSinceLastCall/RobotConstants.launcherPPR;
+        if(ticksSinceLastCall == 0)
+            return -1;
+        double revolutions = -ticksSinceLastCall/RobotConstants.launcherPPR;
         double timeSinceLastCall = OpModeTime.seconds() - lastCallTime;
-        double currentRPM = revolutions/(timeSinceLastCall/60);
+        currentRPM += revolutions/(timeSinceLastCall/60) / 100;
         lastCallTicks = launcher.getCurrentPosition();//Need to wrap if this gets big
         lastCallTime = OpModeTime.seconds();
-        return -currentRPM;
+        counter++;
+        if (counter == 100) {
+            prevRPM = currentRPM;
+            counter = 0;
+            currentRPM = 0;
+        }
+        return prevRPM;
     }
 }

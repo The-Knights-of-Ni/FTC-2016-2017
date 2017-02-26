@@ -24,8 +24,8 @@ public final class RobotConstants {
     public final static double driveTickToDist = distPerRev/drivePPR;
 
     //LAUNCHER
-    public final static int launcherGearRatio = 2;
-    public final static int launcherPPR = neverRestCPR*neverRestPPR*launcherGearRatio;
+    public final static double launcherGearRatio = 1.5;
+    public final static double launcherPPR = neverRestCPR*neverRestPPR*launcherGearRatio;
     public final static int turretRingGear = 455;
     public final static int turretMotorGear = 100;
     public final static int turretPotGear = 40;
