@@ -10,6 +10,11 @@ public class VisionCallback {
     public double redCenterX;
     public double blueCenterX;
 
+    public double centerX;
+    public double centerY;
+
+    public boolean beaconIsRed;
+
     public VisionCallback(){};
 
     public void update(double redCenterX, double blueCenterX) {
@@ -17,5 +22,16 @@ public class VisionCallback {
         this.redCenterX = redCenterX;
         this.blueCenterX = blueCenterX;
         this.redIsRight = blueCenterX < redCenterX;
+    }
+
+    public void update(boolean beaconIsRed) {
+        this.hasFinished = true;
+        this.beaconIsRed = beaconIsRed;
+    }
+
+    public void updateVortex (double centerX, double centerY) {
+        this.centerX = centerX;
+        this.centerY = centerY;
+        this.hasFinished = true;
     }
 }

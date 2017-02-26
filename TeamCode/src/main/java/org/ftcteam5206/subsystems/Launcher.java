@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 //TODO: Integrate Hood, Sensors, Lookup Table, etc. (basically everything)
 public class Launcher {
-    public DcMotor launcher;
+    public DcMotor launcher, launcher2;
     public Servo hood;
     public Flywheel flywheel;
     public ElapsedTime OpModeTime;
@@ -26,8 +26,9 @@ public class Launcher {
         EXHAUSTING, TRANSPORTING, SPINNING_UP, FIRING, RELOADING
     }
 
-    public Launcher(DcMotor launcher, Servo hood, ElapsedTime OpModeTime){
+    public Launcher(DcMotor launcher, DcMotor launcher2, Servo hood, ElapsedTime OpModeTime){
         this.launcher = launcher;
+        this.launcher2 = launcher2;
         this.hood = hood;
         this.OpModeTime = OpModeTime;
         flywheel = new Flywheel(launcher, OpModeTime);
@@ -51,6 +52,11 @@ public class Launcher {
 
     public void setLauncherState(LauncherState launcherState) {
         this.launcherState = launcherState;
+    }
+
+    public void setPower(double power) {
+        launcher.setPower(power);
+        launcher2.setPower(power);
     }
 
 }

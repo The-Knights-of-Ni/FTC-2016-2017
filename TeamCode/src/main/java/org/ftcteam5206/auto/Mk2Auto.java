@@ -28,18 +28,18 @@ public class Mk2Auto extends LinearOpMode {
     KingArthur robot = new KingArthur();
     ElapsedTime runtime = new ElapsedTime();
 
-
     public void waitRobot(double seconds){
         double startTime = runtime.seconds();
         while(opModeIsActive() && runtime.seconds()-startTime < seconds){}
     }
 
+    double lastEncoderChangeTime, lastLeftEncoder, lastRightEncoder;
 
     @Override
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap);
         Drive drive = new Drive(robot.leftDrive, robot.rightDrive, robot.imu, runtime);
-        Launcher launcher = new Launcher(robot.launcher, robot.hood, runtime);
+        Launcher launcher = new Launcher(robot.launcher, robot.launcher2, robot.hood, runtime);
         Intake intake = new Intake(robot.intakeTransport, runtime);
         Transport transport = new Transport(robot.intakeTransport, robot.transportServo,runtime);
         //BeaconPusher beaconPusher = new BeaconPusher(robot.beaconPusher, runtime);
@@ -56,6 +56,9 @@ public class Mk2Auto extends LinearOpMode {
         robot.resetEncoders();
         runtime.reset();
 
+        lastEncoderChangeTime = runtime.seconds();
+        lastLeftEncoder = robot.leftDrive.getCurrentPosition();
+        lastRightEncoder = robot.rightDrive.getCurrentPosition();
 /*
         double distanceTarget = Math.PI/2.0 * RobotConstants.driveBaseRadius;
         Log.d("autodrive", "Target = " + distanceTarget);
@@ -103,17 +106,62 @@ public class Mk2Auto extends LinearOpMode {
         drive.stop();
         Log.d("autotest", robot.leftDrive.getCurrentPosition() + " " + robot.rightDrive.getCurrentPosition());
         */
+        /*
+        robot.leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.leftDrive.setTargetPosition((int) (Maths.degreeToRadians(45)*RobotConstants.driveBaseRadius/RobotConstants.driveTickToDist));
+        robot.rightDrive.setTargetPosition((int) -(Maths.degreeToRadians(45)*RobotConstants.driveBaseRadius/RobotConstants.driveTickToDist));
+        robot.leftDrive.setPower(0.2);
+        robot.rightDrive.setPower(0.2);
+        //drive.encoderTurn(90);
+        while (opModeIsActive() && (robot.leftDrive.isBusy() && robot.rightDrive.isBusy())) {
+            Log.d("autotest", robot.leftDrive.getCurrentPosition() + " " + robot.rightDrive.getCurrentPosition());
+        }
+        drive.stop();
 
-        double driveDelay = 1;
+        while (opModeIsActive()) {
+            telemetry.addData("Heading", drive.getRobotYaw());
+            telemetry.update();
+        }
+        */
+
+        /*
+        while (opModeIsActive()) {
+            telemetry.addData("Left Encoder", drive.leftDrive.getCurrentPosition());
+            telemetry.addData("Right Encoder", drive.rightDrive.getCurrentPosition());
+            telemetry.update();
+        }
+        */
+
+        double driveDelay = .5;
+        double segmentStartTime;
         Log.d("autotest", "Starting first drive segment");
+        /*
         drive.driveDist(24, 30);
         while(opModeIsActive() && drive.driveDistChecker()){
             drive.driveDistUpdate();
+        }
+        */
+        robot.leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        //First drive forward
+        robot.leftDrive.setTargetPosition((int) (24/RobotConstants.driveTickToDist));
+        robot.rightDrive.setTargetPosition((int) (24/RobotConstants.driveTickToDist));
+        robot.leftDrive.setPower(0.2);
+        robot.rightDrive.setPower(0.2);
+
+        segmentStartTime = runtime.seconds();
+        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                break;
         }
         drive.stop();
         Log.d("autotest", "Finished first drive segment");
         waitRobot(driveDelay);
 
+        /*
+        //Launch 2 balls
         Log.d("autotest", "Spinning up launcher");
         launcher.launcher.setPower(1);
         waitRobot(3);
@@ -144,39 +192,184 @@ public class Mk2Auto extends LinearOpMode {
         Log.d("autotest", "Spun down launcher");
         launcher.launcher.setPower(0);
 
-        robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+        /*
         drive.encoderTurn(allianceColorInt == 1 ? 315 - drive.getRobotYaw() : 45 - drive.getRobotYaw());
         while(drive.encoderTurnChecker())
         {
             drive.encoderTurnUpdate();
         }
+        */
+
+        //First 45 degree turn
+        Log.d("autotest", "Starting first turn");
+        int offsetTicks = 0;
+        if (allianceColorInt == 1)
+            offsetTicks = (int) (Maths.degreeToRadians(Maths.smallestSignedAngle(drive.getRobotYaw(), 315))*RobotConstants.driveBaseRadius/RobotConstants.driveTickToDist);
+        else
+            offsetTicks = (int) (Maths.degreeToRadians(Maths.smallestSignedAngle(drive.getRobotYaw(), 45))*RobotConstants.driveBaseRadius/RobotConstants.driveTickToDist);
+        //Log.d("autotest", "Ticks to go: " + offsetTicks);
+
+        robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+        robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() - offsetTicks);
+        robot.leftDrive.setPower(0.2);
+        robot.rightDrive.setPower(0.2);
+        segmentStartTime = runtime.seconds();
+        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                break;
+        }
         drive.stop();
-        robot.leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Log.d("autotest", "Finished first turn");
         waitRobot(driveDelay);
 
+        /*
         drive.driveDist(45, 20);
         while(opModeIsActive() && drive.driveDistChecker()){
             drive.driveDistUpdate();
         }
+        */
+        //Drive toward beacons
+        Log.d("autotest", "Starting second drive segment");
+        offsetTicks = (int) (38/RobotConstants.driveTickToDist);
+        robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+        robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() + offsetTicks);
+        robot.leftDrive.setPower(0.2);
+        robot.rightDrive.setPower(0.2);
+        segmentStartTime = runtime.seconds();
+        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                break;
+        }
         drive.stop();
+        Log.d("autotest", "Finished second drive segment");
         waitRobot(driveDelay);
-        Log.d("autotest", String.valueOf(270-drive.getRobotYaw()));
 
-        robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        /*
+        drive.encoderTurn(allianceColorInt == 1 ? 270 - drive.getRobotYaw() : 90 - drive.getRobotYaw());
+        while(opModeIsActive() && drive.encoderTurnChecker()){
+            drive.encoderTurnUpdate();
+        }
+        */
+
+        //Second 45 turn to square up with beacons
+        Log.d("autotest", "Starting second turn");
+        if (allianceColorInt == 1)
+            offsetTicks = (int) (Maths.degreeToRadians(Maths.smallestSignedAngle(drive.getRobotYaw(), 270))*RobotConstants.driveBaseRadius/RobotConstants.driveTickToDist);
+        else
+            offsetTicks = (int) (Maths.degreeToRadians(Maths.smallestSignedAngle(drive.getRobotYaw(), 90))*RobotConstants.driveBaseRadius/RobotConstants.driveTickToDist);
+        robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+        robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() - offsetTicks);
+        robot.leftDrive.setPower(0.2);
+        robot.rightDrive.setPower(0.2);
+        segmentStartTime = runtime.seconds();
+        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                break;
+        }
+        drive.stop();
+        Log.d("autotest", "Finished second turn");
+        waitRobot(driveDelay);
+
+        /*
         drive.encoderTurn(allianceColorInt == 1 ? 270 - drive.getRobotYaw() : 90 - drive.getRobotYaw());
         while(opModeIsActive() && drive.encoderTurnChecker()){
             drive.encoderTurnUpdate();
         }
         drive.stop();
         waitRobot(driveDelay);
+        */
 
-        drive.encoderTurn(allianceColorInt == 1 ? 270 - drive.getRobotYaw() : 90 - drive.getRobotYaw());
-        while(opModeIsActive() && drive.encoderTurnChecker()){
-            drive.encoderTurnUpdate();
+
+        visionSystem.detectBeacon();
+        Log.d("VisionHelper", "Called visionsystem.detectbeacon() in auto");
+        while (opModeIsActive() && !visionSystem.visionCallback.hasFinished) {}
+        if ((visionSystem.visionCallback.redIsRight && allianceColorInt == 1) || (!visionSystem.visionCallback.redIsRight && allianceColorInt == -1)) //Right beacon position
+            robot.beaconPusher.setPosition(0);
+        else //Left beacon position
+            robot.beaconPusher.setPosition(1);
+        Log.d("autotest", "Moved beacon pusher to correct color");
+
+
+        /*
+        if (robot.beaconPusher.getPosition() == 0)
+            offsetTicks = (int) (Maths.degreeToRadians(-5)*RobotConstants.driveBaseRadius/RobotConstants.driveTickToDist);
+        else
+            offsetTicks = (int) (Maths.degreeToRadians(5)*RobotConstants.driveBaseRadius/RobotConstants.driveTickToDist);
+        */
+
+        //Press first beacon
+        offsetTicks = (int) (30/RobotConstants.driveTickToDist);
+        robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+        robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() + offsetTicks);
+        robot.leftDrive.setPower(0.2);
+        robot.rightDrive.setPower(0.2);
+        segmentStartTime = runtime.seconds();
+        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                break;
+        }
+        drive.stop();
+        waitRobot(driveDelay);
+
+        //Back off first beacon
+        offsetTicks = (int) (-15/RobotConstants.driveTickToDist);
+        robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+        robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() + offsetTicks);
+        robot.leftDrive.setPower(0.2);
+        robot.rightDrive.setPower(0.2);
+        segmentStartTime = runtime.seconds();
+        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                break;
+        }
+        drive.stop();
+        waitRobot(driveDelay);
+
+        //Check first beacon color
+        visionSystem.checkBeacon();
+        while (opModeIsActive() && !visionSystem.visionCallback.hasFinished) {}
+        if ((visionSystem.visionCallback.beaconIsRed && allianceColorInt == -1) || (!visionSystem.visionCallback.beaconIsRed && allianceColorInt == 1)) { //Incorrect beacon color
+            waitRobot(5);
+
+            //Press first beacon
+            offsetTicks = (int) (30/RobotConstants.driveTickToDist);
+            robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+            robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() + offsetTicks);
+            robot.leftDrive.setPower(0.2);
+            robot.rightDrive.setPower(0.2);
+            segmentStartTime = runtime.seconds();
+            while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+                if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                    break;
+            }
+            drive.stop();
+            waitRobot(driveDelay);
+
+            //Back off first beacon
+            offsetTicks = (int) (-30/RobotConstants.driveTickToDist);
+            robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+            robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() + offsetTicks);
+            robot.leftDrive.setPower(0.2);
+            robot.rightDrive.setPower(0.2);
+            segmentStartTime = runtime.seconds();
+            while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+                if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                    break;
+            }
+            drive.stop();
+            waitRobot(driveDelay);
+        }
+
+        //Turn 90 for drive toward second beacon
+        offsetTicks = (int) (Maths.degreeToRadians(Maths.smallestSignedAngle(drive.getRobotYaw(), 0))*RobotConstants.driveBaseRadius/RobotConstants.driveTickToDist);
+        robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+        robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() - offsetTicks);
+        robot.leftDrive.setPower(0.2);
+        robot.rightDrive.setPower(0.2);
+        segmentStartTime = runtime.seconds();
+        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                break;
         }
         drive.stop();
         waitRobot(driveDelay);
@@ -188,6 +381,102 @@ public class Mk2Auto extends LinearOpMode {
             robot.beaconPusher.setPosition(0);
         else //Left beacon position
             robot.beaconPusher.setPosition(1);
+        Log.d("autotest", "Moved beacon pusher to correct color");
+
+        //Drive to second beacon
+        offsetTicks = (int) (44/RobotConstants.driveTickToDist);
+        robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+        robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() + offsetTicks);
+        robot.leftDrive.setPower(0.2);
+        robot.rightDrive.setPower(0.2);
+        segmentStartTime = runtime.seconds();
+        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                break;
+        }
+        drive.stop();
+        waitRobot(driveDelay);
+
+        //Turn toward second beacon
+        if (allianceColorInt == 1)
+            offsetTicks = (int) (Maths.degreeToRadians(Maths.smallestSignedAngle(drive.getRobotYaw(), 270))*RobotConstants.driveBaseRadius/RobotConstants.driveTickToDist);
+        else
+            offsetTicks = (int) (Maths.degreeToRadians(Maths.smallestSignedAngle(drive.getRobotYaw(), 90))*RobotConstants.driveBaseRadius/RobotConstants.driveTickToDist);
+        //offsetTicks = (int) (Maths.degreeToRadians(Maths.smallestSignedAngle(drive.getRobotYaw(), 270))*RobotConstants.driveBaseRadius/RobotConstants.driveTickToDist);
+        robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+        robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() - offsetTicks);
+        robot.leftDrive.setPower(0.2);
+        robot.rightDrive.setPower(0.2);
+        segmentStartTime = runtime.seconds();
+        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                break;
+        }
+        drive.stop();
+        waitRobot(driveDelay);
+
+        //Drive and Press second beacon
+        offsetTicks = (int) (30/RobotConstants.driveTickToDist);
+        robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+        robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() + offsetTicks);
+        robot.leftDrive.setPower(0.2);
+        robot.rightDrive.setPower(0.2);
+        segmentStartTime = runtime.seconds();
+        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                break;
+        }
+        drive.stop();
+        waitRobot(driveDelay);
+
+        //Back off Second beacon
+        offsetTicks = (int) (-15/RobotConstants.driveTickToDist);
+        robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+        robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() + offsetTicks);
+        robot.leftDrive.setPower(0.2);
+        robot.rightDrive.setPower(0.2);
+        segmentStartTime = runtime.seconds();
+        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                break;
+        }
+        drive.stop();
+        waitRobot(driveDelay);
+
+        //Check Second beacon color
+        visionSystem.checkBeacon();
+        while (opModeIsActive() && !visionSystem.visionCallback.hasFinished) {}
+        if ((visionSystem.visionCallback.beaconIsRed && allianceColorInt == -1) || (!visionSystem.visionCallback.beaconIsRed && allianceColorInt == 1)) { //Incorrect beacon color
+            waitRobot(5);
+
+            //Repress second beacon
+            offsetTicks = (int) (30/RobotConstants.driveTickToDist);
+            robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+            robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() + offsetTicks);
+            robot.leftDrive.setPower(0.2);
+            robot.rightDrive.setPower(0.2);
+            segmentStartTime = runtime.seconds();
+            while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+                if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                    break;
+            }
+            drive.stop();
+            waitRobot(driveDelay);
+
+            //Back off second beacon
+            offsetTicks = (int) (-30/RobotConstants.driveTickToDist);
+            robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+            robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() + offsetTicks);
+            robot.leftDrive.setPower(0.2);
+            robot.rightDrive.setPower(0.2);
+            segmentStartTime = runtime.seconds();
+            while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+                if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+                    break;
+            }
+            drive.stop();
+            waitRobot(driveDelay);
+        }
 
         while(opModeIsActive()) {
             telemetry.addData("Robot Yaw", drive.getRobotYaw());
@@ -269,7 +558,7 @@ public class Mk2Auto extends LinearOpMode {
         }
         //Get Beacon Color
         //Press beacon
-        //Back into cap ball and park (or get ready to get free particle)
+        //Back into cap balll and park (or get ready to get free particle)
         drive.plannedTurn(-45);
         while(drive.plannedTurnChecker()){
             drive.plannedTurnUpdate();
@@ -278,5 +567,19 @@ public class Mk2Auto extends LinearOpMode {
         while(drive.driveDistChecker()){
             drive.driveDistUpdate();
         }*/
+    }
+
+    private boolean driveIsStalling () {
+        double leftEncoder = robot.leftDrive.getCurrentPosition();
+        double rightEncoder = robot.rightDrive.getCurrentPosition();
+        if (leftEncoder != lastLeftEncoder) {
+            lastLeftEncoder = leftEncoder;
+            lastEncoderChangeTime = runtime.seconds();
+        }
+        if (rightEncoder != lastRightEncoder) {
+            lastRightEncoder = rightEncoder;
+            lastEncoderChangeTime = runtime.seconds();
+        }
+        return runtime.seconds() - lastEncoderChangeTime > 0.5;
     }
 }
