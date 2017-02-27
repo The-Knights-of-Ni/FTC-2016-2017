@@ -18,9 +18,7 @@ import org.ftcteam5206.utils.Button.ButtonHandler;
 public class LauncherVisionTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        KingArthur robot = new KingArthur();
         ElapsedTime runtime = new ElapsedTime();
-        robot.init(hardwareMap);
         VisionSystem visionSystem = new VisionSystem(this);
         VisionCallback callback = null;
         ButtonHandler pad1 = new ButtonHandler();

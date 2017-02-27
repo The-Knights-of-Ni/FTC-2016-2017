@@ -144,6 +144,8 @@ public class VisionHelper {
         else
             Core.inRange(HSV, new Scalar(blueL, saturation, value), new Scalar(blueH, 255, 255), mask);
 
+        return mask;
+        /*
         List<MatOfPoint> contourList = new ArrayList<>();
         Imgproc.findContours(mask, contourList, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
 
@@ -173,10 +175,11 @@ public class VisionHelper {
         Imgproc.drawContours(mask, contourList, maxPerimeterIndex, new Scalar(255, 255, 255));
         Imgproc.circle(mask, center, 50, new Scalar(255, 255, 255));
 
-        saveFrame(mask);
+        //saveFrame(mask);
 
         //return new double[]{center.x, center.y};
-        return mask;
+        //return mask;
+        */
     }
 
     /** Saves camera frame to internal storage */

@@ -2,9 +2,12 @@ package org.ftcteam5206.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.ftcteam5206.KingArthur;
+import org.ftcteam5206.subsystems.Launcher;
 import org.ftcteam5206.subsystems.RobotConstants;
 
 /**
@@ -15,23 +18,20 @@ import org.ftcteam5206.subsystems.RobotConstants;
 public class RPMTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        KingArthur robot = new KingArthur();
+        DcMotor launcher1 = hardwareMap.dcMotor.get("launcher");
+        DcMotor launcher2 = hardwareMap.dcMotor.get("launcher2");
         ElapsedTime runtime = new ElapsedTime();
-        robot.init(hardwareMap);
+        Launcher launcher = new Launcher(launcher1, launcher2, null, runtime);
+
         waitForStart();
         runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 10) {robot.launcher.setPower(1);}
-        double startTicks = robot.launcher.getCurrentPosition();
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < 30) {robot.launcher.setPower(1);}
-        robot.launcher.setPower(0);
-        double changeInTicks = robot.launcher.getCurrentPosition() - startTicks;
-        double elapsedTime = runtime.seconds();
-        double revs = changeInTicks / (RobotConstants.neverRestCPR*RobotConstants.neverRestPPR*3);
-        double mins = elapsedTime/60;
-        double rpm = revs/mins;
+
         while (opModeIsActive()) {
-            telemetry.addData("Average RPM", rpm);
+            launcher.setPower(1);
+            //launcher.setRPM(2400);
+            telemetry.addData("Launcher RPM", launcher.getRPM());
+            telemetry.addData("Launcher PWM", launcher.launcher.getPower());
+            telemetry.addData("RPM Error", launcher.error);
             telemetry.update();
         }
     }
