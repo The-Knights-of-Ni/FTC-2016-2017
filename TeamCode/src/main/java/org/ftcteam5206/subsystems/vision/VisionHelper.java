@@ -202,9 +202,9 @@ public class VisionHelper {
         return locations;
     }
 
-    /*
-    Returns x and y coordinate of center of vortex of color allianceColor
-    public static double[] detectVortex(Mat src, AllianceColor allianceColor) {
+    /**Returns x and y coordinate of center of vortex of color allianceColor */
+    //public static double[] detectVortex(Mat src, boolean isRed) {
+    public static Mat detectVortex(Mat src, boolean isRed){
         //matrices for images
         Mat HSV = new Mat();
         Mat mask = new Mat();
@@ -221,15 +221,13 @@ public class VisionHelper {
         Log.d(TAG, "Starting vortex detection");
         Imgproc.cvtColor(src, HSV, Imgproc.COLOR_RGB2HSV_FULL);
 
-        switch(allianceColor){
-            case RED:
-                Core.inRange(HSV, new Scalar(redL, saturation, value), new Scalar(redH, 255, 255), mask);
-                break;
-            case BLUE:
-                Core.inRange(HSV, new Scalar(blueL, saturation, value), new Scalar(blueH, 255, 255), mask);
-                break;
-        }
+        if (isRed)
+            Core.inRange(HSV, new Scalar(redL, saturation, value), new Scalar(redH, 255, 255), mask);
+        else
+            Core.inRange(HSV, new Scalar(blueL, saturation, value), new Scalar(blueH, 255, 255), mask);
 
+        return mask;
+        /*
         List<MatOfPoint> contourList = new ArrayList<>();
         Imgproc.findContours(mask, contourList, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
 
@@ -254,16 +252,17 @@ public class VisionHelper {
         Moments moments = Imgproc.moments(maxPerimeterContour);
         Point center = new Point(moments.m10/moments.m00, moments.m01/moments.m00);
 
-        Log.i(TAG, "Found center of vortex: " + (System.currentTimeMillis() - MainActivity.lastFrameRequestedTime) + "ms");
+        Log.i(TAG, "Found center of vortex: " + (System.currentTimeMillis() - VisionSystem.lastFrameRequestedTime) + "ms");
 
         Imgproc.drawContours(mask, contourList, maxPerimeterIndex, new Scalar(255, 255, 255));
         Imgproc.circle(mask, center, 50, new Scalar(255, 255, 255));
 
-        MainActivity.saveFrame(mask);
+        //saveFrame(mask);
 
-        return new double[]{center.x, center.y};
+        //return new double[]{center.x, center.y};
+        //return mask;
+        */
     }
-    */
 
     /** Saves camera frame to internal storage */
     public static void saveFrame(Mat img) {
@@ -277,5 +276,34 @@ public class VisionHelper {
         else
             Log.d(TAG, "Failed to save image");
         //img.release();
+    }
+
+    /** Returns true if beacon is red */
+    public static boolean checkBeacon (Mat src) {
+        Mat HSV = new Mat();
+        Mat red = new Mat();
+        Mat blue = new Mat();
+
+        //constants for thresholding
+        final int redL = 148;
+        final int redH = 178;
+        final int blueL = 63;
+        final int blueH = 110;
+        final int saturation = 100;
+        final int value = 100;
+
+        Imgproc.cvtColor(src, HSV, Imgproc.COLOR_RGB2HSV);
+
+        //create matrices with the red and blue areas thresholded
+        Core.inRange(HSV, new Scalar(redL,60,value),new Scalar(redH, 200,255),red);
+        Core.inRange(HSV, new Scalar(blueL,saturation,value),new Scalar(blueH,255,255),blue);
+
+        Moments redMoments = Imgproc.moments(red);
+        Moments blueMoments = Imgproc.moments(blue);
+
+        if (redMoments.m00 > blueMoments.m00)
+            return true;
+        else
+            return false;
     }
 }

@@ -7,6 +7,7 @@ import android.view.SurfaceView;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
@@ -59,7 +60,7 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
     };
 
     public enum ProcessingMode {
-        NONE, BEACON, VORTEX
+        NONE, BEACON, VORTEX, BEACON_CHECK
     }
 
     private ProcessingMode currentProcessingMode = ProcessingMode.NONE;
@@ -112,13 +113,6 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         Mat rgb = inputFrame.rgba();
-        Mat rgbT = new Mat();
-        Core.transpose(rgb, rgbT);
-        if(cameraId == 0)
-            Core.flip(rgbT, rgbT, 1);
-        else
-            Core.flip(rgbT, rgbT, 0);
-        Imgproc.resize(rgbT, rgbT, rgb.size());
         switch(currentProcessingMode) {
             case BEACON:
                 VisionHelper.saveFrame(rgb);
@@ -126,7 +120,12 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
                 //VisionHelper.saveFrame(rgbT);
                 //updateBeaconResult(VisionHelper.detectBeacon(rgbT));
                 break;
+            case BEACON_CHECK:
+                updateBeaconResult(VisionHelper.checkBeacon(rgb));
+                break;
             case VORTEX:
+                //updateVortexResult(VisionHelper.detectVortex(rgb, FtcRobotControllerActivity.allianceColor == FtcRobotControllerActivity.AllianceColor.RED));
+                return VisionHelper.detectVortex(rgb, FtcRobotControllerActivity.allianceColor == FtcRobotControllerActivity.AllianceColor.RED);
                 //break;
             case NONE:
                 //return rgbT;
@@ -134,12 +133,12 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
         }
 
         //VisionSystem detection was called
-        if(currentProcessingMode == ProcessingMode.BEACON || currentProcessingMode == ProcessingMode.VORTEX){
+        if(currentProcessingMode != ProcessingMode.NONE){
             currentProcessingMode = ProcessingMode.NONE;
             //Log how long vision detection took
             Log.i(TAG, "Returned processed frame: " + (System.currentTimeMillis() - lastFrameRequestedTime));
         }
-        return rgbT;
+        return rgb;
     }
 
     /** Runs beacon detection on next frame */
@@ -150,9 +149,31 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
         return visionCallback;
     }
 
+    public VisionCallback checkBeacon() {
+        currentProcessingMode = ProcessingMode.BEACON_CHECK;
+        lastFrameRequestedTime = System.currentTimeMillis();
+        visionCallback = new VisionCallback();
+        return visionCallback;
+    }
+
+    public VisionCallback detectVortex() {
+        currentProcessingMode = ProcessingMode.VORTEX;
+        lastFrameRequestedTime = System.currentTimeMillis();
+        visionCallback = new VisionCallback();
+        return visionCallback;
+    }
+
     /** Updates vision callback object with result of beacon detection */
     private void updateBeaconResult(double[][] result) {
         visionCallback.update(result[0][0], result[1][0]);
+    }
+
+    private void updateBeaconResult(boolean beaconIsRed) {
+        visionCallback.update(beaconIsRed);
+    }
+
+    private void updateVortexResult(double[] result) {
+        visionCallback.updateVortex(result[0], result[1]);
     }
 
     /** Changes camera being used from rear to front, or front to rear */

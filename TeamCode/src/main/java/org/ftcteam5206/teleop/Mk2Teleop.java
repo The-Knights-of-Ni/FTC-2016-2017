@@ -44,18 +44,18 @@ public class Mk2Teleop extends LinearOpMode{
         robot.init(hardwareMap);
         //Init Subsystem Controllers
         Drive drive = new Drive(robot.leftDrive, robot.rightDrive, robot.imu, runtime);
-        Launcher launcher = new Launcher(robot.launcher, robot.hood, runtime);
+        Launcher launcher = new Launcher(robot.launcher, robot.launcher2, robot.hood, runtime);
         Intake intake = new Intake(robot.intakeTransport, runtime);
         Transport transport = new Transport(robot.intakeTransport, robot.transportServo, runtime);
         Cap cap = new Cap(robot.forkReleaseLeft, robot.forkReleaseRight, robot.clasp, robot.capMotor, runtime);
-        VisionSystem visionSystem = new VisionSystem(this);
+        //VisionSystem visionSystem = new VisionSystem(this);
 
         double servoPosition = 0;
         robot.beaconPusher.setPosition(0.5);
         robot.phone.setPosition(0);
         transport.setServoPosition(servoPosition);
         robot.resetEncoders();
-        visionSystem.disableCamera();
+        //visionSystem.disableCamera();
         waitForStart();
         runtime.reset();
 
@@ -177,10 +177,10 @@ public class Mk2Teleop extends LinearOpMode{
                     break;
                 case OPEN_LOOP: //Each Shot must be confirmed
                     if (pad2.toggle(pad2.buttons.X)) {
-                        robot.launcher.setPower(1);
+                        launcher.setPower(1);
                         telemetry.addData("Launcher", "On");
                     } else {
-                        robot.launcher.setPower(0);
+                        launcher.setPower(0);
                         telemetry.addData("Launcher", "off");
                     }
                     if (pad2.press(pad2.buttons.LEFT_TRIGGER)) {
@@ -223,8 +223,8 @@ public class Mk2Teleop extends LinearOpMode{
                                 break;
                             case SPINNING_UP:
                                 transport.off();
-                                //launcher.flywheel.spinUpToRPM(3000);//FIXME: This method is broken
-                                launcher.launcher.setPower(1);
+                                launcher.setRPM(2000);//FIXME: This method is broken
+                                //launcher.setPower(1);
                                 if (runtime.seconds() - shotConfirmTime > 3) {
                                     shotConfirmTime = runtime.seconds();
                                     semiAutoStatus = FIRING;
@@ -248,7 +248,7 @@ public class Mk2Teleop extends LinearOpMode{
                                 break;
                         }
                     } else {
-                        launcher.flywheel.spinDown();
+                        launcher.setPower(0);
                         wheelHasSpunUp = false;
                     }
                     break;

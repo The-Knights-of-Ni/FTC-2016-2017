@@ -28,6 +28,7 @@ public class KingArthur {
     public DcMotor leftDrive = null;
     public DcMotor rightDrive = null;
     public DcMotor launcher = null;
+    public DcMotor launcher2 = null;
     public DcMotor intakeTransport = null;
     public DcMotor capMotor = null;
     public AnalogInput turretPot = null;
@@ -54,6 +55,7 @@ public class KingArthur {
         leftDrive   = hwMap.dcMotor.get("ldrive");
         rightDrive  = hwMap.dcMotor.get("rdrive");
         launcher    = hwMap.dcMotor.get("launcher");
+        launcher2    = hwMap.dcMotor.get("launcher2");
         intakeTransport = hwMap.dcMotor.get("intake");
         capMotor = hwMap.dcMotor.get("cap");
         //Set Directions
@@ -61,6 +63,8 @@ public class KingArthur {
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDrive.setDirection(DcMotor.Direction.FORWARD);
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        launcher.setDirection(DcMotor.Direction.FORWARD);
+        launcher.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         launcher.setDirection(DcMotor.Direction.FORWARD);
         launcher.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         intakeTransport.setDirection(DcMotor.Direction.FORWARD);
@@ -71,6 +75,7 @@ public class KingArthur {
         leftDrive.setPower(0);
         rightDrive.setPower(0);
         launcher.setPower(0);
+        launcher2.setPower(0);
         intakeTransport.setPower(0);
         capMotor.setPower(0);
 
@@ -78,6 +83,7 @@ public class KingArthur {
         leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         launcher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        launcher2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeTransport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         capMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Define and initialize ALL installed servos.
