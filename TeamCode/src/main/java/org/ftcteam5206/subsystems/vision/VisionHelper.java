@@ -119,6 +119,88 @@ public class VisionHelper {
 
         return new double[][]{{redCenterX, redCenterY},{blueCenterX, blueCenterY}};
     }
+    /* RETURNS X AND Y VALUES OF ALL BALLS DETECTED OF A CERTAIN COLOR, MUST BE RUN ONCE
+    FOR RED AND BLUE BALLS, X AND Y VALUES ARE IN PIXELS, CAN BE USE TO FIND EXACT BALL
+    LOCATIONS AND DRIVE TO THEM
+     */
+    public static double [][] findBallLocations(Mat src, int low, int high, Scalar dot){
+        Mat fill = new Mat();
+        Mat thresh = new Mat();
+        Mat fillInverse = new Mat();
+        Mat cont = new Mat();
+        Mat HSV = new Mat();
+        Mat hierarchy  = new Mat();
+        final int ballMaxSize = 300;
+        final int ballMinSize = 65;
+        int selector = 0;
+        int saturation = 0;
+        int value = 0;
+        double area = 0;
+        int maxBalls = 10;
+        int[] balls = new int[maxBalls];
+        double[][] locations = new double[maxBalls][2];
+
+        //set all balls to false
+        for(int i=0; i<maxBalls; i++)
+        {
+            balls[i] = -1;
+            locations[i][0] = -1;
+            locations[i][1] = -1;
+        }
+
+        Imgproc.cvtColor(src, HSV, Imgproc.COLOR_RGB2HSV);
+        //threshold image
+        Core.inRange(HSV, new Scalar(low,saturation,value),new Scalar(high,255,255),thresh);
+        /*  THIS SECTION DOESN'T WORK WITH JAVA, BUT ISN'T ESSENTIAL, IF BLURRING AND FILLING
+        IN HOLES IN BLOBS IS NECESSARY THEN THIS PART SHOUOLD BE FIGURED OUT
+        //blur the image
+        //Imgproc.blur(thresh,thresh,new Size(4,4));
+        //floodfill image
+        fill = thresh.clone();
+        Imgproc.floodFill(fill,new Point(0,0), new Scalar(255));
+        //invert the image
+        Core.bitwise_not(fill, fillInverse);
+        //combine the images
+        cont = (thresh | fillInverse);
+        */
+        cont = thresh.clone();
+
+        List<MatOfPoint> contours = new ArrayList<>();
+
+        Imgproc.findContours(cont, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
+
+        //make sure that the blobs are within the right size range
+        for(int i=0; i<contours.size(); i++)
+        {
+            //TODO: change min and max size for contour Area not length
+            area = Imgproc.contourArea(contours.get(i),false);
+            if(area>ballMinSize && area<ballMaxSize)
+            {
+                balls[i] = i;
+            }
+        }
+
+        int counted = 0;
+        for(int i=0; i<maxBalls; i++)
+        {
+
+            if(balls[i] != -1)
+            {
+                //moments of the object
+                Moments mu = Imgproc.moments(contours.get(balls[i]),false);
+                //mass center of the object
+                locations[counted][0] = mu.m10/mu.m00;
+                locations[counted][1] = mu.m01/mu.m00;
+
+                //drawContours(display,contours[balls[i]],selector,color,-1,8,hierarchy,0,Point());
+                Imgproc.circle(src, new Point(locations[counted][0],locations[counted][1]), 12,dot,-1,8,0);
+
+                counted += 1;
+            }
+        }
+
+        return locations;
+    }
 
     /*
     Returns x and y coordinate of center of vortex of color allianceColor
