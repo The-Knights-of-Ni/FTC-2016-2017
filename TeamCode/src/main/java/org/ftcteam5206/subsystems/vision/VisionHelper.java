@@ -152,7 +152,7 @@ public class VisionHelper {
         //threshold image
         Core.inRange(HSV, new Scalar(low,saturation,value),new Scalar(high,255,255),thresh);
         /*  THIS SECTION DOESN'T WORK WITH JAVA, BUT ISN'T ESSENTIAL, IF BLURRING AND FILLING
-        IN HOLES IN BLOBS IS NECESSARY THEN THIS PART SHOUOLD BE FIGURED OUT
+        IN HOLES IN BLOBS IS NECESSARY THEN THIS PART SHOULD BE FIGURED OUT
         //blur the image
         //Imgproc.blur(thresh,thresh,new Size(4,4));
         //floodfill image
@@ -183,7 +183,7 @@ public class VisionHelper {
         int counted = 0;
         for(int i=0; i<maxBalls; i++)
         {
-
+            
             if(balls[i] != -1)
             {
                 //moments of the object
