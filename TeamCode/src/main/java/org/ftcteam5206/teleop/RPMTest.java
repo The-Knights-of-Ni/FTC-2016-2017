@@ -1,5 +1,6 @@
 package org.ftcteam5206.teleop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,7 +14,7 @@ import org.ftcteam5206.subsystems.RobotConstants;
 /**
  * Created by tarunsingh on 2/25/17.
  */
-
+@Disabled
 @TeleOp(name="RPM Test")
 public class RPMTest extends LinearOpMode {
     @Override

@@ -42,6 +42,8 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
     protected JavaCameraFrame[] mCameraFrame;
     private SurfaceTexture mSurfaceTexture;
 
+    //FIXME Dev's Mod Here
+    public Camera.Parameters devparams;
     public static class JavaCameraSizeAccessor implements ListItemAccessor {
 
         @Override
@@ -138,6 +140,9 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
             /* Now set camera parameters */
             try {
                 Camera.Parameters params = mCamera.getParameters();
+                //FIXME Dev's code here
+                devparams = mCamera.getParameters();
+                devparams.setAutoWhiteBalanceLock(false);
                 Log.d(TAG, "getSupportedPreviewSizes()");
                 List<android.hardware.Camera.Size> sizes = params.getSupportedPreviewSizes();
 

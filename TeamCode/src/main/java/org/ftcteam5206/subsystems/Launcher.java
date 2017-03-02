@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.ftcteam5206.utils.vectors.vector2d;
+
 /**
  * Launcher Object
  * Handles shots and lines up
