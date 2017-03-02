@@ -13,12 +13,3 @@
 
 // Include common definitions from above.
 apply from: '../build.common.gradle'
-
-dependencies {
-    compile project(path: ':libraries:opencv2')
-    compile project(':FtcRobotController')
-}
-android {
-    compileSdkVersion 23
-    buildToolsVersion '24.0.1'
-}
