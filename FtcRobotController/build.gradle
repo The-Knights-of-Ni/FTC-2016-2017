@@ -20,18 +20,13 @@ android {
     }
 }
 
-    compileSdkVersion 23
-    buildToolsVersion '24.0.1'
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
-}
 repositories {
     flatDir {
         dirs '../libs'
     }
 }
 apply from: 'build.release.gradle'
+dependencies {
+    compile project(':libraries:opencv2')
+}
 
-apply from: 'build.release.gradle'

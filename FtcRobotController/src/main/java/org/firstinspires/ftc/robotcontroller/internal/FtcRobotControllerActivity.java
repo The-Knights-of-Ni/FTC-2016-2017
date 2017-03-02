@@ -39,6 +39,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.content.res.Resources;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
@@ -54,6 +55,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.google.blocks.ftcrobotcontroller.BlocksActivity;
@@ -123,7 +125,15 @@ public class FtcRobotControllerActivity extends Activity {
   protected TextView[] textGamepad = new TextView[NUM_GAMEPADS];
   protected TextView textOpMode;
   protected TextView textErrorMessage;
+  protected TextView textTeamName;
+  protected TextView textTeamNumber;
   protected ImmersiveMode immersion;
+
+  protected RadioButton allianceColorRed, allianceColorBlue;
+  public enum AllianceColor {
+    RED, BLUE
+  }
+  public static AllianceColor allianceColor;
 
   protected UpdateUI updateUI;
   protected Dimmer dimmer;
@@ -232,12 +242,35 @@ public class FtcRobotControllerActivity extends Activity {
     textNetworkConnectionStatus = (TextView) findViewById(R.id.textNetworkConnectionStatus);
     textRobotStatus = (TextView) findViewById(R.id.textRobotStatus);
     textOpMode = (TextView) findViewById(R.id.textOpMode);
-    textErrorMessage = (TextView) findViewById(R.id.textErrorMessage);
+    //textErrorMessage = (TextView) findViewById(R.id.textErrorMessage);
+    textTeamName = (TextView) findViewById(R.id.teamName);
+    Typeface cinzelBold = Typeface.createFromAsset(getAssets(), "fonts/Cinzel-Bold.ttf");
+    textTeamName.setTypeface(cinzelBold);
+    textTeamNumber = (TextView) findViewById(R.id.teamNumber);
+    Typeface orbitronBold = Typeface.createFromAsset(getAssets(), "fonts/Orbitron-Bold.ttf");
+    textTeamNumber.setTypeface(orbitronBold);
     textGamepad[0] = (TextView) findViewById(R.id.textGamepad1);
     textGamepad[1] = (TextView) findViewById(R.id.textGamepad2);
     immersion = new ImmersiveMode(getWindow().getDecorView());
     dimmer = new Dimmer(this);
     dimmer.longBright();
+
+    allianceColorBlue = (RadioButton) findViewById(R.id.allianceColorBlue);
+    allianceColorRed = (RadioButton) findViewById(R.id.allianceColorRed);
+
+    allianceColorBlue.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        allianceColor= AllianceColor.BLUE;
+      }
+    });
+
+    allianceColorRed.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        allianceColor= AllianceColor.RED;
+      }
+    });
 
     programmingModeController = new ProgrammingModeControllerImpl(
         this, (TextView) findViewById(R.id.textRemoteProgrammingMode));

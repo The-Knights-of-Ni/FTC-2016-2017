@@ -55,7 +55,7 @@ public class Drive {
     }
 
     public double getPredictedRobotYaw(int milliseconds){
-        return -Maths.radiansToDegrees(imu.getAngularOrientation().firstAngle - imu.getAngularVelocity().firstAngleRate*milliseconds/1000.0);
+        return -Maths.radiansToDegrees(imu.getAngularOrientation().firstAngle - imu.getAngularVelocity().xRotationRate*milliseconds/1000.0);
     }
     private int ldoffset, rdoffset;
     public void zeroDriveEncoders(){
