@@ -141,8 +141,16 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
             try {
                 Camera.Parameters params = mCamera.getParameters();
                 //FIXME Dev's code here
-                devparams = mCamera.getParameters();
-                devparams.setAutoWhiteBalanceLock(false);
+                params.setAutoWhiteBalanceLock(false);
+                params.setFlashMode(params.FLASH_MODE_OFF);
+                params.setWhiteBalance(params.WHITE_BALANCE_FLUORESCENT);
+                params.setExposureCompensation(params.getMaxExposureCompensation());
+                params.setFocusMode(params.FOCUS_MODE_INFINITY);
+                params.setAutoExposureLock(true);
+                params.set("iso", 100);
+
+
+
                 Log.d(TAG, "getSupportedPreviewSizes()");
                 List<android.hardware.Camera.Size> sizes = params.getSupportedPreviewSizes();
 

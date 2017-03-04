@@ -213,8 +213,8 @@ public class VisionHelper {
         //constants for thresholding
         final int redL = 200;
         final int redH = 255;
-        final int blueL = 125;
-        final int blueH = 200;
+        final int blueL = 70;
+        final int blueH = 125;
         final int saturation = 0;
         final int value = 100;
 

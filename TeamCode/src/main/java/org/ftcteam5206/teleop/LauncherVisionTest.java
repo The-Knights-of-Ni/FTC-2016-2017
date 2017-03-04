@@ -14,7 +14,6 @@ import org.ftcteam5206.utils.Button.ButtonHandler;
 /**
  * Created by tarunsingh on 2/25/17.
  */
-@Disabled
 @TeleOp(name="Launcher Vision Test")
 public class LauncherVisionTest extends LinearOpMode {
     @Override
