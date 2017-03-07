@@ -7,11 +7,14 @@ import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.AnalogSensor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.DeviceConfiguration;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -43,6 +46,8 @@ public class KingArthur {
     public DeviceInterfaceModule dim = null;
     public Servo transportServo = null;
     public TouchSensor transportSensor = null;
+    public ColorSensor beaconSensor = null;
+    public VoltageSensor voltageSensor = null;
 
     HardwareMap hwMap = null;
 
@@ -112,6 +117,8 @@ public class KingArthur {
         imu.initialize(parameters);
         //turretPot = hwMap.get(AnalogInput.class, "pot");
         transportSensor = hwMap.touchSensor.get("ball");
+        beaconSensor = hwMap.colorSensor.get("beaconSensor");
+        voltageSensor = hwMap.voltageSensor.get("Launcher Motor Controller");
     }
 
     public void resetEncoders(){

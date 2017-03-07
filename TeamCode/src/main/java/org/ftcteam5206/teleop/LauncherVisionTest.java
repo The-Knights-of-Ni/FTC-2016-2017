@@ -19,12 +19,12 @@ public class LauncherVisionTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         ElapsedTime runtime = new ElapsedTime();
-        VisionSystem visionSystem = new VisionSystem(this);
         VisionCallback callback = null;
         ButtonHandler pad1 = new ButtonHandler();
         waitForStart();
         runtime.reset();
-        visionSystem.detectVortex();
+        VisionSystem visionSystem = new VisionSystem(this);
+        //visionSystem.detectVortex();
         while (opModeIsActive());
     }
 }

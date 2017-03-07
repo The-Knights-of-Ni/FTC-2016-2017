@@ -3,6 +3,7 @@ package org.ftcteam5206.subsystems;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -17,6 +18,7 @@ import org.ftcteam5206.utils.vectors.vector2d;
 //TODO: Integrate Hood, Sensors, Lookup Table, etc. (basically everything)
 public class Launcher {
     public DcMotor launcher, launcher2;
+    private VoltageSensor voltageSensor;
     public Servo hood;
     public Flywheel flywheel;
     public ElapsedTime OpModeTime;
@@ -34,9 +36,10 @@ public class Launcher {
         EXHAUSTING, TRANSPORTING, SPINNING_UP, FIRING, RELOADING
     }
 
-    public Launcher(DcMotor launcher, DcMotor launcher2, Servo hood, ElapsedTime OpModeTime){
+    public Launcher(DcMotor launcher, DcMotor launcher2, VoltageSensor voltageSensor, Servo hood, ElapsedTime OpModeTime){
         this.launcher = launcher;
         this.launcher2 = launcher2;
+        this.voltageSensor = voltageSensor;
         this.hood = hood;
         this.OpModeTime = OpModeTime;
         flywheel = new Flywheel(launcher, OpModeTime);
@@ -98,6 +101,16 @@ public class Launcher {
         lastPower = power;
         launcher.setPower(power);
         launcher2.setPower(power);
+    }
+
+    public void spinUp() {
+        /*
+        if (voltageSensor.getVoltage() < 12.5)
+            launcher.setPower(1);
+        else
+            launcher.setPower(12/voltageSensor.getVoltage());
+        */
+        setPower(1);
     }
 
 }

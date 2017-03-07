@@ -22,7 +22,7 @@ public class RPMTest extends LinearOpMode {
         DcMotor launcher1 = hardwareMap.dcMotor.get("launcher");
         DcMotor launcher2 = hardwareMap.dcMotor.get("launcher2");
         ElapsedTime runtime = new ElapsedTime();
-        Launcher launcher = new Launcher(launcher1, launcher2, null, runtime);
+        Launcher launcher = new Launcher(launcher1, launcher2, null, null, runtime);
 
         waitForStart();
         runtime.reset();

@@ -44,7 +44,7 @@ public class Mk2Teleop extends LinearOpMode{
         robot.init(hardwareMap);
         //Init Subsystem Controllers
         Drive drive = new Drive(robot.leftDrive, robot.rightDrive, robot.imu, runtime);
-        Launcher launcher = new Launcher(robot.launcher, robot.launcher2, robot.hood, runtime);
+        Launcher launcher = new Launcher(robot.launcher, robot.launcher2,robot.voltageSensor, robot.hood, runtime);
         Intake intake = new Intake(robot.intakeTransport, runtime);
         Transport transport = new Transport(robot.intakeTransport, robot.transportServo, runtime);
         Cap cap = new Cap(robot.forkReleaseLeft, robot.forkReleaseRight, robot.clasp, robot.capMotor, runtime);
@@ -93,6 +93,7 @@ public class Mk2Teleop extends LinearOpMode{
                     drive.leftDrive.setPower(Range.clip(sticks.x - sticks.y, -0.75, 0.75));
                     break;
                 case AUTO:
+                    Log.d("autodrive", "In Auto state");
                     if(driveAutoInitializing){
                         //drive.plannedTurn(90);
                         drive.driveDist(24, 20);
@@ -102,7 +103,7 @@ public class Mk2Teleop extends LinearOpMode{
                         drive.driveDistUpdate();
                     } else {
                         Log.d("autodrive", "Turn finished");
-                        pad1.buttons.Y.setStatus(false);
+                        pad1.buttons.B.setStatus(false);
                         afterTurnLogs = runtime.seconds();
                     }
                     break;
@@ -114,11 +115,13 @@ public class Mk2Teleop extends LinearOpMode{
             }
 
 
-            if(pad1.toggle(pad1.buttons.Y)){
+            if(pad1.toggle(pad1.buttons.B)){
                 drive.setDriveState(Drive.DriveState.AUTO);
-            } else
+            } else {
                 drive.setDriveState(Drive.DriveState.OPEN_LOOP);
-            if(pad1.singlePress(pad1.buttons.Y)){
+            }
+
+            if(pad1.singlePress(pad1.buttons.B)){
                 driveAutoInitializing = true;
             }
 
@@ -177,7 +180,7 @@ public class Mk2Teleop extends LinearOpMode{
                     break;
                 case OPEN_LOOP: //Each Shot must be confirmed
                     if (pad2.toggle(pad2.buttons.X)) {
-                        launcher.setPower(1);
+                        launcher.setPower(.3);
                         telemetry.addData("Launcher", "On");
                     } else {
                         launcher.setPower(0);
@@ -223,8 +226,8 @@ public class Mk2Teleop extends LinearOpMode{
                                 break;
                             case SPINNING_UP:
                                 transport.off();
-                                launcher.setRPM(2000);//FIXME: This method is broken
-                                //launcher.setPower(1);
+                                //launcher.setRPM(2000);//FIXME: This method is broken
+                                launcher.spinUp();
                                 if (runtime.seconds() - shotConfirmTime > 3) {
                                     shotConfirmTime = runtime.seconds();
                                     semiAutoStatus = FIRING;
@@ -343,8 +346,10 @@ public class Mk2Teleop extends LinearOpMode{
                 telemetry.addData("Semi Auto FSM", semiAutoStatus);
             telemetry.addData("Intake FSM", intake.getIntakeState());
             telemetry.addData("Drive FSM", drive.getDriveState());
-            telemetry.addData("Robot Yaw", drive.getRobotYaw());
-            telemetry.addData("Launcher Ticks", robot.launcher.getCurrentPosition());
+            //telemetry.addData("Robot Yaw", drive.getRobotYaw());
+            telemetry.addData("Battery Voltage", robot.voltageSensor.getVoltage());
+            telemetry.addData("Launcher PWM", robot.launcher.getPower());
+            telemetry.addData("Y Status", pad1.buttons.Y.getStatus());
             telemetry.update();
             double rpm = launcher.flywheel.getRPM();
             /*

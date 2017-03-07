@@ -95,7 +95,7 @@ public class Drive {
     //TODO: Tune these, add in gyro stabilization (tangential and normal error)
     public double kv = 1/RobotConstants.maxDriveVelocity;
     public double ka = 1/(8*RobotConstants.maxDriveAcceleration);
-    public double kpDrive = 1/200.0;
+    public double kpDrive = 1/150.0;
     //kdDrive;
     public void driveDistUpdate(){
         double deltaTime = OpModeTime.seconds()-driveTime;
@@ -155,6 +155,8 @@ public class Drive {
         plannedTurnAngle = getRobotYaw() + degrees;
         absTurn(plannedTurnAngle);
         turnTime = OpModeTime.seconds();
+        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     //TODO: Tune these
@@ -228,8 +230,8 @@ public class Drive {
 //    }
     public boolean plannedTurnChecker(){
         Log.d("autodrive", getRobotYaw() + ", "  + Maths.smallestSignedAngle(getRobotYaw(), targetAngle));
-        boolean isAboutEqual = Math.abs(Maths.smallestSignedAngle(getRobotYaw(), targetAngle)) < 0.5 && Math.abs(leftDrive.getPower()) < 0.15 ;//FIXME: Bad stop requirement
-        //isAboutEqual = OpModeTime.seconds() - turnTime > turnPath.target_time;
+        boolean isAboutEqual = Math.abs(Maths.smallestSignedAngle(getRobotYaw(), targetAngle)) < 1 && Math.abs(leftDrive.getPower()) < 0.15 ;//FIXME: Bad stop requirement
+        isAboutEqual = OpModeTime.seconds() - turnTime > turnPath.target_time;
         if(isAboutEqual){
             stop();
             Log.d("autodrive", "Max Error from FFWD was " + maxError);
