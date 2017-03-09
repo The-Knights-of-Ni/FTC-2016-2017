@@ -73,6 +73,10 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
 
     public VisionCallback visionCallback;
 
+    public void setCurrentProcessingMode(ProcessingMode currentProcessingMode) {
+        this.currentProcessingMode = currentProcessingMode;
+    }
+
     public VisionSystem(OpMode opMode) {
         Log.d(TAG, "Called vision constructor");
         this.appContext = (Activity) opMode.hardwareMap.appContext;

@@ -138,23 +138,6 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
             /* Now set camera parameters */
             try {
                 Camera.Parameters params = mCamera.getParameters();
-                //FIXME Dev's code here
-                /*
-                //params.setAutoWhiteBalanceLock(false);
-                params.setFlashMode(params.FLASH_MODE_OFF);
-                //params.setWhiteBalance(params.WHITE_BALANCE_FLUORESCENT);
-                params.setExposureCompensation(-4);
-                //params.setFocusMode(params.FOCUS_MODE_INFINITY);
-                params.setAutoExposureLock(true);
-                params.set("mode", "m");
-                params.set("iso", 100);
-                Log.d("isovals", params.get("mode"));
-                Log.d("isovals", params.get("iso-values"));
-                Log.d("isovals", params.get("iso"));
-                String sParams = params.flatten();
-                Log.d("isovals", "camera flatten: "+sParams);
-                */
-
                 Log.d(TAG, "getSupportedPreviewSizes()");
                 List<android.hardware.Camera.Size> sizes = params.getSupportedPreviewSizes();
 
@@ -175,6 +158,14 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
                         params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
                     }
 
+
+//                    params.setFocusMode(Camera.Parameters.FOCUS_MODE_FIXED);
+//                    params.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_SHADE);
+//                    params.setColorEffect(Camera.Parameters.EFFECT_NONE);
+//                    params.setExposureCompensation(0);
+//                    params.setAutoExposureLock(true);
+//                    params.setAntibanding(Camera.Parameters.ANTIBANDING_OFF);
+//                    params.setSceneMode(Camera.Parameters.SCENE_MODE_NIGHT);
                     mCamera.setParameters(params);
                     params = mCamera.getParameters();
 

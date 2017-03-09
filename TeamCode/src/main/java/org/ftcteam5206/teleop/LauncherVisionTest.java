@@ -25,6 +25,10 @@ public class LauncherVisionTest extends LinearOpMode {
         runtime.reset();
         VisionSystem visionSystem = new VisionSystem(this);
         //visionSystem.detectVortex();
-        while (opModeIsActive());
+        while (opModeIsActive()){
+            visionSystem.setCurrentProcessingMode(VisionSystem.ProcessingMode.NONE);
+            telemetry.addData("Working", "");
+            telemetry.update();
+        }
     }
 }

@@ -93,14 +93,14 @@ public class Mk2Teleop extends LinearOpMode{
                     drive.leftDrive.setPower(Range.clip(sticks.x - sticks.y, -0.75, 0.75));
                     break;
                 case AUTO:
-                    Log.d("autodrive", "In Auto state");
+                    //Log.d("autodrive", "In Auto state");
                     if(driveAutoInitializing){
-                        //drive.plannedTurn(90);
-                        drive.driveDist(24, 20);
+                        drive.plannedTurn(90);
+                        //drive.driveDist(24, 20);
                         driveAutoInitializing = false;
                     }
-                    if(drive.driveDistChecker()){
-                        drive.driveDistUpdate();
+                    if(drive.plannedTurnChecker()){
+                        drive.plannedTurnUpdate();
                     } else {
                         Log.d("autodrive", "Turn finished");
                         pad1.buttons.B.setStatus(false);
