@@ -151,20 +151,21 @@ public class Drive {
 
     public void plannedTurn(double degrees){
         Log.d("autodrive", "Starting Planned Turn");
-        turnPath = new PlannedPath(Maths.degreeToRadians(Math.abs(degrees))*RobotConstants.driveBaseRadius, 30, 60);
+        turnPath = new PlannedPath(Maths.degreeToRadians(Math.abs(degrees))*RobotConstants.driveBaseRadius, 40, 80);
         plannedTurnAngle = getRobotYaw() + degrees;
         absTurn(plannedTurnAngle);
         turnTime = OpModeTime.seconds();
-        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     //TODO: Tune these
-    public final double kvTurn = 1/40.0;
+    public final double kvTurn = 1/40.0;//TODO: Vary with battery, this will make it work.
     public final double kaTurn = 1/(4*RobotConstants.maxDriveAcceleration);
-    public final double kpTurn = 1/20000.0;
-    public final double kiTurn = 1/100000.0;
-    public final double kdTurn = -1/10000.0;
+    public final double kpTurn = 1/5000.0;;
+    public final double kiTurn = 1/5000.0;
+    public final double kdTurn = -1/7000.0;
+    public final int IMU_LAG = 7;
     double errorlast, timelast;
     double maxError;
     public void plannedTurnUpdate(){
@@ -172,7 +173,7 @@ public class Drive {
         //double error = -Maths.smallestSignedAngle(plannedTurnAngle, getRobotYaw());//This is the full error as opposed to the correct model
         vector3d kinematics = turnPath.getData(deltaTime);
         double ffwdAngle = Maths.radiansToDegrees(kinematics.getX()/RobotConstants.driveBaseRadius);//This is the angle we expect to be at.
-        double error =  -Maths.smallestSignedAngle(ffwdAngle, getPredictedRobotYaw(5));//The difference between where we expect to be and where we are.
+        double error =  -Maths.smallestSignedAngle(ffwdAngle, getPredictedRobotYaw(IMU_LAG));//The difference between where we expect to be and where we are.
         if(error > maxError) maxError = error;
         //Log.d("autodrive", "Tracking within " + error + " of FFWD:" + ffwdAngle);
         double integralError = errorlast + error;
@@ -181,7 +182,7 @@ public class Drive {
         //Log.d("autodrive", deltaTime + "," + kinematics.getX() + "," + kinematics.getY() + "," + kinematics.getZ() + "," + ffwdAngle);
 
         double pwm = kvTurn*kinematics.getY() + kaTurn*kinematics.getZ() + kpTurn*error + kiTurn*integralError + kdTurn*derivativeError;
-        Log.d("autodrive", "," + deltaTime + "," + getPredictedRobotYaw(5) + "," + ffwdAngle);
+        Log.d("autodrive", "," + deltaTime + "," + getPredictedRobotYaw(IMU_LAG) + "," + ffwdAngle);
         //Log.d("autodrive", "PWM components " + kvTurn*kinematics.getY() + ", " + kaTurn*kinematics.getZ()  + ", " + kpTurn*error + ", " + kiTurn*integralError + ", " + kdTurn*derivativeError + " = " + pwm);
         if(Math.signum(processedTargetAngle) == 1.0){ //Turn Right
             leftDrive.setPower(pwm);
@@ -230,7 +231,7 @@ public class Drive {
 //    }
     public boolean plannedTurnChecker(){
         //Log.d("autodrive", getPredictedRobotYaw(5) + ", "  + Maths.smallestSignedAngle(getPredictedRobotYaw(5), targetAngle));
-        boolean isAboutEqual = Math.abs(Maths.smallestSignedAngle(getPredictedRobotYaw(5), targetAngle)) < 1 ;//&& Math.abs(leftDrive.getPower()) < 0.15 ;//FIXME: Bad stop requirement
+        boolean isAboutEqual = Math.abs(Maths.smallestSignedAngle(getPredictedRobotYaw(IMU_LAG), targetAngle)) < 1 ;//&& Math.abs(leftDrive.getPower()) < 0.15 ;//FIXME: Bad stop requirement
         //isAboutEqual = OpModeTime.seconds() - turnTime > turnPath.target_time;
         if(isAboutEqual){
             stop();
