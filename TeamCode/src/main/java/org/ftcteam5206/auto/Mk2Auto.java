@@ -142,24 +142,25 @@ public class Mk2Auto extends LinearOpMode {
             drive.driveDistUpdate();
         }
         */
-        robot.leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
         //First drive forward
-        robot.leftDrive.setTargetPosition((int) (24/RobotConstants.driveTickToDist));
-        robot.rightDrive.setTargetPosition((int) (24/RobotConstants.driveTickToDist));
-        robot.leftDrive.setPower(0.2);
-        robot.rightDrive.setPower(0.2);
-
-        segmentStartTime = runtime.seconds();
-        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
-            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
-                break;
+        drive.driveDist(24);
+        while(opModeIsActive() && drive.driveDistChecker()){
+            drive.driveDistUpdate();
         }
         drive.stop();
+//        robot.leftDrive.setTargetPosition((int) (24/RobotConstants.driveTickToDist));
+//        robot.rightDrive.setTargetPosition((int) (24/RobotConstants.driveTickToDist));
+//        robot.leftDrive.setPower(0.2);
+//        robot.rightDrive.setPower(0.2);
+//
+//        segmentStartTime = runtime.seconds();
+//        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+//            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+//                break;
+//        }
+//        drive.stop();
         Log.d("autotest", "Finished first drive segment");
         waitRobot(driveDelay);
-
         /*
         //Launch 2 balls
         Log.d("autotest", "Spinning up launcher");
@@ -201,6 +202,7 @@ public class Mk2Auto extends LinearOpMode {
         */
 
         //First 45 degree turn
+        drive.setMotorsPositionControl();
         Log.d("autotest", "Starting first turn");
         int offsetTicks = 0;
         if (allianceColorInt == 1)
@@ -229,18 +231,25 @@ public class Mk2Auto extends LinearOpMode {
         }
         */
         //Drive toward beacons
-        Log.d("autotest", "Starting second drive segment");
-        offsetTicks = (int) (38/RobotConstants.driveTickToDist);
-        robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
-        robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() + offsetTicks);
-        robot.leftDrive.setPower(0.2);
-        robot.rightDrive.setPower(0.2);
-        segmentStartTime = runtime.seconds();
-        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
-            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
-                break;
+        Log.d("autotest", "Starting second drive segment");drive.setMotorsOpenLoop();
+        drive.driveDist(38);
+        while(opModeIsActive() && drive.driveDistChecker()){
+            drive.driveDistUpdate();
         }
         drive.stop();
+
+
+//        offsetTicks = (int) (38/RobotConstants.driveTickToDist);
+//        robot.leftDrive.setTargetPosition(robot.leftDrive.getCurrentPosition() + offsetTicks);
+//        robot.rightDrive.setTargetPosition(robot.rightDrive.getCurrentPosition() + offsetTicks);
+//        robot.leftDrive.setPower(0.2);
+//        robot.rightDrive.setPower(0.2);
+//        segmentStartTime = runtime.seconds();
+//        while (opModeIsActive() && (robot.leftDrive.isBusy() || robot.rightDrive.isBusy())) {
+//            if(runtime.seconds() - segmentStartTime > 0.5 && driveIsStalling())
+//                break;
+//        }
+//        drive.stop();
         Log.d("autotest", "Finished second drive segment");
         waitRobot(driveDelay);
 
@@ -252,6 +261,7 @@ public class Mk2Auto extends LinearOpMode {
         */
 
         //Second 45 turn to square up with beacons
+        drive.setMotorsPositionControl();
         Log.d("autotest", "Starting second turn");
         if (allianceColorInt == 1)
             offsetTicks = (int) (Maths.degreeToRadians(Maths.smallestSignedAngle(drive.getRobotYaw(), 270))*RobotConstants.driveBaseRadius/RobotConstants.driveTickToDist);
