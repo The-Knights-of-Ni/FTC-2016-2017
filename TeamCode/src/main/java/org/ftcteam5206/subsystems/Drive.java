@@ -307,5 +307,25 @@ public class Drive {
         leftDrive.setPower((isRightTurn ? 1:-1)*motorPWM);
     }
 
+    public void setMotorsOpenLoop(){
+        leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void setMotorsSpeedControl(){
+        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void setMotorsPositionControl(){
+        leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void resetEncoders(){
+        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
     //TODO: Pose Tracking, 2D Motion
 }

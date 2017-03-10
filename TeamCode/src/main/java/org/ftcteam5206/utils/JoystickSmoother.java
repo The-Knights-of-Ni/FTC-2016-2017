@@ -39,8 +39,8 @@ public class JoystickSmoother {
         smoothed.y = quadraticBezier(raw_y, 0, 0.15, 1);
         smoothed.x *= Math.signum(raw_x);
         smoothed.y *= Math.signum(raw_y);
-        smoothed.x = clamp(smoothed.x, -0.5, 0.5);
-        smoothed.y = clamp(smoothed.y, -0.5, 0.5);
+        //smoothed.x = clamp(smoothed.x, -0.5, 0.5);
+        //smoothed.y = clamp(smoothed.y, -0.5, 0.5);
         return smoothed;
     }
 
