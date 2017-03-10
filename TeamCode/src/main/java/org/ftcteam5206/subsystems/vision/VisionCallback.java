@@ -15,7 +15,15 @@ public class VisionCallback {
 
     public boolean beaconIsRed;
 
+    public double[][] ballLocationsRed;
+    public double[][] ballLocationsBlue;
+
     public VisionCallback(){};
+
+    public void update(double [][] ballLocations) {
+        this.hasFinished = true;
+        this.ballLocationsRed = ballLocations;
+    }
 
     public void update(double redCenterX, double blueCenterX) {
         this.hasFinished = true;

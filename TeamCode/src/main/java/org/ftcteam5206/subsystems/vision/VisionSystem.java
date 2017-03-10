@@ -60,7 +60,7 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
     };
 
     public enum ProcessingMode {
-        NONE, BEACON, VORTEX, BEACON_CHECK
+        NONE, BEACON, VORTEX, BEACON_CHECK, FINDBALLS
     }
 
     private ProcessingMode currentProcessingMode = ProcessingMode.NONE;
@@ -127,6 +127,10 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
                 //updateVortexResult(VisionHelper.detectVortex(rgb, FtcRobotControllerActivity.allianceColor == FtcRobotControllerActivity.AllianceColor.RED));
                 return VisionHelper.detectVortex(rgb, FtcRobotControllerActivity.allianceColor == FtcRobotControllerActivity.AllianceColor.RED);
                 //break;
+            case FINDBALLS:
+                Log.d("VISION RESULTS", "HIHIHIHIHI");
+                updateBallLocations(VisionHelper.findBallLocations(rgb,100,255));
+                break;
             case NONE:
                 //return rgbT;
                 return rgb;
@@ -149,6 +153,13 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
         return visionCallback;
     }
 
+    public VisionCallback findBallLocations() {
+        currentProcessingMode = ProcessingMode.FINDBALLS;
+        lastFrameRequestedTime = System.currentTimeMillis();
+        visionCallback = new VisionCallback();
+        return visionCallback;
+    }
+
     public VisionCallback checkBeacon() {
         currentProcessingMode = ProcessingMode.BEACON_CHECK;
         lastFrameRequestedTime = System.currentTimeMillis();
@@ -163,11 +174,15 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
         return visionCallback;
     }
 
-    /** Updates vision callback object with result of beacon detection */
+    /** Updates vision callback object with result of beacon detection AND ALSO BALL DETECTION*/
     private void updateBeaconResult(double[][] result) {
         visionCallback.update(result[0][0], result[1][0]);
     }
 
+    private void updateBallLocations(double[][] result) {
+        Log.d("VISION TESTING","lololollolol");
+        visionCallback.update(result);
+    }
     private void updateBeaconResult(boolean beaconIsRed) {
         visionCallback.update(beaconIsRed);
     }
