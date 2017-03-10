@@ -14,7 +14,7 @@ public final class RobotConstants {
     public final static int neverRestCPR = 4;
     //DRIVE
     public final static int wheelRadius = 2;
-    public final static double driveBaseRadius = 8.125;
+    public final static double driveBaseRadius = 8.625;
     public final static double maxDriveVelocity = 67;
     public final static double maxDriveAcceleration = 150;
     public final static double driveDistTolerance = 0.5;

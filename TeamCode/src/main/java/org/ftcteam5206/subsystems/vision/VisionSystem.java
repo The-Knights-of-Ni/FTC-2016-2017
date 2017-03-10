@@ -73,6 +73,10 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
 
     public VisionCallback visionCallback;
 
+    public void setCurrentProcessingMode(ProcessingMode currentProcessingMode) {
+        this.currentProcessingMode = currentProcessingMode;
+    }
+
     public VisionSystem(OpMode opMode) {
         Log.d(TAG, "Called vision constructor");
         this.appContext = (Activity) opMode.hardwareMap.appContext;
@@ -133,7 +137,12 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
                 break;
             case NONE:
                 //return rgbT;
-                return rgb;
+                //return rgb;
+                Mat hsv = new Mat();
+                Mat dest = new Mat();
+                Imgproc.cvtColor(rgb, hsv, Imgproc.COLOR_RGB2HSV);
+                Core.inRange(hsv, new Scalar(70, 0, 100), new Scalar(125, 255, 255), dest);
+                return dest;
         }
 
         //VisionSystem detection was called

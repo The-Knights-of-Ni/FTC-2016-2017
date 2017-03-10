@@ -17,6 +17,10 @@ public class Button {
         this.status = status;
     }
 
+    public boolean getStatus() {
+        return status;
+    }
+
     public boolean toggle(){
         this.status = !this.status;
         return status;

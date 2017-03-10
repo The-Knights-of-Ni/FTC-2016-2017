@@ -39,7 +39,7 @@ public class Mk2Auto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap);
         Drive drive = new Drive(robot.leftDrive, robot.rightDrive, robot.imu, runtime);
-        Launcher launcher = new Launcher(robot.launcher, robot.launcher2, robot.hood, runtime);
+        Launcher launcher = new Launcher(robot.launcher, robot.launcher2, robot.voltageSensor, robot.hood, runtime);
         Intake intake = new Intake(robot.intakeTransport, runtime);
         Transport transport = new Transport(robot.intakeTransport, robot.transportServo,runtime);
         //BeaconPusher beaconPusher = new BeaconPusher(robot.beaconPusher, runtime);

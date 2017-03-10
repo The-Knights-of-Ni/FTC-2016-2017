@@ -214,15 +214,15 @@ public class VisionHelper {
         Mat hierarchy = new Mat();
 
         //constants for thresholding
-        final int redL = 200;
-        final int redH = 255;
-        final int blueL = 125;
-        final int blueH = 200;
+        final int redL = 148;
+        final int redH = 178;
+        final int blueL = 70;
+        final int blueH = 125;
         final int saturation = 0;
         final int value = 100;
 
         Log.d(TAG, "Starting vortex detection");
-        Imgproc.cvtColor(src, HSV, Imgproc.COLOR_RGB2HSV_FULL);
+        Imgproc.cvtColor(src, HSV, Imgproc.COLOR_RGB2HSV);
 
         if (isRed)
             Core.inRange(HSV, new Scalar(redL, saturation, value), new Scalar(redH, 255, 255), mask);
