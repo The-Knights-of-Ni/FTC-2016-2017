@@ -5,20 +5,13 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-<<<<<<< HEAD
-=======
 import com.qualcomm.robotcore.exception.RobotCoreException;
->>>>>>> 676976e2463733e00104723dace08c3964c3b33b
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.ftcteam5206.KingArthur;
-<<<<<<< HEAD
-=======
 import org.ftcteam5206.utils.Button.ButtonHandler;
->>>>>>> 676976e2463733e00104723dace08c3964c3b33b
 
 /**
  * Created by tarunsingh on 3/4/17.

@@ -29,9 +29,6 @@ public class visionTest extends LinearOpMode {
         Log.d("VisionHelper", "Called visionsystem.detectbeacon() in auto");
         while (opModeIsActive() && !visionSystem.visionCallback.hasFinished) {}
 
-
-
-
         while(opModeIsActive()) {
             for (double[] x : visionSystem.visionCallback.ballLocationsRed)
                 telemetry.addData("ngfjhg", x[0] + " " + x[1]);
