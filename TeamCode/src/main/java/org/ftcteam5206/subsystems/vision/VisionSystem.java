@@ -132,9 +132,7 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
                 return VisionHelper.detectVortex(rgb, FtcRobotControllerActivity.allianceColor == FtcRobotControllerActivity.AllianceColor.RED);
                 //break;
             case FINDBALLS:
-                Log.d("VISION RESULTS", "HIHIHIHIHI");
-                updateBallLocations(VisionHelper.findBallLocations(rgb,100,255));
-                break;
+                updateBallLocations(VisionHelper.findBallLocations(rgb));;
             case NONE:
                 //return rgbT;
                 //return rgb;
@@ -169,6 +167,7 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
         return visionCallback;
     }
 
+
     public VisionCallback checkBeacon() {
         currentProcessingMode = ProcessingMode.BEACON_CHECK;
         lastFrameRequestedTime = System.currentTimeMillis();
@@ -189,9 +188,10 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
     }
 
     private void updateBallLocations(double[][] result) {
-        Log.d("VISION TESTING","lololollolol");
         visionCallback.update(result);
+        Log.d(TAG, "updateBallLocations: " + visionCallback.ballLocations.length);
     }
+
     private void updateBeaconResult(boolean beaconIsRed) {
         visionCallback.update(beaconIsRed);
     }
@@ -212,4 +212,6 @@ public class VisionSystem implements CameraBridgeViewBase.CvCameraViewListener2 
     public void disableCamera () {
         openCvCameraView.disableView();
     }
+
 }
+

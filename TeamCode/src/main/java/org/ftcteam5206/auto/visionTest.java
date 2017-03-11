@@ -1,5 +1,6 @@
 package org.ftcteam5206.auto;
 
+import android.nfc.Tag;
 import android.util.Log;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -23,17 +24,30 @@ public class visionTest extends LinearOpMode {
 
         Log.d("autotest", "Starting");
 
-        visionSystem.findBallLocations();
-
         Log.d("autotest", "Vision Done");
         Log.d("VisionHelper", "Called visionsystem.detectbeacon() in auto");
+
+        visionSystem.findBallLocations();
         while (opModeIsActive() && !visionSystem.visionCallback.hasFinished) {}
 
+        visionSystem.disableCamera();
+        int counter = 0;
         while(opModeIsActive()) {
-            for (double[] x : visionSystem.visionCallback.ballLocationsRed)
-                telemetry.addData("ngfjhg", x[0] + " " + x[1]);
-            telemetry.update();
-        }
+            for (int i = 0; i < 3; i ++)
+            {
+                telemetry.addData("RED:",visionSystem.visionCallback.ballLocations[i][0] + " " + visionSystem.visionCallback.ballLocations[i][1] + " " + visionSystem.visionCallback.ballLocations[i][2]);
+            }
 
+            for (int i = 3; i < 6; i ++)
+            {
+                telemetry.addData("BLUE:",visionSystem.visionCallback.ballLocations[i][0] + " " + visionSystem.visionCallback.ballLocations[i][1] + " " + visionSystem.visionCallback.ballLocations[i][2]);
+            }
+
+            counter++;
+
+            telemetry.addData("Thing",counter);
+            telemetry.update();
+            sleep(1000);
+        }
     }
 }

@@ -9,6 +9,7 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.core.Core;
@@ -123,35 +124,40 @@ public class VisionHelper {
     FOR RED AND BLUE BALLS, X AND Y VALUES ARE IN PIXELS, CAN BE USE TO FIND EXACT BALL
     LOCATIONS AND DRIVE TO THEM
      */
-    public static double [][] findBallLocations(Mat src, int low, int high){
+    public static double [][] findBallLocations(Mat src){
         Mat fill = new Mat();
         Mat thresh = new Mat();
         Mat fillInverse = new Mat();
         Mat cont = new Mat();
         Mat HSV = new Mat();
         Mat hierarchy  = new Mat();
-        final int ballMaxSize = 300;
-        final int ballMinSize = 65;
+        final int ballMaxSize = 150000000;
+        final int ballMinSize = 12000;
         int selector = 0;
         int saturation = 0;
         int value = 0;
         double area = 0;
-        double[][] locations = null;
-        Imgproc.cvtColor(src, HSV, Imgproc.COLOR_RGB2HSV);
+        double[][] locations = new double[6][3];
+        int lowRed = 200;
+        int highRed = 255;
+        int lowBlue = 100;
+        int highBlue = 180;
+
+        for(int i = 0; i<6;i++)
+        {
+            locations[i][0] = -1;
+            locations[i][1] = -1;
+            locations[i][2] = -1;
+        }
+
+        Imgproc.cvtColor(src, HSV, Imgproc.COLOR_RGB2HSV_FULL);
+        // THE RED PART OF THE IMAGE
         //threshold image
-        Core.inRange(HSV, new Scalar(low,saturation,value),new Scalar(high,255,255),thresh);
-        /*  THIS SECTION DOESN'T WORK WITH JAVA, BUT ISN'T ESSENTIAL, IF BLURRING AND FILLING
-        IN HOLES IN BLOBS IS NECESSARY THEN THIS PART SHOULD BE FIGURED OUT
-        //blur the image
-        //Imgproc.blur(thresh,thresh,new Size(4,4));
-        //floodfill image
-        fill = thresh.clone();
-        Imgproc.floodFill(fill,new Point(0,0), new Scalar(255));
-        //invert the image
-        Core.bitwise_not(fill, fillInverse);
-        //combine the images
-        cont = (thresh | fillInverse);
-        */
+        Core.inRange(HSV, new Scalar(lowRed,saturation,value),new Scalar(highRed,255,255),thresh);
+
+        //TODO: add image hole filling
+
+        Imgproc.blur(thresh,thresh, new Size(4,4));
         cont = thresh.clone();
 
         List<MatOfPoint> contours = new ArrayList<>();
@@ -162,14 +168,11 @@ public class VisionHelper {
         {
             int maxBalls = contours.size();
             int[] balls = new int[maxBalls];
-            locations = new double[maxBalls][2];
 
             //set all balls to false
             for(int i=0; i<maxBalls; i++)
             {
                 balls[i] = -1;
-                locations[i][0] = -1;
-                locations[i][1] = -1;
             }
 
             //make sure that the blobs are within the right size range
@@ -186,22 +189,91 @@ public class VisionHelper {
             int counted = 0;
             for(int i=0; i<maxBalls; i++)
             {
+                    if(balls[i] != -1 && counted < 3)
+                    {
+                        //moments of the object
+                        Moments mu = Imgproc.moments(contours.get(balls[i]), false);
+                        //mass center of the object
+                        locations[counted][0] = mu.m10 / mu.m00;
+                        locations[counted][1] = mu.m01 / mu.m00;
+                        locations[counted][2] = Imgproc.contourArea(contours.get(balls[i]));
 
-                if(balls[i] != -1)
+                        counted += 1;
+                    }
+            }
+        }
+
+        // THE BLUE PART OF THE IMAGE
+        //threshold image
+        Core.inRange(HSV, new Scalar(lowBlue,saturation,value),new Scalar(highBlue,255,255),thresh);
+
+        //TODO: add image hole filling
+
+        Imgproc.blur(thresh,thresh, new Size(4,4));
+        cont = thresh.clone();
+
+        List<MatOfPoint> blueContours = new ArrayList<>();
+
+        Imgproc.findContours(cont, blueContours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
+
+        if(contours.size() != 0)
+        {
+            int maxBalls = blueContours.size();
+            int[] balls = new int[maxBalls];
+
+            //set all balls to false
+            for(int i=0; i<maxBalls; i++)
+            {
+                balls[i] = -1;
+            }
+
+            //make sure that the blobs are within the right size range
+            for(int i=0; i<blueContours.size(); i++)
+            {
+                //TODO: change min and max size for contour Area not length
+                area = Imgproc.contourArea(blueContours.get(i),false);
+                if(area>ballMinSize && area<ballMaxSize)
+                {
+                    balls[i] = i;
+                }
+            }
+
+            int counted = 3;
+            for(int i=0; i<maxBalls; i++)
+            {
+                if(balls[i] != -1 && counted < 6)
                 {
                     //moments of the object
-                    Moments mu = Imgproc.moments(contours.get(balls[i]),false);
+                    Moments mu = Imgproc.moments(blueContours.get(balls[i]), false);
                     //mass center of the object
-                    locations[counted][0] = mu.m10/mu.m00;
-                    locations[counted][1] = mu.m01/mu.m00;
-
-                    //drawContours(display,contours[balls[i]],selector,color,-1,8,hierarchy,0,Point());
-                    //Imgproc.circle(src, new Point(locations[counted][0],locations[counted][1]), 12,dot,-1,8,0);
+                    locations[counted][0] = mu.m10 / mu.m00;
+                    locations[counted][1] = mu.m01 / mu.m00;
+                    locations[counted][2] = Imgproc.contourArea(blueContours.get(balls[i]));
 
                     counted += 1;
                 }
             }
         }
+        for(int i = 0; i < 6; i++){
+            Log.d(TAG, "findBallLocations: " + locations[i][0] + " "+ locations[i][1] + " "+ locations[i][2]);
+        }
+
+        Mat saved = src.clone();
+
+        for(int i=0; i< 3; i++){
+            if(locations[i][0] != -1 && locations[i][1] != -1){
+                Point center = new Point(locations[i][0],locations[i][1]);
+                Imgproc.circle(saved,center,20,new Scalar(0,0,0),15);
+            }
+        }
+        for(int i=3; i< 6; i++){
+            if(locations[i][0] != -1 && locations[i][1] != -1){
+                Point center = new Point(locations[i][0],locations[i][1]);
+                Imgproc.circle(saved,center,20,new Scalar(255,255,255),15);
+            }
+        }
+
+        saveFrame(saved);
         return locations;
     }
 
@@ -270,7 +342,7 @@ public class VisionHelper {
     /** Saves camera frame to internal storage */
     public static void saveFrame(Mat img) {
         File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        String filename = "FRAME_" + System.currentTimeMillis() + ".png";
+        String filename = "FRAME_thatISaved.png";
         File file = new File(path, filename);
         filename = file.toString();
         boolean success = Imgcodecs.imwrite(filename, img);
@@ -281,7 +353,6 @@ public class VisionHelper {
         //img.release();
     }
 
-    /** Returns true if beacon is red */
     public static boolean checkBeacon (Mat src) {
         Mat HSV = new Mat();
         Mat red = new Mat();
