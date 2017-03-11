@@ -131,8 +131,8 @@ public class VisionHelper {
         Mat cont = new Mat();
         Mat HSV = new Mat();
         Mat hierarchy  = new Mat();
-        final int ballMaxSize = 150000000;
-        final int ballMinSize = 12000;
+        final int ballMaxSize = 30000;
+        final int ballMinSize = 2500;
         int selector = 0;
         int saturation = 0;
         int value = 0;
@@ -140,8 +140,8 @@ public class VisionHelper {
         double[][] locations = new double[6][3];
         int lowRed = 200;
         int highRed = 255;
-        int lowBlue = 100;
-        int highBlue = 180;
+        int lowBlue = 0;
+        int highBlue = 100;
 
         for(int i = 0; i<6;i++)
         {
@@ -164,6 +164,12 @@ public class VisionHelper {
 
         Imgproc.findContours(cont, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
 
+        List<MatOfPoint2f> newContours = new ArrayList<>();
+        for(MatOfPoint point : contours) {
+            MatOfPoint2f newPoint = new MatOfPoint2f(point.toArray());
+            newContours.add(newPoint);
+        }
+
         if(contours.size() != 0)
         {
             int maxBalls = contours.size();
@@ -180,6 +186,7 @@ public class VisionHelper {
             {
                 //TODO: change min and max size for contour Area not length
                 area = Imgproc.contourArea(contours.get(i),false);
+                double length = Imgproc.arcLength(newContours.get(i), true);
                 if(area>ballMinSize && area<ballMaxSize)
                 {
                     balls[i] = i;
@@ -196,7 +203,7 @@ public class VisionHelper {
                         //mass center of the object
                         locations[counted][0] = mu.m10 / mu.m00;
                         locations[counted][1] = mu.m01 / mu.m00;
-                        locations[counted][2] = Imgproc.contourArea(contours.get(balls[i]));
+                        locations[counted][2] = Imgproc.arcLength(newContours.get(balls[i]),true);
 
                         counted += 1;
                     }
@@ -216,6 +223,13 @@ public class VisionHelper {
 
         Imgproc.findContours(cont, blueContours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
 
+
+        List<MatOfPoint2f> newBlueContours = new ArrayList<>();
+        for(MatOfPoint point : blueContours) {
+            MatOfPoint2f newPoint = new MatOfPoint2f(point.toArray());
+            newBlueContours.add(newPoint);
+        }
+
         if(contours.size() != 0)
         {
             int maxBalls = blueContours.size();
@@ -232,6 +246,7 @@ public class VisionHelper {
             {
                 //TODO: change min and max size for contour Area not length
                 area = Imgproc.contourArea(blueContours.get(i),false);
+                double length = Imgproc.arcLength(newBlueContours.get(i), true);
                 if(area>ballMinSize && area<ballMaxSize)
                 {
                     balls[i] = i;
@@ -248,7 +263,7 @@ public class VisionHelper {
                     //mass center of the object
                     locations[counted][0] = mu.m10 / mu.m00;
                     locations[counted][1] = mu.m01 / mu.m00;
-                    locations[counted][2] = Imgproc.contourArea(blueContours.get(balls[i]));
+                    locations[counted][2] = Imgproc.arcLength(newBlueContours.get(balls[i]),true);
 
                     counted += 1;
                 }
@@ -342,7 +357,7 @@ public class VisionHelper {
     /** Saves camera frame to internal storage */
     public static void saveFrame(Mat img) {
         File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        String filename = "FRAME_thatISaved.png";
+        String filename = "FRAME_" + System.currentTimeMillis() + ".png";
         File file = new File(path, filename);
         filename = file.toString();
         boolean success = Imgcodecs.imwrite(filename, img);
